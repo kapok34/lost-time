@@ -62,12 +62,12 @@ const Index = () => {
               Manifeste
             </a>
             <span className="inline-flex items-center gap-1">
-              <Link to="/connexion" className="link-underline">
-                Connexion
+              <Link to="/login" className="link-underline">
+                Login
               </Link>
               <span aria-hidden="true">/</span>
-              <Link to="/inscription" className="link-underline">
-                Inscription
+              <Link to="/apply" className="link-underline">
+                Apply
               </Link>
             </span>
           </nav>
