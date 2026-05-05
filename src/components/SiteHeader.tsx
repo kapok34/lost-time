@@ -17,7 +17,6 @@ export const SiteHeader = () => {
       <div className="container max-w-6xl flex items-center justify-between py-5">
         <Link to="/" className="font-display text-2xl tracking-tight">lost time</Link>
         <nav className="hidden md:flex items-center gap-8">
-          <NavLink to="/members" className={linkCls}>Members</NavLink>
           {approved && (
             <>
               <NavLink to="/messages" className={linkCls}>Messages</NavLink>
@@ -27,6 +26,7 @@ export const SiteHeader = () => {
           {isAdmin && <NavLink to="/admin" className={linkCls}>Admin</NavLink>}
         </nav>
         <div className="flex items-center gap-3 font-sans">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/members")}>Members</Button>
           {!user && (
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Sign in</Button>
