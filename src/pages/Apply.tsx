@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -107,23 +106,20 @@ const Apply = () => {
         if (signInErr) throw signInErr;
       }
 
-      const { error: profErr } = await supabase.from("profiles").insert({
-        id: uid,
-        display_name: displayName,
-        language,
-        location,
-        status: "pending",
-        questionnaire_language: qLang,
-      });
-      if (profErr) throw profErr;
+      const answersJson = Object.fromEntries(
+        questions.map((q) => [String(q.id), answers[q.id] ?? ""])
+      );
 
-      const rows = questions.map((q) => ({
-        user_id: uid,
-        question_id: q.id,
-        answer: (answers[q.id] ?? "").trim(),
-      }));
-      const { error: ansErr } = await supabase.from("questionnaire_answers").insert(rows);
-      if (ansErr) throw ansErr;
+      const { data: submitData, error: submitErr } = await supabase.rpc("submit_application", {
+        _email: email,
+        _password: password,
+        _display_name: displayName,
+        _language: language,
+        _location: location,
+        _questionnaire_language: qLang,
+        _answers: answersJson,
+      });
+      if (submitErr) throw submitErr;
 
       localStorage.removeItem(STORAGE_KEY);
       toast.success(t("apply.submit"));
@@ -136,11 +132,11 @@ const Apply = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col font-sans-ui">
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-16">
-        <h1 className="font-display text-4xl md:text-5xl text-center mb-3">{t("apply.title")}</h1>
-        <p className="text-center text-muted-foreground italic mb-10">
+        <h1 className="font-sans-ui text-4xl md:text-5xl text-center mb-3">{t("apply.title")}</h1>
+        <p className="text-center text-muted-foreground mb-10">
           {t("apply.subtitle")}
         </p>
 
@@ -150,45 +146,45 @@ const Apply = () => {
             <span className="text-sm font-medium">{filledCount} / {TOTAL_QUESTIONS} {t("apply.answered")}</span>
           </div>
           <Progress value={progress} />
-          <p className="text-xs text-muted-foreground mt-2 italic">{t("apply.draft")}</p>
+          <p className="text-xs text-muted-foreground mt-2">{t("apply.draft")}</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-12">
           <section className="space-y-5">
-            <h2 className="font-display text-2xl border-b border-border pb-2">{t("apply.account")}</h2>
+            <h2 className="font-sans-ui text-2xl border-b border-border pb-2">{t("apply.account")}</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="email">{t("login.email")}</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Label htmlFor="email" className="font-sans-ui">{t("login.email")}</Label>
+                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white border-input" />
               </div>
               <div>
-                <Label htmlFor="password">{t("login.password")}</Label>
-                <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Label htmlFor="password" className="font-sans-ui">{t("login.password")}</Label>
+                <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-white border-input" />
               </div>
             </div>
             <div>
-              <Label htmlFor="display_name">{t("apply.displayName")}</Label>
-              <Input id="display_name" required maxLength={60} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+              <Label htmlFor="display_name" className="font-sans-ui">{t("apply.displayName")}</Label>
+              <Input id="display_name" required maxLength={60} value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="bg-white border-input" />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label>{t("apply.primaryLanguage")}</Label>
+                <Label className="font-sans-ui">{t("apply.primaryLanguage")}</Label>
                 <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger><SelectValue placeholder="Choose a language" /></SelectTrigger>
+                  <SelectTrigger className="bg-white border-input"><SelectValue placeholder="Choose a language" /></SelectTrigger>
                   <SelectContent>
                     {LANGUAGES.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="location">{t("apply.location")}</Label>
-                <Input id="location" placeholder="City, Country" required maxLength={120} value={location} onChange={(e) => setLocation(e.target.value)} />
+                <Label htmlFor="location" className="font-sans-ui">{t("apply.location")}</Label>
+                <Input id="location" placeholder="City, Country" required maxLength={120} value={location} onChange={(e) => setLocation(e.target.value)} className="bg-white border-input" />
               </div>
             </div>
             <div>
-              <Label>{t("apply.questionnaireLanguage")}</Label>
+              <Label className="font-sans-ui">{t("apply.questionnaireLanguage")}</Label>
               <Select value={qLang} onValueChange={(v) => setQLang(v as QuestionnaireLang)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="bg-white border-input"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {QUESTIONNAIRE_LANGS.map((l) => (
                     <SelectItem key={l} value={l}>{QUESTIONNAIRE_LANG_LABELS[l]}</SelectItem>
@@ -199,10 +195,10 @@ const Apply = () => {
           </section>
 
           <section className="space-y-8">
-            <h2 className="font-display text-2xl border-b border-border pb-2">{t("apply.questionnaire")}</h2>
+            <h2 className="font-sans-ui text-2xl border-b border-border pb-2">{t("apply.questionnaire")}</h2>
             {questions.map((q) => (
               <div key={q.id} className="space-y-2">
-                <Label className="font-display text-lg leading-snug">
+                <Label className="font-sans-ui text-lg leading-snug">
                   <span className="text-primary mr-2">{q.id}.</span>{q.text}
                 </Label>
                 <Textarea
@@ -210,15 +206,19 @@ const Apply = () => {
                   maxLength={2000}
                   value={answers[q.id] ?? ""}
                   onChange={(e) => setAnswer(q.id, e.target.value)}
-                  className="font-serif"
+                  className="bg-white border-input"
                 />
               </div>
             ))}
           </section>
 
-          <Button type="submit" size="lg" className="w-full" disabled={submitting}>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full text-sm font-sans-ui bg-[hsl(10,35%,28%)] text-white px-5 py-3 rounded hover:bg-[hsl(10,35%,22%)] transition-colors disabled:opacity-50"
+          >
             {submitting ? t("apply.submitting") : t("apply.submit")}
-          </Button>
+          </button>
         </form>
       </main>
     </div>

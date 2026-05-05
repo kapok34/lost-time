@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/SiteHeader";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,52 +26,46 @@ const Login = () => {
     navigate("/");
   };
 
-  const onGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (result.error) toast.error("Could not sign in with Google");
-    if (!result.redirected && !result.error) navigate("/");
-  };
-
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col font-sans-ui">
       <SiteHeader />
       <main className="flex-1 container max-w-md py-16">
-        <h1 className="font-display text-4xl text-center mb-2">Welcome back</h1>
-        <p className="text-center text-muted-foreground italic mb-10">
-          Sign in to continue your correspondence.
-        </p>
-
-        <Button variant="outline" className="w-full mb-6" onClick={onGoogle}>
-          Continue with Google
-        </Button>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-          <div className="relative flex justify-center text-xs uppercase tracking-widest">
-            <span className="bg-background px-3 text-muted-foreground">or</span>
-          </div>
-        </div>
-
         <form onSubmit={onSubmit} className="space-y-5">
           <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Label htmlFor="email" className="font-sans-ui">{t("login.email")}</Label>
+            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="font-sans-ui bg-white border-input" />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Label htmlFor="password" className="font-sans-ui">{t("login.password")}</Label>
+            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans-ui bg-white border-input" />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in…" : "Sign in"}
-          </Button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full text-sm font-sans-ui bg-[hsl(10,35%,28%)] text-white px-5 py-2 rounded hover:bg-[hsl(10,35%,22%)] transition-colors disabled:opacity-50"
+          >
+            {loading ? t("login.signingIn") : t("login.submit")}
+          </button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-8">
-          Not yet a member?{" "}
-          <Link to="/apply" className="text-primary underline-offset-4 hover:underline">
-            Apply
-          </Link>
-        </p>
+        <div className="text-center mt-6">
+          <button
+            onClick={async () => {
+              if (!email) {
+                toast.error(t("login.forgotPasswordHint"));
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/`,
+              });
+              if (error) toast.error(error.message);
+              else toast.success(t("login.resetSent"));
+            }}
+            className="text-sm font-sans-ui text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t("login.forgotPassword")}
+          </button>
+        </div>
       </main>
     </div>
   );

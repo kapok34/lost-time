@@ -74,11 +74,11 @@ const Settings = () => {
         <section className="space-y-5 mb-12">
           <div>
             <Label>{t("apply.displayName")}</Label>
-            <Input value={displayName} maxLength={60} onChange={(e) => setDisplayName(e.target.value)} />
+            <Input value={displayName} maxLength={60} onChange={(e) => setDisplayName(e.target.value)} className="bg-white border-input" />
           </div>
           <div>
             <Label>Avatar URL</Label>
-            <Input value={avatarUrl} placeholder="https://…" onChange={(e) => setAvatarUrl(e.target.value)} />
+            <Input value={avatarUrl} placeholder="https://…" onChange={(e) => setAvatarUrl(e.target.value)} className="bg-white border-input" />
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
@@ -92,7 +92,7 @@ const Settings = () => {
             </div>
             <div>
               <Label>{t("apply.location")}</Label>
-              <Input value={location} maxLength={120} onChange={(e) => setLocation(e.target.value)} />
+              <Input value={location} maxLength={120} onChange={(e) => setLocation(e.target.value)} className="bg-white border-input" />
             </div>
           </div>
         </section>
@@ -109,6 +109,7 @@ const Settings = () => {
                 maxLength={2000}
                 value={answers[q.id] ?? ""}
                 onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+                className="bg-white border-input"
               />
             </div>
           ))}
