@@ -26,7 +26,7 @@ export const SiteHeader = () => {
           )}
           {isAdmin && <NavLink to="/admin" className={linkCls}>Admin</NavLink>}
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 font-sans">
           {!user && (
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Sign in</Button>
