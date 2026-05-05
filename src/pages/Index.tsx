@@ -33,7 +33,7 @@ const Index = () => {
         <section className="container max-w-4xl pb-24">
           <div className="grid md:grid-cols-3 gap-12">
             {[
-              { n: "I.", title: "No lurking.", body: "Members-only." },
+              { n: "I.", title: "No lurking", body: "Members-only." },
               { n: "II.", title: "No juggling", body: "​Only one active conversation at a time." },
               { n: "III.", title: "No swiping", body: "Once admitted, you may browse other members and hold one private correspondence at a time." },
             ].map((s) => (
