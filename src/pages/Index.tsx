@@ -31,10 +31,6 @@ const Index = () => {
         </section>
 
         <section className="container max-w-4xl pb-24">
-          <div className="text-center ornament mb-16">
-            <span className="font-display italic text-5xl font-sans font-medium text-accent text-left">manifesto</span>
-          </div>
-
           <div className="grid md:grid-cols-3 gap-12">
             {[
               { n: "I.", title: "No lurking.", body: "Members-only." },
