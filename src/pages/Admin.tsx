@@ -163,7 +163,7 @@ const Admin = () => {
                       <AlertDialogTitle>Reject application?</AlertDialogTitle>
                       <AlertDialogDescription>Optionally include a short note.</AlertDialogDescription>
                     </AlertDialogHeader>
-                    <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" />
+                <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" className="bg-white border-input" />
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction onClick={() => reject(openId)}>{t("admin.reject")}</AlertDialogAction>

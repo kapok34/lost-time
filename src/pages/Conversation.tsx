@@ -176,6 +176,7 @@ const Conversation = () => {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) onSend();
               }}
+              className="bg-white border-input"
             />
             <div className="flex justify-between items-center mt-2">
               <p className="text-xs text-muted-foreground italic">⌘/Ctrl + Enter to send</p>

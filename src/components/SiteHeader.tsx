@@ -17,11 +17,11 @@ export const SiteHeader = () => {
   const onLanding = location.pathname === "/";
 
   return (
-    <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-40">
+    <header className="border-b border-border bg-background sticky top-0 z-40">
       <div className="container max-w-6xl flex items-center justify-between py-5">
-        <Link to="/" className={`font-sans-ui text-2xl tracking-tight select-none ${onLanding ? "text-foreground" : ""}`}>
-          <span className={onLanding ? "" : "text-lost"}>lost</span>{" "}
-          <span className={onLanding ? "" : "text-time"}>time</span>
+        <Link to="/" className="font-sans-ui text-2xl tracking-tight select-none text-black">
+          <span>lost</span>{" "}
+          <span>time</span>
         </Link>
 
         {!onLanding && (
@@ -38,7 +38,7 @@ export const SiteHeader = () => {
         )}
 
         <div className="flex items-center gap-3">
-          {onLanding && !user && (
+          {!user && (
             <>
               <button
                 onClick={() => navigate("/login")}

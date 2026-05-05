@@ -61,6 +61,7 @@ const Members = () => {
               placeholder="Filter by location…"
               value={locationQuery}
               onChange={(e) => setLocationQuery(e.target.value)}
+              className="bg-white border-input"
             />
           </div>
           <div className="w-full md:w-64">
