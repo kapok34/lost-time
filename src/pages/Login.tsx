@@ -36,7 +36,6 @@ const Login = () => {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 container max-w-md py-16">
-        <h1 className="font-display text-4xl text-center mb-2">Welcome back</h1>
         <p className="text-center text-muted-foreground italic mb-10">
           Sign in to continue your correspondence.
         </p>
