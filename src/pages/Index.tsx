@@ -13,16 +13,10 @@ const Index = () => {
       <main className="flex-1">
         <section className="container max-w-3xl py-24 md:py-32 text-center">
           <p className="font-sans-ui text-xs tracking-[0.3em] uppercase text-muted-foreground mb-6">
-            A private society · est. 2026
+            AN ASOCIAL NETWORK
           </p>
-          <h1 className="font-display text-5xl md:text-7xl leading-[1.05] mb-8">
-            Acquaintance, by way of <em className="text-primary">questions</em>.
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground italic max-w-2xl mx-auto leading-relaxed">
-            The Salon is a members-only circle for people who would rather know
-            a stranger's idea of happiness than their job title. Joining begins
-            with the Proust Questionnaire — thirty-five questions, in your own hand.
-          </p>
+          <h1 className="font-display text-5xl md:text-7xl leading-[1.05] mb-8">lost time</h1>
+          <p className="text-xl md:text-2xl text-muted-foreground italic max-w-2xl mx-auto leading-relaxed">{"\n"}</p>
 
           <div className="mt-12 flex items-center justify-center gap-4">
             {!user && (
@@ -36,7 +30,7 @@ const Index = () => {
               </>
             )}
             {user && approved && (
-              <Button asChild size="lg"><Link to="/members">Enter the salon</Link></Button>
+              <Button asChild size="lg"><Link to="/members">Enter lost time</Link></Button>
             )}
             {user && !approved && !isAdmin && (
               <Button asChild size="lg"><Link to="/pending">Your application</Link></Button>
@@ -46,12 +40,12 @@ const Index = () => {
 
         <section className="container max-w-4xl pb-24">
           <div className="text-center ornament mb-16">
-            <span className="font-display italic text-2xl">How it works</span>
+            <span className="font-display italic text-2xl">Manifesto</span>
           </div>
 
           <div className="grid md:grid-cols-3 gap-12">
             {[
-              { n: "I.", title: "Answer", body: "Fill out all thirty-five questions in your own voice. Take your time — autosaved as you write." },
+              { n: "I.", title: "No juggling.", body: "Only members can browse." },
               { n: "II.", title: "Await", body: "Each application is read by hand. You will hear back by email when a decision is made." },
               { n: "III.", title: "Converse", body: "Once admitted, you may browse other members and hold one private correspondence at a time." },
             ].map((s) => (
