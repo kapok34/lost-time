@@ -6,6 +6,14 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
+      <div className="w-full text-center py-2">
+        <button
+          onClick={() => window.location.href = "mailto:hello@losttime.social"}
+          className="text-xs font-sans-ui uppercase tracking-widest text-muted-foreground hover:text-[hsl(207,65%,47%)] transition-colors"
+        >
+          contact
+        </button>
+      </div>
       <SiteHeader />
 
       <div className="flex-1 flex flex-col items-center px-6">
