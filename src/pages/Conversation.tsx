@@ -114,7 +114,7 @@ const Conversation = () => {
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-8 flex flex-col" style={{ minHeight: 0 }}>
         <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
-          <Link to={`/members/${other.id}`} className="flex items-center gap-3 group">
+          <Link to={`/members/${other.id}`} className="flex items-center gap-3 group font-sans">
             <Avatar className="h-10 w-10 border border-border">
               <AvatarImage src={other.avatar_url ?? undefined} />
               <AvatarFallback>{other.display_name.charAt(0)}</AvatarFallback>
