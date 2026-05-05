@@ -42,7 +42,6 @@ const Index = () => {
               { n: "III.", title: "No swiping.", body: "Once admitted, you may browse other members and hold one private correspondence at a time." },
             ].map((s) => (
               <div key={s.n}>
-                <div className="font-display text-3xl text-primary mb-3">{s.n}</div>
                 <h3 className="font-display text-2xl mb-3">{s.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{s.body}</p>
               </div>
