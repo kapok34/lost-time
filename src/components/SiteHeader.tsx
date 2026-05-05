@@ -48,7 +48,7 @@ export const SiteHeader = () => {
               </button>
               <button
                 onClick={() => navigate("/apply")}
-                className="text-sm font-sans-ui bg-[hsl(10,35%,28%)] text-white px-5 py-2 rounded hover:bg-[hsl(10,35%,22%)] transition-colors"
+                className="text-sm font-sans-ui bg-[hsl(207,65%,47%)] text-white px-4 py-1.5 rounded hover:bg-[hsl(207,65%,42%)] transition-colors"
               >
                 {t("apply")}
               </button>

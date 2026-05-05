@@ -215,7 +215,7 @@ const Apply = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full text-sm font-sans-ui bg-[hsl(10,35%,28%)] text-white px-5 py-3 rounded hover:bg-[hsl(10,35%,22%)] transition-colors disabled:opacity-50"
+            className="w-full text-sm font-sans-ui bg-[hsl(207,65%,47%)] text-white px-4 py-2 rounded hover:bg-[hsl(207,65%,42%)] transition-colors disabled:opacity-50"
           >
             {submitting ? t("apply.submitting") : t("apply.submit")}
           </button>
