@@ -15,7 +15,7 @@ export const SiteHeader = () => {
   return (
     <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-40">
       <div className="container max-w-6xl flex items-center justify-between py-5">
-        <Link to="/" className="font-display text-2xl tracking-tight">lost time</Link>
+        <Link to="/" className="font-display text-2xl tracking-tight font-sans">lost time</Link>
         <nav className="hidden md:flex items-center gap-8">
           {approved && (
             <>
