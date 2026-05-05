@@ -6,16 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LANGUAGES, PROUST_QUESTIONS } from "@/data/questions";
+import { LANGUAGES, getQuestions, type QuestionnaireLang } from "@/data/questions";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
 
 const Settings = () => {
   const { user, profile, refreshProfile } = useAuth();
+  const { t } = useI18n();
   const [displayName, setDisplayName] = useState("");
   const [language, setLanguage] = useState("");
   const [location, setLocation] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [qLang, setQLang] = useState<QuestionnaireLang>("en");
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [saving, setSaving] = useState(false);
 
@@ -25,6 +28,7 @@ const Settings = () => {
     setLanguage(profile.language);
     setLocation(profile.location);
     setAvatarUrl(profile.avatar_url ?? "");
+    setQLang((profile as any).questionnaire_language ?? "en");
     supabase.from("questionnaire_answers").select("question_id, answer").eq("user_id", user.id).then(({ data }) => {
       const map: Record<number, string> = {};
       (data ?? []).forEach((a: any) => (map[a.question_id] = a.answer));
@@ -42,7 +46,7 @@ const Settings = () => {
         .eq("id", user.id);
       if (pErr) throw pErr;
 
-      const rows = PROUST_QUESTIONS.map((q) => ({
+      const rows = getQuestions(qLang).map((q) => ({
         user_id: user.id,
         question_id: q.id,
         answer: (answers[q.id] ?? "").trim(),
@@ -65,11 +69,11 @@ const Settings = () => {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-12">
-        <h1 className="font-display text-4xl mb-10">Your profile</h1>
+        <h1 className="font-display text-4xl mb-10">{t("settings.title")}</h1>
 
         <section className="space-y-5 mb-12">
           <div>
-            <Label>Display name</Label>
+            <Label>{t("apply.displayName")}</Label>
             <Input value={displayName} maxLength={60} onChange={(e) => setDisplayName(e.target.value)} />
           </div>
           <div>
@@ -78,7 +82,7 @@ const Settings = () => {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <Label>Language</Label>
+              <Label>{t("apply.primaryLanguage")}</Label>
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -87,15 +91,15 @@ const Settings = () => {
               </Select>
             </div>
             <div>
-              <Label>Location</Label>
+              <Label>{t("apply.location")}</Label>
               <Input value={location} maxLength={120} onChange={(e) => setLocation(e.target.value)} />
             </div>
           </div>
         </section>
 
-        <h2 className="font-display text-2xl mb-6 border-b border-border pb-2">Your answers</h2>
+        <h2 className="font-display text-2xl mb-6 border-b border-border pb-2">{t("profile.questionnaire")}</h2>
         <div className="space-y-8 mb-10">
-          {PROUST_QUESTIONS.map((q) => (
+          {getQuestions(qLang).map((q) => (
             <div key={q.id}>
               <Label className="font-display text-lg">
                 <span className="text-primary mr-2">{q.id}.</span>{q.text}
@@ -111,7 +115,7 @@ const Settings = () => {
         </div>
 
         <Button onClick={onSave} disabled={saving} className="w-full" size="lg">
-          {saving ? "Saving…" : "Save changes"}
+          {saving ? "Saving…" : "Save"}
         </Button>
       </main>
     </div>

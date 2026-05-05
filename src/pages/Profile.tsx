@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { PROUST_QUESTIONS } from "@/data/questions";
+import { getQuestions, type QuestionnaireLang } from "@/data/questions";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -15,12 +16,14 @@ interface ProfileFull {
   avatar_url: string | null;
   language: string;
   location: string;
+  questionnaire_language: QuestionnaireLang | null;
 }
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useI18n();
   const [profile, setProfile] = useState<ProfileFull | null>(null);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [hasActive, setHasActive] = useState(false);
@@ -31,7 +34,7 @@ const Profile = () => {
     if (!id) return;
     (async () => {
       const [{ data: prof }, { data: ans }, { data: convs }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, avatar_url, language, location").eq("id", id).maybeSingle(),
+        supabase.from("profiles").select("id, display_name, avatar_url, language, location, questionnaire_language").eq("id", id).maybeSingle(),
         supabase.from("questionnaire_answers").select("question_id, answer").eq("user_id", id),
         supabase.from("conversations").select("id, member_a, member_b").eq("status", "active"),
       ]);
@@ -51,6 +54,11 @@ const Profile = () => {
 
   const isMe = user?.id === id;
   const canMessage = !isMe && (!hasActive || activeWith === id);
+
+  const questions = useMemo(
+    () => getQuestions(profile?.questionnaire_language ?? "en"),
+    [profile?.questionnaire_language]
+  );
 
   const onMessage = async () => {
     if (!id) return;
@@ -95,43 +103,45 @@ const Profile = () => {
             <AvatarImage src={profile.avatar_url ?? undefined} />
             <AvatarFallback className="font-display text-3xl">{profile.display_name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <h1 className="font-display text-5xl mb-2">{profile.display_name}</h1>
+        <h1 className="font-display text-5xl mb-2">{profile.display_name}</h1>
           <p className="text-muted-foreground italic mb-6">{profile.location} · {profile.language}</p>
           {!isMe && (
             canMessage ? (
               <Button onClick={onMessage} disabled={starting}>
-                {hasActive && activeWith === id ? "Open conversation" : "Begin a correspondence"}
+                {hasActive && activeWith === id ? t("profile.openConversation") : t("profile.beginCorrespondence")}
               </Button>
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span tabIndex={0}>
-                    <Button disabled>Begin a correspondence</Button>
+                    <Button disabled>{t("profile.beginCorrespondence")}</Button>
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="max-w-xs">End your current conversation in <Link to="/messages" className="underline">Messages</Link> to write to someone new.</p>
+                  <p className="max-w-xs" dangerouslySetInnerHTML={{
+                    __html: t("profile.endCurrent").replace(/Messages/, '<Link to="/messages" class="underline">Messages</Link>')
+                  }} />
                 </TooltipContent>
               </Tooltip>
             )
           )}
           {isMe && (
-            <Button asChild variant="outline"><Link to="/settings">Edit your answers</Link></Button>
+            <Button asChild variant="outline"><Link to="/settings">{t("profile.edit")}</Link></Button>
           )}
         </div>
 
         <div className="ornament text-center mb-12">
-          <span className="font-display italic text-xl">The Questionnaire</span>
+          <span className="font-display italic text-xl">{t("profile.questionnaire")}</span>
         </div>
 
         <div className="space-y-10">
-          {PROUST_QUESTIONS.map((q) => (
+          {questions.map((q) => (
             <div key={q.id}>
               <h3 className="font-display text-xl mb-2">
                 <span className="text-primary mr-2">{q.id}.</span>{q.text}
               </h3>
               <p className="text-lg leading-relaxed whitespace-pre-wrap text-foreground/90">
-                {answers[q.id] || <span className="text-muted-foreground italic">— no answer —</span>}
+                {answers[q.id] || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
               </p>
             </div>
           ))}

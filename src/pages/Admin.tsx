@@ -4,7 +4,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { PROUST_QUESTIONS } from "@/data/questions";
+import { getQuestions, type QuestionnaireLang } from "@/data/questions";
+import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -19,9 +20,11 @@ interface Profile {
   status: string;
   created_at: string;
   rejection_reason?: string | null;
+  questionnaire_language?: QuestionnaireLang | null;
 }
 
 const Admin = () => {
+  const { t } = useI18n();
   const [pending, setPending] = useState<Profile[]>([]);
   const [members, setMembers] = useState<Profile[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -76,17 +79,17 @@ const Admin = () => {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 container max-w-5xl py-12">
-        <h1 className="font-display text-4xl mb-8">Admin</h1>
+        <h1 className="font-display text-4xl mb-8">{t("admin.title")}</h1>
 
         <Tabs defaultValue="pending">
           <TabsList>
-            <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
+            <TabsTrigger value="pending">{t("admin.pendingApplications")} ({pending.length})</TabsTrigger>
             <TabsTrigger value="members">Members ({members.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending" className="mt-8">
             {pending.length === 0 ? (
-              <p className="text-muted-foreground italic">No pending applications.</p>
+              <p className="text-muted-foreground italic">{t("admin.noPending")}</p>
             ) : (
               <ul className="space-y-3">
                 {pending.map((p) => (
@@ -137,23 +140,23 @@ const Admin = () => {
               </div>
 
               <div className="space-y-8 mb-12">
-                {PROUST_QUESTIONS.map((q) => (
+                {getQuestions((pending.find((p) => p.id === openId)?.questionnaire_language) ?? "en").map((q) => (
                   <div key={q.id}>
                     <h3 className="font-display text-lg mb-1">
                       <span className="text-primary mr-2">{q.id}.</span>{q.text}
                     </h3>
                     <p className="leading-relaxed whitespace-pre-wrap">
-                      {answers[q.id] || <span className="text-muted-foreground italic">— no answer —</span>}
+                      {answers[q.id] || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
                     </p>
                   </div>
                 ))}
               </div>
 
               <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
-                <Button className="flex-1" onClick={() => approve(openId)}>Approve</Button>
+                <Button className="flex-1" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="flex-1">Reject</Button>
+                    <Button variant="destructive" className="flex-1">{t("admin.reject")}</Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -163,7 +166,7 @@ const Admin = () => {
                     <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" />
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => reject(openId)}>Reject</AlertDialogAction>
+                      <AlertDialogAction onClick={() => reject(openId)}>{t("admin.reject")}</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
