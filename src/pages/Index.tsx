@@ -18,24 +18,16 @@ const Index = () => {
           <h1 className="font-display md:text-7xl leading-[1.05] mb-8 font-sans font-semibold text-8xl">lost time</h1>
           <p className="text-xl md:text-2xl text-muted-foreground italic max-w-2xl mx-auto leading-relaxed">{"\n"}</p>
 
-          <div className="mt-12 flex items-center justify-center gap-4">
-            {!user && (
-              <>
-                <Button asChild size="lg">
-                  <Link to="/apply">Apply for membership</Link>
-                </Button>
-                <Button asChild variant="ghost" size="lg">
-                  <Link to="/login">Sign in</Link>
-                </Button>
-              </>
-            )}
-            {user && approved && (
-              <Button asChild size="lg"><Link to="/members">Enter lost time</Link></Button>
-            )}
-            {user && !approved && !isAdmin && (
-              <Button asChild size="lg"><Link to="/pending">Your application</Link></Button>
-            )}
-          </div>
+          {user && (
+            <div className="mt-12 flex items-center justify-center gap-4">
+              {approved && (
+                <Button asChild size="lg"><Link to="/members">Enter lost time</Link></Button>
+              )}
+              {!approved && !isAdmin && (
+                <Button asChild size="lg"><Link to="/pending">Your application</Link></Button>
+              )}
+            </div>
+          )}
         </section>
 
         <section className="container max-w-4xl pb-24">
