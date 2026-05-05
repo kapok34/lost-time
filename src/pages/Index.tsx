@@ -38,12 +38,12 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-12">
             {[
               { n: "I.", title: "No lurking.", body: "Only members can browse." },
-              { n: "II.", title: "Await", body: "​Lost time is genderless. You have to be open to connecting with anyone." },
+              { n: "II.", title: "No lurking", body: "​Only one active conversation at a time." },
               { n: "III.", title: "No swiping.", body: "Once admitted, you may browse other members and hold one private correspondence at a time." },
             ].map((s) => (
               <div key={s.n}>
                 <h3 className="font-display text-2xl mb-3 font-sans">{s.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{s.body}</p>
+                <p className="text-muted-foreground leading-relaxed font-sans">{s.body}</p>
               </div>
             ))}
           </div>
