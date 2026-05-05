@@ -59,7 +59,9 @@ const Index = () => {
         </section>
       </main>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground" />
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+        <p className="italic">​</p>
+      </footer>
     </div>
   );
 };
