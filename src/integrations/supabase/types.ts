@@ -195,6 +195,7 @@ export type Database = {
     }
     Functions: {
       archive_conversation: { Args: { _conv_id: string }; Returns: undefined }
+      get_member_stats: { Args: never; Returns: Json }
       has_active_conversation: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {

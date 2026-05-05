@@ -17,9 +17,9 @@ export const SiteHeader = () => {
       <div className="container max-w-6xl flex items-center justify-between py-5">
         <Link to="/" className="font-display text-2xl tracking-tight">lost time</Link>
         <nav className="hidden md:flex items-center gap-8">
+          <NavLink to="/members" className={linkCls}>Members</NavLink>
           {approved && (
             <>
-              <NavLink to="/members" className={linkCls}>Members</NavLink>
               <NavLink to="/messages" className={linkCls}>Messages</NavLink>
               <NavLink to="/settings" className={linkCls}>Profile</NavLink>
             </>

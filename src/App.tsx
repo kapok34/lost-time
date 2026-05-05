@@ -31,7 +31,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/apply" element={<Apply />} />
             <Route path="/pending" element={<RequireAuth><Pending /></RequireAuth>} />
-            <Route path="/members" element={<RequireAuth requireApproved><Members /></RequireAuth>} />
+            <Route path="/members" element={<Members />} />
             <Route path="/members/:id" element={<RequireAuth requireApproved><Profile /></RequireAuth>} />
             <Route path="/settings" element={<RequireAuth requireApproved><Settings /></RequireAuth>} />
             <Route path="/messages" element={<RequireAuth requireApproved><Messages /></RequireAuth>} />
