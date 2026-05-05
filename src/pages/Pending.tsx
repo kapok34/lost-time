@@ -25,9 +25,7 @@ const Pending = () => {
         {profile.status === "rejected" && (
           <>
             <h1 className="font-display text-4xl mb-6">Application not accepted</h1>
-            <p className="text-muted-foreground italic text-lg">
-              The Salon could not extend membership at this time.
-            </p>
+            <p className="text-muted-foreground italic text-lg">lost time could not extend membership at this time.</p>
             {profile && (profile as any).rejection_reason && (
               <p className="mt-6 italic">"{(profile as any).rejection_reason}"</p>
             )}
@@ -36,9 +34,7 @@ const Pending = () => {
         {profile.status === "suspended" && (
           <>
             <h1 className="font-display text-4xl mb-6">Membership suspended</h1>
-            <p className="text-muted-foreground italic text-lg">
-              Please contact the salonnier.
-            </p>
+            <p className="text-muted-foreground italic text-lg">Please contact lost time.</p>
           </>
         )}
       </main>
