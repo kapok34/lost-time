@@ -1,8 +1,10 @@
 import { Navigate } from "react-router-dom";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/i18n/context";
 
 const Pending = () => {
+  const { t } = useI18n();
   const { profile, isAdmin, loading } = useAuth();
   if (loading) return null;
   if (!profile) return <Navigate to="/" replace />;
@@ -14,19 +16,17 @@ const Pending = () => {
       <main className="flex-1 container max-w-xl py-24 text-center">
         {profile.status === "pending" && (
           <>
-            <h1 className="font-display text-4xl mb-6">Your application is under review</h1>
+            <h1 className="font-display text-4xl mb-6">{t("pending.title")}</h1>
             <p className="text-muted-foreground italic text-lg leading-relaxed">
-              Thank you, {profile.display_name}. Each application is read by hand,
-              so it may take a few days. You will receive an email when a decision
-              has been made.
+              {t("pending.subtitle")}
             </p>
           </>
         )}
         {profile.status === "rejected" && (
           <>
-            <h1 className="font-display text-4xl mb-6">Application not accepted</h1>
+            <h1 className="font-display text-4xl mb-6">{t("pending.title")}</h1>
             <p className="text-muted-foreground italic text-lg">
-              The Salon could not extend membership at this time.
+              {t("pending.subtitle")}
             </p>
             {profile && (profile as any).rejection_reason && (
               <p className="mt-6 italic">"{(profile as any).rejection_reason}"</p>
@@ -35,9 +35,9 @@ const Pending = () => {
         )}
         {profile.status === "suspended" && (
           <>
-            <h1 className="font-display text-4xl mb-6">Membership suspended</h1>
+            <h1 className="font-display text-4xl mb-6">{t("pending.title")}</h1>
             <p className="text-muted-foreground italic text-lg">
-              Please contact the salonnier.
+              {t("pending.status")}
             </p>
           </>
         )}

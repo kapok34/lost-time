@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { PROUST_QUESTIONS, LANGUAGES, TOTAL_QUESTIONS } from "@/data/questions";
+import { getQuestions, LANGUAGES, TOTAL_QUESTIONS, type QuestionnaireLang, QUESTIONNAIRE_LANGS, QUESTIONNAIRE_LANG_LABELS } from "@/data/questions";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "salon.apply.draft.v1";
@@ -28,12 +29,14 @@ interface DraftAnswers { [id: number]: string }
 const Apply = () => {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
+  const { t } = useI18n();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [language, setLanguage] = useState("");
   const [location, setLocation] = useState("");
+  const [qLang, setQLang] = useState<QuestionnaireLang>("en");
   const [answers, setAnswers] = useState<DraftAnswers>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,6 +50,7 @@ const Apply = () => {
         setDisplayName(d.display_name ?? "");
         setLanguage(d.language ?? "");
         setLocation(d.location ?? "");
+        setQLang((d.q_lang as QuestionnaireLang) ?? "en");
         setAnswers(d.answers ?? {});
       } catch {}
     }
@@ -54,8 +58,8 @@ const Apply = () => {
 
   // Persist draft (without password)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ email, display_name: displayName, language, location, answers }));
-  }, [email, displayName, language, location, answers]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ email, display_name: displayName, language, location, q_lang: qLang, answers }));
+  }, [email, displayName, language, location, qLang, answers]);
 
   // If user is already signed in & has a profile, send them home
   useEffect(() => {
@@ -64,9 +68,11 @@ const Apply = () => {
     }
   }, [loading, user, profile, navigate]);
 
+  const questions = useMemo(() => getQuestions(qLang), [qLang]);
+
   const filledCount = useMemo(
-    () => PROUST_QUESTIONS.filter((q) => (answers[q.id] ?? "").trim().length > 0).length,
-    [answers]
+    () => questions.filter((q) => (answers[q.id] ?? "").trim().length > 0).length,
+    [answers, questions]
   );
   const progress = Math.round((filledCount / TOTAL_QUESTIONS) * 100);
 
@@ -80,7 +86,7 @@ const Apply = () => {
       return;
     }
     if (filledCount < TOTAL_QUESTIONS) {
-      toast.error(`Please answer all ${TOTAL_QUESTIONS} questions before submitting.`);
+      toast.error(t("apply.error.allQuestions"));
       return;
     }
 
@@ -107,10 +113,11 @@ const Apply = () => {
         language,
         location,
         status: "pending",
+        questionnaire_language: qLang,
       });
       if (profErr) throw profErr;
 
-      const rows = PROUST_QUESTIONS.map((q) => ({
+      const rows = questions.map((q) => ({
         user_id: uid,
         question_id: q.id,
         answer: (answers[q.id] ?? "").trim(),
@@ -119,7 +126,7 @@ const Apply = () => {
       if (ansErr) throw ansErr;
 
       localStorage.removeItem(STORAGE_KEY);
-      toast.success("Application submitted");
+      toast.success(t("apply.submit"));
       navigate("/pending");
     } catch (err: any) {
       toast.error(err.message ?? "Something went wrong");
@@ -132,40 +139,40 @@ const Apply = () => {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-16">
-        <h1 className="font-display text-4xl md:text-5xl text-center mb-3">Apply for membership</h1>
+        <h1 className="font-display text-4xl md:text-5xl text-center mb-3">{t("apply.title")}</h1>
         <p className="text-center text-muted-foreground italic mb-10">
-          Please answer in your own voice. There are no right answers — only true ones.
+          {t("apply.subtitle")}
         </p>
 
         <div className="sticky top-20 z-30 bg-background/90 backdrop-blur-sm border border-border rounded-md p-4 mb-10">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">Progress</span>
-            <span className="text-sm font-medium">{filledCount} / {TOTAL_QUESTIONS} answered</span>
+            <span className="text-sm text-muted-foreground">{t("apply.progress")}</span>
+            <span className="text-sm font-medium">{filledCount} / {TOTAL_QUESTIONS} {t("apply.answered")}</span>
           </div>
           <Progress value={progress} />
-          <p className="text-xs text-muted-foreground mt-2 italic">Your draft saves automatically.</p>
+          <p className="text-xs text-muted-foreground mt-2 italic">{t("apply.draft")}</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-12">
           <section className="space-y-5">
-            <h2 className="font-display text-2xl border-b border-border pb-2">Your account</h2>
+            <h2 className="font-display text-2xl border-b border-border pb-2">{t("apply.account")}</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("login.email")}</Label>
                 <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("login.password")}</Label>
                 <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
             </div>
             <div>
-              <Label htmlFor="display_name">Display name</Label>
+              <Label htmlFor="display_name">{t("apply.displayName")}</Label>
               <Input id="display_name" required maxLength={60} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label>Primary language</Label>
+                <Label>{t("apply.primaryLanguage")}</Label>
                 <Select value={language} onValueChange={setLanguage}>
                   <SelectTrigger><SelectValue placeholder="Choose a language" /></SelectTrigger>
                   <SelectContent>
@@ -174,15 +181,26 @@ const Apply = () => {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="location">Location</Label>
+                <Label htmlFor="location">{t("apply.location")}</Label>
                 <Input id="location" placeholder="City, Country" required maxLength={120} value={location} onChange={(e) => setLocation(e.target.value)} />
               </div>
+            </div>
+            <div>
+              <Label>{t("apply.questionnaireLanguage")}</Label>
+              <Select value={qLang} onValueChange={(v) => setQLang(v as QuestionnaireLang)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {QUESTIONNAIRE_LANGS.map((l) => (
+                    <SelectItem key={l} value={l}>{QUESTIONNAIRE_LANG_LABELS[l]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </section>
 
           <section className="space-y-8">
-            <h2 className="font-display text-2xl border-b border-border pb-2">The questionnaire</h2>
-            {PROUST_QUESTIONS.map((q) => (
+            <h2 className="font-display text-2xl border-b border-border pb-2">{t("apply.questionnaire")}</h2>
+            {questions.map((q) => (
               <div key={q.id} className="space-y-2">
                 <Label className="font-display text-lg leading-snug">
                   <span className="text-primary mr-2">{q.id}.</span>{q.text}
@@ -199,7 +217,7 @@ const Apply = () => {
           </section>
 
           <Button type="submit" size="lg" className="w-full" disabled={submitting}>
-            {submitting ? "Submitting…" : "Submit application"}
+            {submitting ? t("apply.submitting") : t("apply.submit")}
           </Button>
         </form>
       </main>
