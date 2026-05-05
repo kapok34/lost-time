@@ -39,7 +39,7 @@ const Index = () => {
             {[
               { n: "I.", title: "No lurking.", body: "Members-only." },
               { n: "II.", title: "No juggling", body: "​Only one active conversation at a time." },
-              { n: "III.", title: "No swiping.", body: "Once admitted, you may browse other members and hold one private correspondence at a time." },
+              { n: "III.", title: "No swiping", body: "Once admitted, you may browse other members and hold one private correspondence at a time." },
             ].map((s) => (
               <div key={s.n}>
                 <h3 className="font-display text-2xl mb-3 font-sans">{s.title}</h3>
