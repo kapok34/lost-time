@@ -12,21 +12,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
 
-    <!-- SPA redirect for GitHub Pages -->
-    <script>
-      (function() {
-        var redirect = sessionStorage.redirect;
-        delete sessionStorage.redirect;
-        if (redirect && redirect !== location.href) {
-          var base = location.origin + '/lost-time';
-          var target = redirect.replace(base, '');
-          if (target && target !== '/') {
-            history.replaceState(null, null, target);
-          }
-        }
-      })();
-    </script>
-
     <meta property="og:title" content="lost time — an asocial network" />
     <meta property="og:description" content="A private, members-only society of curious people exchanging answers to the Proust Questionnaire." />
     <meta property="og:type" content="website" />
