@@ -40,30 +40,15 @@ const Conversation = () => {
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const isDemo = !id || id.startsWith("demo-");
 
-  const demoUserId = "demo-user";
-  const demoConv: Conv = { id: id ?? "", member_a: demoUserId, member_b: "demo-2", status: "active" };
-  const demoOther = { id: "demo-2", member_number: 2 };
-  const demoMessages: Message[] = [
-    { id: "m1", conversation_id: id ?? "", sender_id: "demo-2", body: "Hello! I came across your profile and noticed we share a love for quiet mornings.", created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
-    { id: "m2", conversation_id: id ?? "", sender_id: demoUserId, body: "What a lovely thing to notice. I do treasure those early hours before the world wakes.", created_at: new Date(Date.now() - 86400000).toISOString() },
-    { id: "m3", conversation_id: id ?? "", sender_id: "demo-2", body: "Do you have a particular ritual? Mine is making coffee and watching the light change through the kitchen window.", created_at: new Date(Date.now() - 3600000 * 6).toISOString() },
-  ];
-
-  const effectiveConv = isDemo ? demoConv : conv;
-  const effectiveOther = isDemo ? demoOther : other;
-  const effectiveMessages = isDemo ? demoMessages : messages;
-
-  const myCount = effectiveMessages.filter((m) => m.sender_id === (isDemo ? demoUserId : user?.id)).length;
+  const myCount = messages.filter((m) => m.sender_id === user?.id).length;
   const atLimit = myCount >= 10;
-  const isInitialMessage = effectiveMessages.length === 0;
+  const isInitialMessage = messages.length === 0;
   const minLength = isInitialMessage ? 34 : 5;
   const bodyValid = body.trim().length >= minLength;
   const remaining = 10 - myCount;
 
   useEffect(() => {
-    if (isDemo) return;
     if (!id || !user) { navigate("/login"); return; }
     (async () => {
       const { data: c } = await supabase.from("conversations").select("*").eq("id", id).maybeSingle();
@@ -123,7 +108,7 @@ const Conversation = () => {
     navigate("/messages");
   };
 
-  if (!isDemo && (!user || (!conv || !other))) {
+  if (!user || !conv || !other) {
     return (
       <div className="min-h-screen flex flex-col">
         <SiteHeader />
@@ -133,20 +118,20 @@ const Conversation = () => {
     );
   }
 
-  const lastMessage = effectiveMessages.length > 0 ? effectiveMessages[effectiveMessages.length - 1] : null;
+  const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
   const daysSinceLastMessage = lastMessage ? (Date.now() - new Date(lastMessage.created_at).getTime()) / (1000 * 60 * 60 * 24) : null;
-  const canEnd = effectiveMessages.some((m) => m.sender_id === (isDemo ? demoUserId : user?.id)) && effectiveMessages.some((m) => m.sender_id === effectiveOther!.id);
-  const canEndDueToInactivity = lastMessage?.sender_id === (isDemo ? demoUserId : user?.id) && daysSinceLastMessage !== null && daysSinceLastMessage > 7;
+  const canEnd = messages.some((m) => m.sender_id === user?.id) && messages.some((m) => m.sender_id === other!.id);
+  const canEndDueToInactivity = lastMessage?.sender_id === user?.id && daysSinceLastMessage !== null && daysSinceLastMessage > 7;
 
-  const archived = effectiveConv!.status === "archived";
+  const archived = conv?.status === "archived";
 
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-8 flex flex-col" style={{ minHeight: 0 }}>
         <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
-          <Link to={`/members/${effectiveOther!.id}`} className="font-sans-ui text-4xl font-bold hover:text-[hsl(350,55%,35%)] transition-colors">
-            {effectiveOther!.member_number ?? "—"}
+          <Link to={`/members/${other.id}`} className="font-sans-ui text-4xl font-bold hover:text-[hsl(350,55%,35%)] transition-colors">
+            {other.member_number ?? "—"}
           </Link>
           {archived ? (
             <p className="text-base text-muted-foreground italic">{t("conversation.ended")}</p>
@@ -171,16 +156,16 @@ const Conversation = () => {
           ) : null}
         </div>
         <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 py-4 min-h-[40vh] max-h-[60vh]">
-          {effectiveMessages.length === 0 ? (
+          {messages.length === 0 ? (
             <p className="text-center text-muted-foreground italic mt-12">{t("conversation.noMessages")}</p>
           ) : (
-            effectiveMessages.map((m) => {
-              const mine = isDemo ? m.sender_id === demoUserId : m.sender_id === user?.id;
-              const num = mine ? (isDemo ? 1 : (profile?.member_number ?? "—")) : (effectiveOther!.member_number ?? "—");
+            messages.map((m) => {
+              const mine = m.sender_id === user?.id;
+              const num = mine ? (profile?.member_number ?? "—") : (other.member_number ?? "—");
               return (
                 <div key={m.id} className={`flex items-end gap-3 ${mine ? "justify-end" : "justify-start"}`}>
                   {!mine && (
-                    <Link to={`/members/${effectiveOther!.id}`} className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-card flex items-center justify-center text-base font-bold font-sans-ui hover:border-foreground transition-colors">
+                    <Link to={`/members/${other.id}`} className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-card flex items-center justify-center text-base font-bold font-sans-ui hover:border-foreground transition-colors">
                       {num}
                     </Link>
                   )}
@@ -221,7 +206,7 @@ const Conversation = () => {
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-base text-muted-foreground font-sans-ui">{remaining} {t("conversation.messagesLeft")}</span>
                   {!bodyValid && body.length > 0 && (
-                    <span className="text-base text-destructive font-sans-ui">{effectiveMessages.length === 0 ? t("conversation.initialMinLength") : t("conversation.minLength")}</span>
+                    <span className="text-base text-destructive font-sans-ui">{messages.length === 0 ? t("conversation.initialMinLength") : t("conversation.minLength")}</span>
                   )}
                 </div>
                 <div className="flex justify-center mt-3">
