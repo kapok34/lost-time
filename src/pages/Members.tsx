@@ -18,11 +18,13 @@ interface Member {
   display_name: string;
   member_number: number | null;
   location: string;
+  questionnaire_languages: string[] | null;
 }
 
 const DEMO_MEMBERS: Member[] = [
-  { id: "demo-1", display_name: "Member One", member_number: 1, location: "Paris, France" },
-  { id: "demo-2", display_name: "Member Two", member_number: 2, location: "Kyoto, Japan" },
+  { id: "demo-1", display_name: "Member One", member_number: 1, location: "Paris, France", questionnaire_languages: ["en", "fr", "it"] },
+  { id: "demo-2", display_name: "Member Two", member_number: 2, location: "Kyoto, Japan", questionnaire_languages: ["fr", "it"] },
+  { id: "demo-3", display_name: "Member Three", member_number: 3, location: "Rome, Italy", questionnaire_languages: ["it"] },
 ];
 
 const Members = () => {
@@ -38,14 +40,14 @@ const Members = () => {
     (async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, member_number, location")
+        .select("id, display_name, member_number, location, questionnaire_languages")
         .order("member_number", { ascending: true });
       if (error) {
         console.warn("Members fetch error:", error.message);
       }
       const fetched = (data as Member[]) ?? [];
       // Fallback to demo members when database is empty or unreachable
-      setMembers(fetched.length > 0 ? fetched : DEMO_MEMBERS);
+      setMembers([...fetched, ...DEMO_MEMBERS]);
       setLoading(false);
     })();
   }, []);
@@ -101,24 +103,24 @@ const Members = () => {
       <main className="flex-1 container max-w-6xl py-12">
         <div className="flex justify-end gap-3 mb-8">
           <Select value={countryFilter} onValueChange={(v) => { setCountryFilter(v); setCityFilter("all"); }}>
-            <SelectTrigger className="w-40 bg-white border-input">
-              <SelectValue placeholder="country" />
+            <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
+              <SelectValue placeholder={t("members.filterCountry")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">all countries</SelectItem>
+              <SelectItem value="all" className="font-sans-ui">{t("members.allCountries")}</SelectItem>
               {countries.map((c) => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
+                <SelectItem key={c} value={c} className="font-sans-ui">{c}</SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={cityFilter} onValueChange={setCityFilter}>
-            <SelectTrigger className="w-40 bg-white border-input">
-              <SelectValue placeholder="city" />
+            <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
+              <SelectValue placeholder={t("members.filterCity")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">all cities</SelectItem>
+              <SelectItem value="all" className="font-sans-ui">{t("members.allCities")}</SelectItem>
               {(citiesByCountry[countryFilter] ?? []).map((c) => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
+                <SelectItem key={c} value={c} className="font-sans-ui">{c}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -136,10 +138,15 @@ const Members = () => {
                 <Link
                   to={`/members/${m.id}`}
                   key={m.id}
-                  className={`flex flex-col items-center justify-center aspect-square border border-border bg-card transition-colors hover:border-foreground ${contacted ? "opacity-40" : ""}`}
+                  className={`flex flex-col items-center justify-center aspect-square border border-border bg-card transition-colors hover:border-[hsl(350,55%,35%)] ${contacted ? "opacity-40" : ""}`}
                 >
                   <span className="text-4xl font-bold font-sans-ui">{m.member_number ?? m.display_name}</span>
-                  <span className="text-base text-muted-foreground mt-2">{m.location}</span>
+                  <span className="text-base text-muted-foreground mt-1">{m.location}</span>
+                  {m.questionnaire_languages && m.questionnaire_languages.length > 0 && (
+                    <span className="text-xs text-muted-foreground mt-1 tracking-wider">
+                      {m.questionnaire_languages.map((l) => l.toUpperCase()).join(" / ")}
+                    </span>
+                  )}
                 </Link>
               );
             })}

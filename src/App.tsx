@@ -36,7 +36,8 @@ const App = () => (
             <Route path="/members" element={<Members />} />
             <Route path="/members/:id" element={<Profile />} />
             <Route path="/settings" element={<RequireAuth requireApproved><Settings /></RequireAuth>} />
-            <Route path="/messages" element={<RequireAuth requireApproved><Messages /></RequireAuth>} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/messages-demo" element={<Messages />} />
             <Route path="/messages/:id" element={<Conversation />} />
             <Route path="/admin" element={<RequireAuth requireAdmin><Admin /></RequireAuth>} />
             <Route path="*" element={<NotFound />} />

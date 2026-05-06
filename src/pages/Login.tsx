@@ -30,7 +30,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans-ui">
       <SiteHeader />
-      <main className="flex-1 container max-w-md py-16">
+      <main className="flex-1 container max-w-md flex flex-col justify-center py-16">
         <form onSubmit={onSubmit} className="space-y-5">
           <div>
             <Label htmlFor="email" className="font-sans-ui">{t("login.email")}</Label>
@@ -46,7 +46,7 @@ const Login = () => {
               disabled={loading}
               className="text-base font-sans-ui bg-[hsl(350,55%,35%)] text-white px-8 py-1.5 rounded hover:bg-[hsl(350,55%,30%)] transition-colors disabled:opacity-50"
             >
-              {loading ? t("login.signingIn") : t("login.submit")}
+              {t("login.submit")}
             </button>
           </div>
         </form>
