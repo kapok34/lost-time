@@ -11,6 +11,7 @@ interface ProfileLite {
   language: string;
   location: string;
   status: ProfileStatus;
+  member_number: number | null;
 }
 
 interface AuthContextValue {
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loadProfile = async (uid: string) => {
     const [{ data: prof }, { data: roles }] = await Promise.all([
-      supabase.from("profiles").select("id, display_name, avatar_url, language, location, status").eq("id", uid).maybeSingle(),
+      supabase.from("profiles").select("id, display_name, avatar_url, language, location, status, member_number").eq("id", uid).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", uid),
     ]);
     setProfile((prof as ProfileLite) ?? null);

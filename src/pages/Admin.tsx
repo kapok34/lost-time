@@ -52,7 +52,7 @@ const Admin = () => {
   };
 
   const approve = async (id: string) => {
-    const { error } = await supabase.from("profiles").update({ status: "approved" }).eq("id", id);
+    const { error } = await supabase.rpc("approve_member", { _member_id: id });
     if (error) { toast.error(error.message); return; }
     toast.success("Approved");
     setOpenId(null);
@@ -96,7 +96,7 @@ const Admin = () => {
                   <li key={p.id} className="border border-border p-4 flex items-center justify-between">
                     <div>
                       <h3 className="font-display text-xl">{p.display_name}</h3>
-                      <p className="text-sm text-muted-foreground italic">
+                      <p className="text-base text-muted-foreground italic">
                         {p.location} · {p.language} · applied {new Date(p.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -113,7 +113,7 @@ const Admin = () => {
                 <li key={p.id} className="border border-border p-4 flex items-center justify-between">
                   <div>
                     <h3 className="font-display text-xl">{p.display_name}</h3>
-                    <p className="text-sm text-muted-foreground italic">
+                    <p className="text-base text-muted-foreground italic">
                       {p.location} · {p.language} · {p.status}
                     </p>
                   </div>

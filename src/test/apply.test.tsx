@@ -56,20 +56,26 @@ describe("Application submission flow", () => {
     expect(TOTAL_QUESTIONS).toBe(34);
   });
 
-  it("should render the apply form with all sections", () => {
+  it("should render the apply form with account and questionnaire sections", () => {
     render(<Apply />, { wrapper });
-    expect(screen.getByText(/Apply for membership/i)).toBeInTheDocument();
+    expect(screen.getByText(/account information/i)).toBeInTheDocument();
+    expect(screen.getByText(/questionnaire/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Display name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/location/i)).toBeInTheDocument();
   });
 
-  it("should count filled answers correctly", () => {
+  it("should count valid answers correctly", () => {
     const answers: Record<number, string> = {};
     const questions = getQuestions("en");
 
+    const isValid = (a: string) => {
+      const len = a.trim().length;
+      return len >= 3 && len <= 200;
+    };
+
     // Initially empty
-    const emptyCount = questions.filter((q) => (answers[q.id] ?? "").trim().length > 0).length;
+    const emptyCount = questions.filter((q) => isValid(answers[q.id] ?? "")).length;
     expect(emptyCount).toBe(0);
 
     // Fill 5 answers
@@ -79,9 +85,14 @@ describe("Application submission flow", () => {
     answers[4] = "Friends answer";
     answers[5] = "Flaw answer";
 
-    const filledCount = questions.filter((q) => (answers[q.id] ?? "").trim().length > 0).length;
-    expect(filledCount).toBe(5);
-    expect(Math.round((filledCount / TOTAL_QUESTIONS) * 100)).toBe(15);
+    const validCount = questions.filter((q) => isValid(answers[q.id] ?? "")).length;
+    expect(validCount).toBe(5);
+    expect(Math.round((validCount / TOTAL_QUESTIONS) * 100)).toBe(15);
+
+    // Short answer should not count as valid
+    answers[6] = "ab";
+    const shortCount = questions.filter((q) => isValid(answers[q.id] ?? "")).length;
+    expect(shortCount).toBe(5);
   });
 
   it("should persist draft to localStorage", async () => {
@@ -96,41 +107,63 @@ describe("Application submission flow", () => {
     });
   });
 
-  it("should validate all questions answered before submit", async () => {
-    render(<Apply />, { wrapper });
+  it("should disable submit when questions are incomplete", async () => {
+    const { container } = render(<Apply />, { wrapper });
 
     // Fill account fields
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: "password123" } });
-    fireEvent.change(screen.getByLabelText(/Display name/i), { target: { value: "Test User" } });
+    fireEvent.change(screen.getByLabelText(/location/i), { target: { value: "Paris, France" } });
 
-    // Submit without answering questions
-    const submitBtn = screen.getByRole("button", { name: /Submit application/i });
-    fireEvent.click(submitBtn);
+    const submitBtn = screen.getByRole("button", { name: /submit/i });
+    expect(submitBtn).toBeDisabled();
+  });
 
-    // The button should remain on the page (no navigation)
+  it("should enable submit after all questions are valid", async () => {
+    const { container } = render(<Apply />, { wrapper });
+
+    // Fill account fields
+    fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: "password123" } });
+    fireEvent.change(screen.getByLabelText(/location/i), { target: { value: "Paris, France" } });
+
+    // Fill all questions with valid answers
+    const textareas = container.querySelectorAll("textarea");
+    textareas.forEach((ta) => {
+      fireEvent.change(ta, { target: { value: "A valid answer here." } });
+    });
+
+    const submitBtn = screen.getByRole("button", { name: /submit/i });
     await waitFor(() => {
-      expect(submitBtn).toBeInTheDocument();
+      expect(submitBtn).not.toBeDisabled();
     });
   });
 
-  it("should compute progress as 0% when empty", () => {
+  it("should compute valid progress as 0% when empty", () => {
     const questions = getQuestions("en");
     const answers: Record<number, string> = {};
-    const filledCount = questions.filter((q) => (answers[q.id] ?? "").trim().length > 0).length;
-    expect(filledCount).toBe(0);
-    expect(Math.round((filledCount / TOTAL_QUESTIONS) * 100)).toBe(0);
+    const isValid = (a: string) => {
+      const len = a.trim().length;
+      return len >= 3 && len <= 200;
+    };
+    const validCount = questions.filter((q) => isValid(answers[q.id] ?? "")).length;
+    expect(validCount).toBe(0);
+    expect(Math.round((validCount / TOTAL_QUESTIONS) * 100)).toBe(0);
   });
 
-  it("should compute progress as 100% when all answered", () => {
+  it("should compute valid progress as 100% when all answered", () => {
     const questions = getQuestions("en");
     const answers: Record<number, string> = {};
     questions.forEach((q) => {
       answers[q.id] = `Answer for question ${q.id}`;
     });
-    const filledCount = questions.filter((q) => (answers[q.id] ?? "").trim().length > 0).length;
-    expect(filledCount).toBe(34);
-    expect(Math.round((filledCount / TOTAL_QUESTIONS) * 100)).toBe(100);
+    const isValid = (a: string) => {
+      const len = a.trim().length;
+      return len >= 3 && len <= 200;
+    };
+    const validCount = questions.filter((q) => isValid(answers[q.id] ?? "")).length;
+    expect(validCount).toBe(34);
+    expect(Math.round((validCount / TOTAL_QUESTIONS) * 100)).toBe(100);
   });
 });
 

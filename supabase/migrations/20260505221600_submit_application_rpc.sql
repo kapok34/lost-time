@@ -5,8 +5,8 @@
 CREATE OR REPLACE FUNCTION public.submit_application(
   _email TEXT,
   _password TEXT,
-  _display_name TEXT,
-  _language TEXT,
+  _display_name TEXT DEFAULT NULL,
+  _language TEXT DEFAULT NULL,
   _location TEXT,
   _questionnaire_language TEXT,
   _answers JSONB  -- { "1": "answer text", "2": "...", ... }
@@ -23,10 +23,15 @@ DECLARE
   _expected INTEGER := 34;
   _received INTEGER;
 BEGIN
-  -- Validate inputs
+  -- Apply defaults for optional fields
   IF _display_name IS NULL OR length(trim(_display_name)) < 1 THEN
-    RAISE EXCEPTION 'Display name is required';
+    _display_name := split_part(_email, '@', 1);
   END IF;
+  IF _language IS NULL OR length(trim(_language)) < 1 THEN
+    _language := _questionnaire_language;
+  END IF;
+
+  -- Validate inputs
   IF _location IS NULL OR length(trim(_location)) < 2 THEN
     RAISE EXCEPTION 'Location is required';
   END IF;
@@ -65,6 +70,9 @@ BEGIN
   FOR _qid, _ans IN
     SELECT (key)::int, value FROM jsonb_each_text(_answers)
   LOOP
+    IF _ans IS NULL OR length(trim(_ans)) < 3 OR length(trim(_ans)) > 200 THEN
+      RAISE EXCEPTION 'Answer % must be between 3 and 200 characters', _qid;
+    END IF;
     INSERT INTO public.questionnaire_answers (user_id, question_id, answer)
     VALUES (_uid, _qid, trim(_ans));
   END LOOP;

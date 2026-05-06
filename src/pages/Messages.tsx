@@ -79,7 +79,7 @@ const Messages = () => {
               </Avatar>
               <div>
                 <h3 className="font-display text-xl">{active.other.display_name}</h3>
-                <p className="text-sm text-muted-foreground italic">Open conversation →</p>
+                <p className="text-base text-muted-foreground italic">Open conversation →</p>
               </div>
             </button>
           )}
@@ -93,7 +93,7 @@ const Messages = () => {
                 <li key={conv.id}>
                   <Link to={`/messages/${conv.id}`} className="block border border-border p-4 hover:bg-secondary transition-colors">
                     <span className="font-display text-lg">{other.display_name}</span>
-                    <span className="text-sm text-muted-foreground italic ml-2">
+                    <span className="text-base text-muted-foreground italic ml-2">
                       ended {conv.archived_at ? new Date(conv.archived_at).toLocaleDateString() : ""}
                     </span>
                   </Link>
