@@ -30,7 +30,7 @@ serve(async (req) => {
             <li><strong>Language:</strong> ${language}</li>
             <li><strong>Applied at:</strong> ${new Date(created_at).toLocaleString()}</li>
           </ul>
-          <p><a href="https://losttime.app/admin">Review in Admin</a></p>
+        <p><a href="https://lost-time.org/admin">Review in Admin</a></p>
         `,
       }),
     });

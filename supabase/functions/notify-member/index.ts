@@ -78,7 +78,7 @@ serve(async (req) => {
           <blockquote style="border-left: 3px solid #ccc; padding-left: 1em; color: #555;">
             ${preview.replace(/\n/g, "<br>")}
           </blockquote>
-          <p><a href="https://kapok34.github.io/lost-time/messages/${conversation_id}">Open conversation</a></p>
+          <p><a href="https://lost-time.org/messages/${conversation_id}">Open conversation</a></p>
           <p style="color: #999; font-size: 0.9em;">— lost time</p>
         `,
       }),
