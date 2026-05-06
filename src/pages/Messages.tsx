@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
@@ -20,30 +20,20 @@ interface OtherProfile {
   member_number: number | null;
 }
 
-const DEMO_ACTIVE = { conv: { id: "demo-conv", member_a: "demo-user", member_b: "demo-2", status: "active", archived_at: null, created_at: new Date().toISOString() } as ConvRow, other: { id: "demo-2", member_number: 2 } as OtherProfile };
-const DEMO_ARCHIVED = [
-  { conv: { id: "demo-arch-1", member_a: "demo-user", member_b: "demo-3", status: "archived", archived_at: new Date(Date.now() - 86400000 * 30).toISOString(), created_at: new Date(Date.now() - 86400000 * 60).toISOString() } as ConvRow, other: { id: "demo-3", member_number: 3 } as OtherProfile },
-  { conv: { id: "demo-arch-2", member_a: "demo-user", member_b: "demo-5", status: "archived", archived_at: new Date(Date.now() - 86400000 * 10).toISOString(), created_at: new Date(Date.now() - 86400000 * 45).toISOString() } as ConvRow, other: { id: "demo-5", member_number: 5 } as OtherProfile },
-];
 
 const Messages = () => {
   const { user } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isDemo = !user || location.pathname === "/messages-demo";
   const [active, setActive] = useState<{ conv: ConvRow; other: OtherProfile } | null>(null);
   const [archived, setArchived] = useState<{ conv: ConvRow; other: OtherProfile }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isDemo) {
-      setActive(DEMO_ACTIVE);
-      setArchived(DEMO_ARCHIVED);
+    if (!user) {
       setLoading(false);
       return;
     }
-    if (!user) return;
     (async () => {
       const { data: convs } = await supabase
         .from("conversations")
@@ -65,7 +55,7 @@ const Messages = () => {
       setArchived(enriched.filter((e) => e.conv.status !== "active"));
       setLoading(false);
     })();
-  }, [user, isDemo]);
+  }, [user]);
 
   const formatDate = (d: string | null) => {
     if (!d) return "";
