@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { getQuestions, type QuestionnaireLang } from "@/data/questions";
+import { getQuestions, type QuestionnaireLang, QUESTIONNAIRE_LANGS, QUESTIONNAIRE_LANG_LABELS } from "@/data/questions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Globe } from "lucide-react";
 import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
 import {
@@ -36,6 +38,8 @@ const Admin = () => {
   const [broadcastSubject, setBroadcastSubject] = useState("");
   const [broadcastBody, setBroadcastBody] = useState("");
   const [sending, setSending] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [savingAnswers, setSavingAnswers] = useState(false);
 
   const load = async () => {
     const { data } = await supabase
@@ -51,6 +55,7 @@ const Admin = () => {
 
   const openApplicant = async (id: string) => {
     setOpenId(id);
+    setEditMode(false);
     setReviewLang("en");
     const { data } = await supabase.from("questionnaire_answers").select("question_id, answer, lang").eq("user_id", id);
     const map: Record<string, Record<number, string>> = {};
@@ -59,6 +64,52 @@ const Admin = () => {
       map[a.lang][a.question_id] = a.answer;
     });
     setAnswers(map);
+  };
+
+  const openMember = async (id: string) => {
+    setOpenId(id);
+    setEditMode(true);
+    setReviewLang("en");
+    const { data } = await supabase.from("questionnaire_answers").select("question_id, answer, lang").eq("user_id", id);
+    const map: Record<string, Record<number, string>> = {};
+    (data ?? []).forEach((a: any) => {
+      if (!map[a.lang]) map[a.lang] = {};
+      map[a.lang][a.question_id] = a.answer;
+    });
+    setAnswers(map);
+  };
+
+  const saveMemberAnswers = async () => {
+    if (!openId) return;
+    setSavingAnswers(true);
+    try {
+      const langAnswers = answers[reviewLang] ?? {};
+      const rows = getQuestions(reviewLang).map((q) => ({
+        user_id: openId,
+        question_id: q.id,
+        answer: (langAnswers[q.id] ?? "").trim(),
+        lang: reviewLang,
+      }));
+      const { error } = await supabase.from("questionnaire_answers").upsert(rows, { onConflict: "user_id,question_id,lang" });
+      if (error) throw error;
+
+      const allProfiles = [...pending, ...members];
+      const profile = allProfiles.find((p) => p.id === openId);
+      const currentLangs = (profile?.questionnaire_languages ?? []) as QuestionnaireLang[];
+      const isComplete = getQuestions(reviewLang).every((q) => {
+        const len = (langAnswers[q.id] ?? "").trim().length;
+        return len >= 3 && len <= 200;
+      });
+      if (isComplete && !currentLangs.includes(reviewLang)) {
+        await supabase.from("profiles").update({ questionnaire_languages: [...currentLangs, reviewLang] }).eq("id", openId);
+        load();
+      }
+      toast.success("Saved");
+    } catch (err: any) {
+      toast.error(err.message ?? "Could not save");
+    } finally {
+      setSavingAnswers(false);
+    }
   };
 
   const approve = async (id: string) => {
@@ -170,12 +221,17 @@ const Admin = () => {
                       {p.location} · {p.language} · {p.status}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => suspend(p.id, p.status === "approved")}
-                  >
-                    {p.status === "approved" ? "Suspend" : "Reinstate"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => openMember(p.id)}>
+                      Edit questionnaire
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => suspend(p.id, p.status === "approved")}
+                    >
+                      {p.status === "approved" ? "Suspend" : "Reinstate"}
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -235,20 +291,36 @@ const Admin = () => {
             <div className="container max-w-3xl py-12">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="font-display text-3xl">
-                  {pending.find((p) => p.id === openId)?.display_name}
+                  {[...pending, ...members].find((p) => p.id === openId)?.display_name}
                 </h2>
                 <Button variant="ghost" onClick={() => setOpenId(null)}>Close</Button>
               </div>
 
               <div className="space-y-8 mb-12">
                 {(() => {
-                  const applicant = pending.find((p) => p.id === openId);
-                  const langs = (applicant?.questionnaire_languages ?? [applicant?.questionnaire_language ?? "en"]) as QuestionnaireLang[];
-                  const currentLang = langs.includes(reviewLang) ? reviewLang : langs[0];
+                  const profile = [...pending, ...members].find((p) => p.id === openId);
+                  const langs = (profile?.questionnaire_languages ?? [profile?.questionnaire_language ?? "en"]) as QuestionnaireLang[];
+                  const currentLang = editMode ? reviewLang : (langs.includes(reviewLang) ? reviewLang : langs[0]);
                   const qs = getQuestions(currentLang);
                   return (
                     <>
-                      {langs.length > 1 && (
+                      {editMode ? (
+                        <div className="flex items-center gap-2 mb-4">
+                          <Globe size={16} className="text-muted-foreground" />
+                          <Select value={reviewLang} onValueChange={(val) => setReviewLang(val as QuestionnaireLang)}>
+                            <SelectTrigger className="w-auto min-w-[200px]">
+                              {QUESTIONNAIRE_LANG_LABELS[reviewLang]} ({reviewLang.toUpperCase()})
+                            </SelectTrigger>
+                            <SelectContent>
+                              {QUESTIONNAIRE_LANGS.map((l) => (
+                                <SelectItem key={l} value={l}>
+                                  {QUESTIONNAIRE_LANG_LABELS[l]} ({l.toUpperCase()})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ) : langs.length > 1 ? (
                         <div className="flex gap-2 mb-4">
                           {langs.map((l) => (
                             <button
@@ -264,41 +336,71 @@ const Admin = () => {
                             </button>
                           ))}
                         </div>
-                      )}
-                      {qs.map((q) => (
-                        <div key={q.id}>
-                          <h3 className="font-display text-lg mb-1">
-                            <span className="text-primary mr-2">{q.id}.</span>{q.text}
-                          </h3>
-                          <p className="leading-relaxed whitespace-pre-wrap">
-                            {answers[currentLang]?.[q.id] || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
-                          </p>
+                      ) : null}
+                      {editMode ? (
+                        <div className="space-y-6">
+                          {qs.map((q) => (
+                            <div key={q.id}>
+                              <h3 className="font-display text-lg mb-1">
+                                <span className="text-primary mr-2">{q.id}.</span>{q.text}
+                              </h3>
+                              <Textarea
+                                rows={2}
+                                value={answers[currentLang]?.[q.id] ?? ""}
+                                onChange={(e) => setAnswers((a) => ({
+                                  ...a,
+                                  [currentLang]: { ...(a[currentLang] ?? {}), [q.id]: e.target.value },
+                                }))}
+                                className="bg-white border-input"
+                              />
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      ) : (
+                        qs.map((q) => (
+                          <div key={q.id}>
+                            <h3 className="font-display text-lg mb-1">
+                              <span className="text-primary mr-2">{q.id}.</span>{q.text}
+                            </h3>
+                            <p className="leading-relaxed whitespace-pre-wrap">
+                              {answers[currentLang]?.[q.id] || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
+                            </p>
+                          </div>
+                        ))
+                      )}
                     </>
                   );
                 })()}
               </div>
 
-              <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
-                <Button className="flex-1" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="flex-1">{t("admin.reject")}</Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Reject application?</AlertDialogTitle>
-                      <AlertDialogDescription>Optionally include a short note.</AlertDialogDescription>
-                    </AlertDialogHeader>
-                <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" className="bg-white border-input" />
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => reject(openId)}>{t("admin.reject")}</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+              {editMode ? (
+                <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
+                  <Button className="flex-1" onClick={saveMemberAnswers} disabled={savingAnswers}>
+                    {savingAnswers ? "Saving…" : "Save"}
+                  </Button>
+                  <Button variant="ghost" onClick={() => setOpenId(null)}>Close</Button>
+                </div>
+              ) : (
+                <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
+                  <Button className="flex-1" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="flex-1">{t("admin.reject")}</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Reject application?</AlertDialogTitle>
+                        <AlertDialogDescription>Optionally include a short note.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" className="bg-white border-input" />
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => reject(openId)}>{t("admin.reject")}</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
             </div>
           </div>
         )}

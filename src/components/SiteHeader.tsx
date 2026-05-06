@@ -3,6 +3,7 @@ import { Globe } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
 import { Title } from "./Title";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,6 +80,17 @@ export const SiteHeader = () => {
                 className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
               >
                 {t("signOut")}
+              </button>
+              <button
+                onClick={() => navigate(`/members/${user.id}`)}
+                className="p-0 rounded-full hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label={t("profile")}
+              >
+                <Avatar className="h-10 w-10 border border-border rounded-full">
+                  <AvatarFallback className="bg-white text-black text-base font-bold font-sans-ui">
+                    {profile?.member_number ?? "?"}
+                  </AvatarFallback>
+                </Avatar>
               </button>
             </>
           )}

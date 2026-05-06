@@ -15,6 +15,7 @@ interface ProfileLite {
   questionnaire_languages: string[] | null;
 }
 
+
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
