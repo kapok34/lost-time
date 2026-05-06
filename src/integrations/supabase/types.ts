@@ -119,6 +119,7 @@ export type Database = {
         Row: {
           answer: string
           id: string
+          lang: string
           question_id: number
           updated_at: string
           user_id: string
@@ -126,6 +127,7 @@ export type Database = {
         Insert: {
           answer?: string
           id?: string
+          lang?: string
           question_id: number
           updated_at?: string
           user_id: string
@@ -133,6 +135,7 @@ export type Database = {
         Update: {
           answer?: string
           id?: string
+          lang?: string
           question_id?: number
           updated_at?: string
           user_id?: string
