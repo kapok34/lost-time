@@ -25,8 +25,6 @@ const Index = () => {
       </div>
 
       <Footer />
-      {/* Seed helper - remove before production */}
-      <SeedButton />
     </main>
   );
 };

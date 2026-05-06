@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { getQuestions, type QuestionnaireLang } from "@/data/questions";
 import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ interface Profile {
   created_at: string;
   rejection_reason?: string | null;
   questionnaire_language?: QuestionnaireLang | null;
+  questionnaire_languages?: QuestionnaireLang[] | null;
 }
 
 const Admin = () => {
@@ -28,13 +30,17 @@ const Admin = () => {
   const [pending, setPending] = useState<Profile[]>([]);
   const [members, setMembers] = useState<Profile[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<Record<string, Record<number, string>>>({});
+  const [reviewLang, setReviewLang] = useState<QuestionnaireLang>("en");
   const [reason, setReason] = useState("");
+  const [broadcastSubject, setBroadcastSubject] = useState("");
+  const [broadcastBody, setBroadcastBody] = useState("");
+  const [sending, setSending] = useState(false);
 
   const load = async () => {
     const { data } = await supabase
       .from("profiles")
-      .select("id, display_name, language, location, status, created_at, rejection_reason")
+      .select("id, display_name, language, location, status, created_at, rejection_reason, questionnaire_languages")
       .order("created_at", { ascending: false });
     const all = (data as Profile[]) ?? [];
     setPending(all.filter((p) => p.status === "pending"));
@@ -45,9 +51,13 @@ const Admin = () => {
 
   const openApplicant = async (id: string) => {
     setOpenId(id);
-    const { data } = await supabase.from("questionnaire_answers").select("question_id, answer").eq("user_id", id);
-    const map: Record<number, string> = {};
-    (data ?? []).forEach((a: any) => (map[a.question_id] = a.answer));
+    setReviewLang("en");
+    const { data } = await supabase.from("questionnaire_answers").select("question_id, answer, lang").eq("user_id", id);
+    const map: Record<string, Record<number, string>> = {};
+    (data ?? []).forEach((a: any) => {
+      if (!map[a.lang]) map[a.lang] = {};
+      map[a.lang][a.question_id] = a.answer;
+    });
     setAnswers(map);
   };
 
@@ -75,6 +85,48 @@ const Admin = () => {
     load();
   };
 
+  const approvedCount = members.filter((p) => p.status === "approved").length;
+
+  const sendBroadcast = async () => {
+    if (!broadcastSubject.trim() || !broadcastBody.trim()) {
+      toast.error(t("admin.broadcastEmpty") || "Please enter a subject and message.");
+      return;
+    }
+    setSending(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        toast.error("Not authenticated");
+        setSending(false);
+        return;
+      }
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-bulk-email`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subject: broadcastSubject.trim(),
+          body: broadcastBody.trim(),
+        }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        toast.error(result.error || "Failed to send broadcast");
+      } else {
+        toast.success(`Sent ${result.sent} of ${result.total} emails`);
+        setBroadcastSubject("");
+        setBroadcastBody("");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send broadcast");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -85,6 +137,7 @@ const Admin = () => {
           <TabsList>
             <TabsTrigger value="pending">{t("admin.pendingApplications")} ({pending.length})</TabsTrigger>
             <TabsTrigger value="members">Members ({members.length})</TabsTrigger>
+            <TabsTrigger value="broadcast">{t("admin.broadcast") || "Broadcast"}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending" className="mt-8">
@@ -127,6 +180,54 @@ const Admin = () => {
               ))}
             </ul>
           </TabsContent>
+
+          <TabsContent value="broadcast" className="mt-8 max-w-2xl">
+            <div className="space-y-4">
+              <p className="text-base text-muted-foreground italic">
+                {(t("admin.broadcastRecipients") || "Recipients").replace("{{count}}", String(approvedCount))}
+              </p>
+              <div>
+                <label className="block text-base mb-1">{t("admin.broadcastSubject") || "Subject"}</label>
+                <Input
+                  value={broadcastSubject}
+                  onChange={(e) => setBroadcastSubject(e.target.value)}
+                  placeholder="Subject"
+                  className="bg-white border-input"
+                />
+              </div>
+              <div>
+                <label className="block text-base mb-1">{t("admin.broadcastBody") || "Message"}</label>
+                <Textarea
+                  value={broadcastBody}
+                  onChange={(e) => setBroadcastBody(e.target.value)}
+                  placeholder="Message"
+                  rows={10}
+                  className="bg-white border-input"
+                />
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="w-full" disabled={sending || !broadcastSubject.trim() || !broadcastBody.trim()}>
+                    {sending ? (t("conversation.sending") || "sending…") : (t("admin.broadcastSend") || "Send")}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t("admin.broadcastConfirm") || "Send broadcast?"}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will email {approvedCount} approved member{approvedCount === 1 ? "" : "s"}.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t("conversation.cancel") || "cancel"}</AlertDialogCancel>
+                    <AlertDialogAction onClick={sendBroadcast}>
+                      {t("admin.broadcastSend") || "Send"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </TabsContent>
         </Tabs>
 
         {openId && (
@@ -140,16 +241,43 @@ const Admin = () => {
               </div>
 
               <div className="space-y-8 mb-12">
-                {getQuestions((pending.find((p) => p.id === openId)?.questionnaire_language) ?? "en").map((q) => (
-                  <div key={q.id}>
-                    <h3 className="font-display text-lg mb-1">
-                      <span className="text-primary mr-2">{q.id}.</span>{q.text}
-                    </h3>
-                    <p className="leading-relaxed whitespace-pre-wrap">
-                      {answers[q.id] || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
-                    </p>
-                  </div>
-                ))}
+                {(() => {
+                  const applicant = pending.find((p) => p.id === openId);
+                  const langs = (applicant?.questionnaire_languages ?? [applicant?.questionnaire_language ?? "en"]) as QuestionnaireLang[];
+                  const currentLang = langs.includes(reviewLang) ? reviewLang : langs[0];
+                  const qs = getQuestions(currentLang);
+                  return (
+                    <>
+                      {langs.length > 1 && (
+                        <div className="flex gap-2 mb-4">
+                          {langs.map((l) => (
+                            <button
+                              key={l}
+                              onClick={() => setReviewLang(l)}
+                              className={`text-xs tracking-wider px-2 py-1 rounded border transition-colors ${
+                                currentLang === l
+                                  ? "bg-[hsl(350,55%,35%)] text-white border-[hsl(350,55%,35%)]"
+                                  : "border-border text-muted-foreground hover:border-[hsl(350,55%,35%)] hover:text-foreground"
+                              }`}
+                            >
+                              {l.toUpperCase()}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {qs.map((q) => (
+                        <div key={q.id}>
+                          <h3 className="font-display text-lg mb-1">
+                            <span className="text-primary mr-2">{q.id}.</span>{q.text}
+                          </h3>
+                          <p className="leading-relaxed whitespace-pre-wrap">
+                            {answers[currentLang]?.[q.id] || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
+                          </p>
+                        </div>
+                      ))}
+                    </>
+                  );
+                })()}
               </div>
 
               <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">

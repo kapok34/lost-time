@@ -42,9 +42,24 @@ const Conversation = () => {
 
   const isDemo = !id || id.startsWith("demo-");
 
-  const myCount = messages.filter((m) => m.sender_id === user?.id).length;
+  const demoUserId = "demo-user";
+  const demoConv: Conv = { id: id ?? "", member_a: demoUserId, member_b: "demo-2", status: "active" };
+  const demoOther = { id: "demo-2", member_number: 2 };
+  const demoMessages: Message[] = [
+    { id: "m1", conversation_id: id ?? "", sender_id: "demo-2", body: "Hello! I came across your profile and noticed we share a love for quiet mornings.", created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
+    { id: "m2", conversation_id: id ?? "", sender_id: demoUserId, body: "What a lovely thing to notice. I do treasure those early hours before the world wakes.", created_at: new Date(Date.now() - 86400000).toISOString() },
+    { id: "m3", conversation_id: id ?? "", sender_id: "demo-2", body: "Do you have a particular ritual? Mine is making coffee and watching the light change through the kitchen window.", created_at: new Date(Date.now() - 3600000 * 6).toISOString() },
+  ];
+
+  const effectiveConv = isDemo ? demoConv : conv;
+  const effectiveOther = isDemo ? demoOther : other;
+  const effectiveMessages = isDemo ? demoMessages : messages;
+
+  const myCount = effectiveMessages.filter((m) => m.sender_id === (isDemo ? demoUserId : user?.id)).length;
   const atLimit = myCount >= 10;
-  const bodyValid = body.trim().length >= 5;
+  const isInitialMessage = effectiveMessages.length === 0;
+  const minLength = isInitialMessage ? 34 : 5;
+  const bodyValid = body.trim().length >= minLength;
   const remaining = 10 - myCount;
 
   useEffect(() => {
@@ -88,7 +103,7 @@ const Conversation = () => {
   }, [messages]);
 
   const onSend = async () => {
-    if (!id || !user || !body.trim() || body.trim().length < 5 || atLimit) return;
+    if (!id || !user || !body.trim() || body.trim().length < minLength || atLimit) return;
     setSending(true);
     const { error } = await supabase.from("messages").insert({
       conversation_id: id,
@@ -118,23 +133,10 @@ const Conversation = () => {
     );
   }
 
-  const demoUserId = "demo-user";
-  const demoConv: Conv = { id: id ?? "", member_a: demoUserId, member_b: "demo-2", status: "active" };
-  const demoOther = { id: "demo-2", member_number: 2 };
-  const demoMessages: Message[] = [
-    { id: "m1", conversation_id: id ?? "", sender_id: "demo-2", body: "Hello! I came across your profile and noticed we share a love for quiet mornings.", created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
-    { id: "m2", conversation_id: id ?? "", sender_id: demoUserId, body: "What a lovely thing to notice. I do treasure those early hours before the world wakes.", created_at: new Date(Date.now() - 86400000).toISOString() },
-    { id: "m3", conversation_id: id ?? "", sender_id: "demo-2", body: "Do you have a particular ritual? Mine is making coffee and watching the light change through the kitchen window.", created_at: new Date(Date.now() - 3600000 * 6).toISOString() },
-  ];
-
-  const effectiveConv = isDemo ? demoConv : conv;
-  const effectiveOther = isDemo ? demoOther : other;
-  const effectiveMessages = isDemo ? demoMessages : messages;
-
   const lastMessage = effectiveMessages.length > 0 ? effectiveMessages[effectiveMessages.length - 1] : null;
   const daysSinceLastMessage = lastMessage ? (Date.now() - new Date(lastMessage.created_at).getTime()) / (1000 * 60 * 60 * 24) : null;
-  const canEnd = effectiveMessages.some((m) => m.sender_id === user?.id) && effectiveMessages.some((m) => m.sender_id === effectiveOther!.id);
-  const canEndDueToInactivity = lastMessage?.sender_id === user?.id && daysSinceLastMessage !== null && daysSinceLastMessage > 7;
+  const canEnd = effectiveMessages.some((m) => m.sender_id === (isDemo ? demoUserId : user?.id)) && effectiveMessages.some((m) => m.sender_id === effectiveOther!.id);
+  const canEndDueToInactivity = lastMessage?.sender_id === (isDemo ? demoUserId : user?.id) && daysSinceLastMessage !== null && daysSinceLastMessage > 7;
 
   const archived = effectiveConv!.status === "archived";
 
@@ -151,18 +153,18 @@ const Conversation = () => {
           ) : canEnd || canEndDueToInactivity ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="outline">{t("conversation.end")}</Button>
+                <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">{t("conversation.end")}</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>{t("conversation.endConfirm")}</AlertDialogTitle>
-                  <AlertDialogDescription>
+                  <AlertDialogTitle className="font-sans-ui">{t("conversation.endConfirm")}</AlertDialogTitle>
+                  <AlertDialogDescription className="font-sans-ui">
                     {t("conversation.endDesc")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>{t("conversation.cancel")}</AlertDialogCancel>
-                  <AlertDialogAction onClick={onEnd}>{t("conversation.end")}</AlertDialogAction>
+                  <AlertDialogCancel className="font-sans-ui hover:!bg-[hsl(350,55%,35%)] hover:!text-white">{t("conversation.cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={onEnd} className="font-sans-ui bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,35%)]">{t("conversation.end")}</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
@@ -174,7 +176,7 @@ const Conversation = () => {
           ) : (
             effectiveMessages.map((m) => {
               const mine = isDemo ? m.sender_id === demoUserId : m.sender_id === user?.id;
-              const num = mine ? (profile?.member_number ?? "—") : (effectiveOther!.member_number ?? "—");
+              const num = mine ? (isDemo ? 1 : (profile?.member_number ?? "—")) : (effectiveOther!.member_number ?? "—");
               return (
                 <div key={m.id} className={`flex items-end gap-3 ${mine ? "justify-end" : "justify-start"}`}>
                   {!mine && (
@@ -183,7 +185,7 @@ const Conversation = () => {
                     </Link>
                   )}
                   <div className={`max-w-[75%] px-4 py-3 ${mine ? "bg-[hsl(350,55%,35%)] text-white" : "bg-secondary text-secondary-foreground"}`} style={{ borderRadius: "0.25rem" }}>
-                    <p className="text-base whitespace-pre-wrap leading-relaxed">{m.body}</p>
+                    <p className="text-lg whitespace-pre-wrap leading-relaxed">{m.body}</p>
                     <p className={`text-base mt-1 ${mine ? "text-white/70" : "text-muted-foreground"}`}>
 {(() => { const d = new Date(m.created_at); const p = (n: number) => String(n).padStart(2, '0'); return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${String(d.getFullYear()).slice(-2)} ${p(d.getHours())}:${p(d.getMinutes())}`; })()}
                     </p>
@@ -214,12 +216,12 @@ const Conversation = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) onSend();
                   }}
-                  className="bg-white border-input"
+                  className="bg-white border-input text-lg"
                 />
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-base text-muted-foreground font-sans-ui">{remaining} {t("conversation.messagesLeft")}</span>
                   {!bodyValid && body.length > 0 && (
-                    <span className="text-base text-destructive italic font-sans-ui">{t("conversation.minLength")}</span>
+                    <span className="text-base text-destructive font-sans-ui">{effectiveMessages.length === 0 ? t("conversation.initialMinLength") : t("conversation.minLength")}</span>
                   )}
                 </div>
                 <div className="flex justify-center mt-3">

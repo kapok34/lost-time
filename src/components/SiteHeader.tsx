@@ -1,7 +1,14 @@
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Globe } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
 import { Title } from "./Title";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const linkCls = ({ isActive }: { isActive: boolean }) =>
   `text-base tracking-wide uppercase transition-colors ${
@@ -41,13 +48,13 @@ export const SiteHeader = () => {
             <>
               <button
                 onClick={() => navigate("/login")}
-                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
               >
                 {t("signIn")}
               </button>
               <button
                 onClick={() => navigate("/apply")}
-                className="text-base font-sans-ui bg-[hsl(350,55%,35%)] text-white px-4 py-1.5 rounded hover:bg-[hsl(350,55%,30%)] transition-colors"
+                className="text-base font-sans-ui bg-[hsl(350,55%,35%)] text-white px-4 py-1.5 rounded hover:bg-[#800000] transition-colors"
               >
                 {t("apply")}
               </button>
@@ -57,43 +64,56 @@ export const SiteHeader = () => {
             <>
               <button
                 onClick={() => navigate("/members")}
-                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
-              >
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
+                >
                 {t("profiles")}
               </button>
               <button
                 onClick={() => navigate("/messages")}
-                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
-              >
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
+                >
                 {t("conversation")}
               </button>
               <button
                 onClick={async () => { await signOut(); navigate("/"); }}
-                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
               >
                 {t("signOut")}
               </button>
             </>
           )}
 
-          {/* EN/FR toggle */}
-          <div className="flex items-center gap-1 text-base font-sans-ui tracking-widest text-muted-foreground ml-2">
-            <button
-              onClick={() => setLang("en")}
-              className={`px-1 py-0.5 transition-colors ${lang === "en" ? "text-foreground font-medium" : "hover:text-foreground"}`}
-              aria-label="English"
-            >
-              EN
-            </button>
-            <span>/</span>
-            <button
-              onClick={() => setLang("fr")}
-              className={`px-1 py-0.5 transition-colors ${lang === "fr" ? "text-foreground font-medium" : "hover:text-foreground"}`}
-              aria-label="Français"
-            >
-              FR
-            </button>
-          </div>
+          {/* Language dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="ml-2 p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Language"
+              >
+                <Globe size={18} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[80px]">
+              <DropdownMenuItem
+                onClick={() => setLang("en")}
+                className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "en" ? "text-foreground font-medium" : ""}`}
+              >
+                EN
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setLang("fr")}
+                className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "fr" ? "text-foreground font-medium" : ""}`}
+              >
+                FR
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setLang("it")}
+                className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "it" ? "text-foreground font-medium" : ""}`}
+              >
+                IT
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
