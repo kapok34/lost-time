@@ -84,6 +84,7 @@ export type Database = {
           id: string
           language: string
           location: string
+          member_number: number | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["profile_status"]
           updated_at: string
@@ -95,6 +96,7 @@ export type Database = {
           id: string
           language: string
           location: string
+          member_number?: number | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string
@@ -106,6 +108,7 @@ export type Database = {
           id?: string
           language?: string
           location?: string
+          member_number?: number | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string
@@ -195,6 +198,7 @@ export type Database = {
     }
     Functions: {
       archive_conversation: { Args: { _conv_id: string }; Returns: undefined }
+      approve_member: { Args: { _member_id: string }; Returns: undefined }
       has_active_conversation: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {

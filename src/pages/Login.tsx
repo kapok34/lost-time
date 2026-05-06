@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Footer } from "@/components/Footer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/i18n/context";
@@ -39,13 +40,15 @@ const Login = () => {
             <Label htmlFor="password" className="font-sans-ui">{t("login.password")}</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="font-sans-ui bg-white border-input" />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full text-sm font-sans-ui bg-[hsl(207,65%,47%)] text-white px-4 py-1.5 rounded hover:bg-[hsl(207,65%,42%)] transition-colors disabled:opacity-50"
-          >
-            {loading ? t("login.signingIn") : t("login.submit")}
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={loading}
+              className="text-base font-sans-ui bg-[hsl(350,55%,35%)] text-white px-8 py-1.5 rounded hover:bg-[hsl(350,55%,30%)] transition-colors disabled:opacity-50"
+            >
+              {loading ? t("login.signingIn") : t("login.submit")}
+            </button>
+          </div>
         </form>
 
         <div className="text-center mt-6">
@@ -61,12 +64,13 @@ const Login = () => {
               if (error) toast.error(error.message);
               else toast.success(t("login.resetSent"));
             }}
-            className="text-sm font-sans-ui text-muted-foreground hover:text-foreground transition-colors"
+            className="text-base font-sans-ui text-muted-foreground hover:text-foreground transition-colors"
           >
             {t("login.forgotPassword")}
           </button>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

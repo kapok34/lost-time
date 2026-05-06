@@ -1,10 +1,10 @@
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
-import { Button } from "@/components/ui/button";
+import { Title } from "./Title";
 
 const linkCls = ({ isActive }: { isActive: boolean }) =>
-  `text-sm tracking-wide uppercase transition-colors ${
+  `text-base tracking-wide uppercase transition-colors ${
     isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
   }`;
 
@@ -19,9 +19,8 @@ export const SiteHeader = () => {
   return (
     <header className="border-b border-border bg-background sticky top-0 z-40">
       <div className="container max-w-6xl flex items-center justify-between py-5">
-        <Link to="/" className="font-sans-ui text-2xl tracking-tight select-none text-black">
-          <span>lost</span>{" "}
-          <span>time</span>
+        <Link to="/">
+          <Title />
         </Link>
 
         {!onLanding && (
@@ -42,26 +41,43 @@ export const SiteHeader = () => {
             <>
               <button
                 onClick={() => navigate("/login")}
-                className="text-sm font-sans-ui text-foreground hover:text-muted-foreground transition-colors"
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
               >
                 {t("signIn")}
               </button>
               <button
                 onClick={() => navigate("/apply")}
-                className="text-sm font-sans-ui bg-[hsl(207,65%,47%)] text-white px-4 py-1.5 rounded hover:bg-[hsl(207,65%,42%)] transition-colors"
+                className="text-base font-sans-ui bg-[hsl(350,55%,35%)] text-white px-4 py-1.5 rounded hover:bg-[hsl(350,55%,30%)] transition-colors"
               >
                 {t("apply")}
               </button>
             </>
           )}
           {user && (
-            <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate("/"); }}>
-              {t("signOut")}
-            </Button>
+            <>
+              <button
+                onClick={() => navigate("/members")}
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
+              >
+                {t("profiles")}
+              </button>
+              <button
+                onClick={() => navigate("/messages")}
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
+              >
+                {t("conversation")}
+              </button>
+              <button
+                onClick={async () => { await signOut(); navigate("/"); }}
+                className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-foreground hover:text-background transition-colors"
+              >
+                {t("signOut")}
+              </button>
+            </>
           )}
 
           {/* EN/FR toggle */}
-          <div className="flex items-center gap-1 text-xs font-sans-ui uppercase tracking-widest text-muted-foreground ml-2">
+          <div className="flex items-center gap-1 text-base font-sans-ui tracking-widest text-muted-foreground ml-2">
             <button
               onClick={() => setLang("en")}
               className={`px-1 py-0.5 transition-colors ${lang === "en" ? "text-foreground font-medium" : "hover:text-foreground"}`}
