@@ -62,7 +62,9 @@ describe("Application submission flow", () => {
     expect(screen.getByText(/questionnaire/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/location/i)).toBeInTheDocument();
+    // Country appears as both a Label and a Select placeholder, so use getAllByText
+    expect(screen.getAllByText(/country/i).length).toBeGreaterThan(0);
+    expect(screen.getByPlaceholderText(/city/i)).toBeInTheDocument();
   });
 
   it("should count valid answers correctly", () => {
@@ -102,18 +104,23 @@ describe("Application submission flow", () => {
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
     await waitFor(() => {
-      const draft = localStorage.getItem("salon.apply.draft.v1");
+      const draft = localStorage.getItem("salon.apply.draft.v2");
       expect(draft).toContain("test@example.com");
     });
   });
 
   it("should disable submit when questions are incomplete", async () => {
-    const { container } = render(<Apply />, { wrapper });
+    render(<Apply />, { wrapper });
 
     // Fill account fields
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: "password123" } });
-    fireEvent.change(screen.getByLabelText(/location/i), { target: { value: "Paris, France" } });
+    // Select country via the combobox trigger
+    const countrySelect = screen.getAllByRole("combobox")[0];
+    fireEvent.click(countrySelect);
+    const franceOption = await screen.findByRole("option", { name: "France" });
+    fireEvent.click(franceOption);
+    fireEvent.change(screen.getByPlaceholderText(/city/i), { target: { value: "Paris" } });
 
     const submitBtn = screen.getByRole("button", { name: /submit/i });
     expect(submitBtn).toBeDisabled();
@@ -125,7 +132,11 @@ describe("Application submission flow", () => {
     // Fill account fields
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: "password123" } });
-    fireEvent.change(screen.getByLabelText(/location/i), { target: { value: "Paris, France" } });
+    const countrySelect = screen.getAllByRole("combobox")[0];
+    fireEvent.click(countrySelect);
+    const franceOption = await screen.findByRole("option", { name: "France" });
+    fireEvent.click(franceOption);
+    fireEvent.change(screen.getByPlaceholderText(/city/i), { target: { value: "Paris" } });
 
     // Fill all questions with valid answers
     const textareas = container.querySelectorAll("textarea");
