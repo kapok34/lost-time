@@ -130,7 +130,7 @@ const Conversation = () => {
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-8 flex flex-col" style={{ minHeight: 0 }}>
         <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
-          <Link to={`/members/${other.id}`} className="font-sans-ui text-4xl font-bold hover:text-[hsl(350,55%,35%)] transition-colors">
+          <Link to={`/members/${other.member_number}`} className="font-sans-ui text-4xl font-bold hover:text-[hsl(350,55%,35%)] transition-colors">
             {other.member_number ?? "—"}
           </Link>
           {archived ? (
@@ -165,7 +165,7 @@ const Conversation = () => {
               return (
                 <div key={m.id} className={`flex items-end gap-3 ${mine ? "justify-end" : "justify-start"}`}>
                   {!mine && (
-                    <Link to={`/members/${other.id}`} className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-card flex items-center justify-center text-base font-bold font-sans-ui hover:border-foreground transition-colors">
+                    <Link to={`/members/${other.member_number}`} className="flex-shrink-0 w-10 h-10 rounded-full border border-border bg-card flex items-center justify-center text-base font-bold font-sans-ui hover:border-foreground transition-colors">
                       {num}
                     </Link>
                   )}

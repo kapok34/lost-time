@@ -128,7 +128,7 @@ const Members = () => {
               const contacted = contactedIds.has(m.id);
               return (
                 <Link
-                  to={`/members/${m.id}`}
+                  to={`/members/${m.member_number}`}
                   key={m.id}
                   className={`flex flex-col items-center justify-center aspect-square border border-border bg-card transition-colors hover:border-[hsl(350,55%,35%)] ${contacted ? "opacity-40" : ""}`}
                 >

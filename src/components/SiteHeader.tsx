@@ -67,7 +67,7 @@ export const SiteHeader = () => {
                   onClick={() => navigate("/admin")}
                   className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
                 >
-                  {t("admin")}
+                  admin
                 </button>
               )}
               <button
@@ -77,7 +77,7 @@ export const SiteHeader = () => {
                 {t("signOut")}
               </button>
               <button
-                onClick={() => navigate(`/members/${user.id}`)}
+                onClick={() => navigate(`/members/${profile?.member_number}`)}
                 className="p-0 rounded-full hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
                 aria-label={t("profile")}
               >

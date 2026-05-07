@@ -34,7 +34,7 @@ const App = () => (
             <Route path="/apply" element={<Apply />} />
             <Route path="/pending" element={<RequireAuth><Pending /></RequireAuth>} />
             <Route path="/members" element={<Members />} />
-            <Route path="/members/:id" element={<Profile />} />
+            <Route path="/members/:memberNumber" element={<Profile />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/messages-demo" element={<Messages />} />
             <Route path="/messages/:id" element={<Conversation />} />

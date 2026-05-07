@@ -41,6 +41,10 @@ const Admin = () => {
   const [sending, setSending] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [savingAnswers, setSavingAnswers] = useState(false);
+  const [editingLocationId, setEditingLocationId] = useState<string | null>(null);
+  const [editCity, setEditCity] = useState("");
+  const [editCountry, setEditCountry] = useState("");
+  const [savingLocation, setSavingLocation] = useState(false);
 
   const load = async () => {
     const { data } = await supabase
@@ -130,6 +134,33 @@ const Admin = () => {
     load();
   };
 
+  const openLocationEdit = (id: string) => {
+    setEditingLocationId(id);
+    const p = members.find((m) => m.id === id);
+    if (p) {
+      const parts = p.location.split(",").map((s) => s.trim());
+      if (parts.length > 1) {
+        setEditCity(parts.slice(0, parts.length - 1).join(", "));
+        setEditCountry(parts[parts.length - 1]);
+      } else {
+        setEditCity(parts[0] || "");
+        setEditCountry("");
+      }
+    }
+  };
+
+  const saveLocation = async () => {
+    if (!editingLocationId) return;
+    setSavingLocation(true);
+    const newLocation = `${editCity.trim()}, ${editCountry.trim()}`;
+    const { error } = await supabase.from("profiles").update({ location: newLocation }).eq("id", editingLocationId);
+    setSavingLocation(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("location updated");
+    setEditingLocationId(null);
+    load();
+  };
+
   const suspend = async (id: string, suspend: boolean) => {
     const { error } = await supabase.from("profiles").update({ status: suspend ? "suspended" : "approved" }).eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -202,7 +233,7 @@ const Admin = () => {
                         {p.location} · {p.language} · applied {new Date(p.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <Button variant="outline" onClick={(e) => { e.stopPropagation(); openApplicant(p.id); }}>Review</Button>
+                    <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={(e) => { e.stopPropagation(); openApplicant(p.id); }}>review</Button>
                   </li>
                 ))}
               </ul>
@@ -220,14 +251,18 @@ const Admin = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => openMember(p.id)}>
-                      Edit questionnaire
+                    <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => openMember(p.id)}>
+                      edit questionnaire
+                    </Button>
+                    <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => openLocationEdit(p.id)}>
+                      edit location
                     </Button>
                     <Button
                       variant="outline"
+                      className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white"
                       onClick={() => suspend(p.id, p.status === "approved")}
                     >
-                      {p.status === "approved" ? "Suspend" : "Reinstate"}
+                      {p.status === "approved" ? "suspend" : "reinstate"}
                     </Button>
                   </div>
                 </li>
@@ -284,6 +319,30 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
 
+        {editingLocationId && (
+          <div className="fixed inset-0 z-50 bg-background/80 flex items-center justify-center">
+            <div className="bg-background border border-border p-6 w-full max-w-md space-y-4">
+              <h3 className="font-sans-ui text-xl tracking-tight text-black font-medium">edit location</h3>
+              <div>
+                <Label className="font-sans-ui">city</Label>
+                <Input value={editCity} onChange={(e) => setEditCity(e.target.value)} className="bg-white border-input" />
+              </div>
+              <div>
+                <Label className="font-sans-ui">country</Label>
+                <Input value={editCountry} onChange={(e) => setEditCountry(e.target.value)} className="bg-white border-input" />
+              </div>
+              <div className="flex gap-3">
+                <Button className="flex-1 bg-[#800000] text-white hover:bg-[hsl(350,55%,30%)]" onClick={saveLocation} disabled={savingLocation}>
+                  {savingLocation ? "saving…" : "save"}
+                </Button>
+                <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setEditingLocationId(null)}>
+                  cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {openId && (
           <div className="fixed inset-0 z-50 bg-background/95 overflow-y-auto">
             <div className="container max-w-3xl py-12">
@@ -291,7 +350,7 @@ const Admin = () => {
                 <h2 className="font-display text-3xl">
                   {[...pending, ...members].find((p) => p.id === openId)?.member_number ?? "—"}
                 </h2>
-                <Button variant="ghost" onClick={() => setOpenId(null)}>Close</Button>
+                <Button variant="ghost" onClick={() => setOpenId(null)}>close</Button>
               </div>
 
               <div className="space-y-8 mb-12">
@@ -304,15 +363,15 @@ const Admin = () => {
                     <>
                       {editMode ? (
                         <div className="flex items-center gap-2 mb-4">
-                          <Globe size={16} className="text-muted-foreground" />
                           <Select value={reviewLang} onValueChange={(val) => setReviewLang(val as QuestionnaireLang)}>
-                            <SelectTrigger className="w-auto min-w-[200px]">
-                              {QUESTIONNAIRE_LANG_LABELS[reviewLang]} ({reviewLang})
+                            <SelectTrigger className="w-auto min-w-[80px] bg-transparent border-none font-sans-ui gap-1 px-1.5">
+                              <Globe size={20} className="text-muted-foreground" />
+                              <span className="text-muted-foreground">{reviewLang.toUpperCase()}</span>
                             </SelectTrigger>
                             <SelectContent>
                               {QUESTIONNAIRE_LANGS.map((l) => (
-                                <SelectItem key={l} value={l}>
-                                  {QUESTIONNAIRE_LANG_LABELS[l]} ({l})
+                                <SelectItem key={l} value={l} className="font-sans-ui text-sm cursor-pointer">
+                                  {l.toUpperCase()}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -324,13 +383,13 @@ const Admin = () => {
                             <button
                               key={l}
                               onClick={() => setReviewLang(l)}
-                              className={`text-xs tracking-wider px-2 py-1 rounded border transition-colors ${
+                              className={`text-xs tracking-wider px-2 py-1 rounded border transition-colors font-sans-ui ${
                                 currentLang === l
                                   ? "bg-[hsl(350,55%,35%)] text-white border-[hsl(350,55%,35%)]"
                                   : "border-border text-muted-foreground hover:border-[hsl(350,55%,35%)] hover:text-foreground"
                               }`}
                             >
-                              {l}
+                              {l.toUpperCase()}
                             </button>
                           ))}
                         </div>
@@ -383,27 +442,27 @@ const Admin = () => {
 
               {editMode ? (
                 <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
-                  <Button className="flex-1" onClick={saveMemberAnswers} disabled={savingAnswers}>
-                    {savingAnswers ? "Saving…" : "Save"}
+                  <Button className="flex-1 bg-[#800000] text-white hover:bg-[hsl(350,55%,30%)]" onClick={saveMemberAnswers} disabled={savingAnswers}>
+                    {savingAnswers ? "saving…" : "save"}
                   </Button>
-                  <Button variant="ghost" onClick={() => setOpenId(null)}>Close</Button>
+                  <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setOpenId(null)}>close</Button>
                 </div>
               ) : (
                 <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
-                  <Button className="flex-1" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
+                  <Button className="flex-1 bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="destructive" className="flex-1">{t("admin.reject")}</Button>
+                      <Button variant="outline" className="flex-1 hover:!bg-destructive hover:!text-white">{t("admin.reject")}</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Reject application?</AlertDialogTitle>
-                        <AlertDialogDescription>Optionally include a short note.</AlertDialogDescription>
+                        <AlertDialogTitle>reject application?</AlertDialogTitle>
+                        <AlertDialogDescription>optionally include a short note.</AlertDialogDescription>
                       </AlertDialogHeader>
                       <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" className="bg-white border-input" />
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => reject(openId)}>{t("admin.reject")}</AlertDialogAction>
+                        <AlertDialogCancel className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => reject(openId)} className="hover:!bg-destructive hover:!text-white">{t("admin.reject")}</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
