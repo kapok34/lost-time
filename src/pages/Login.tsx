@@ -18,12 +18,28 @@ const Login = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      setLoading(false);
+      toast.error(signInError.message);
       return;
     }
+
+    const uid = signInData.user!.id;
+    const [{ data: prof }, { data: roles }] = await Promise.all([
+      supabase.from("profiles").select("status").eq("id", uid).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+    ]);
+
+    const isAdmin = (roles ?? []).some((r: any) => r.role === "admin");
+    if (!prof || (prof.status !== "approved" && !isAdmin)) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error(t("login.notApproved"));
+      return;
+    }
+
+    setLoading(false);
     navigate("/");
   };
 
