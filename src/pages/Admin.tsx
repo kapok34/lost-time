@@ -300,7 +300,7 @@ const Admin = () => {
             </ul>
           </TabsContent>
 
-          <TabsContent value="broadcast" className="mt-8 max-w-2xl">
+          <TabsContent value="broadcast" className="mt-8">
             <div className="space-y-4">
               <p className="text-base text-muted-foreground italic">
                 {(t("admin.broadcastRecipients") || "Recipients").replace("{{count}}", String(approvedCount))}
@@ -326,7 +326,7 @@ const Admin = () => {
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button className="w-full bg-[hsl(350,55%,35%)] text-white hover:bg-[#800000]" disabled={sending || !broadcastSubject.trim() || !broadcastBody.trim()}>
+                  <Button className="bg-[hsl(350,55%,35%)] text-white hover:bg-[#800000]" disabled={sending || !broadcastSubject.trim() || !broadcastBody.trim()}>
                     {sending ? (t("conversation.sending") || "sending…") : (t("admin.broadcastSend") || "Send")}
                   </Button>
                 </AlertDialogTrigger>
@@ -493,10 +493,10 @@ const Admin = () => {
 
               {editMode ? (
                 <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
-                  <Button className="flex-1 bg-[#800000] text-white hover:bg-[hsl(350,55%,30%)]" onClick={saveMemberAnswers} disabled={savingAnswers}>
+                  <Button className="bg-[#800000] text-white hover:bg-[hsl(350,55%,30%)]" onClick={saveMemberAnswers} disabled={savingAnswers}>
                     {savingAnswers ? "saving…" : "save"}
                   </Button>
-                  <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setOpenId(null)}>close</Button>
+                  <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setAnswers((a) => ({ ...a, [reviewLang]: {} }))} disabled={([...pending, ...members].find((p) => p.id === openId)?.questionnaire_languages ?? ["en"]).length <= 1}>clear</Button>
                 </div>
               ) : (
                 <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
