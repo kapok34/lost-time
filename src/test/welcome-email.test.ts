@@ -76,7 +76,7 @@ describe("welcome-member edge function", () => {
     expect(res.status).toBe(404);
   });
 
-  it("sends a welcome email with member number and delete-account link", async () => {
+  it("sends an English welcome email when language is en", async () => {
     mockFrom.mockReturnValue({
       select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: () => Promise.resolve({ data: { id: "user-1", display_name: "Alice", member_number: 7, language: "en" }, error: null }) })) })),
     });
@@ -97,12 +97,69 @@ describe("welcome-member edge function", () => {
     const payload = JSON.parse(callInit.body);
 
     expect(payload.to).toEqual(["alice@example.com"]);
-    expect(payload.subject).toBe("Welcome to lost time — member #7");
-    expect(payload.html).toContain("Alice");
+    expect(payload.subject).toBe("In search of — member #7");
+    expect(payload.html).toContain("Hello,");
     expect(payload.html).toContain("member #7");
     expect(payload.html).toContain("https://lost-time.org/delete-account");
-    expect(payload.html).toContain("Need to change your answers?");
-    expect(payload.html).toContain("Reply to this email or write to the admin");
+    expect(payload.html).toContain("Need to change your location or your answers? Want to add another language?");
+    expect(payload.html).toContain("Write to admin@lost-time.org");
+  });
+
+  it("sends a French welcome email when language is fr", async () => {
+    mockFrom.mockReturnValue({
+      select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: () => Promise.resolve({ data: { id: "user-2", display_name: "Béatrice", member_number: 8, language: "fr" }, error: null }) })) })),
+    });
+    mockGetUserById.mockResolvedValue({ data: { user: { id: "user-2", email: "beatrice@example.com" } }, error: null });
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({ id: "email-2" }) });
+
+    const req = new Request("https://test.supabase.co", {
+      method: "POST",
+      body: JSON.stringify({ member_id: "user-2" }),
+    });
+    const res = await handler(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [, callInit] = mockFetch.mock.calls[0];
+    const payload = JSON.parse(callInit.body);
+
+    expect(payload.to).toEqual(["beatrice@example.com"]);
+    expect(payload.subject).toBe("À la recherche de — membre #8");
+    expect(payload.html).toContain("Bonjour,");
+    expect(payload.html).toContain("membre #8");
+    expect(payload.html).toContain("lost-time.org");
+    expect(payload.html).toContain("admin@lost-time.org");
+    expect(payload.html).toContain("Bonne recherche.");
+  });
+
+  it("sends an Italian welcome email when language is it", async () => {
+    mockFrom.mockReturnValue({
+      select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: () => Promise.resolve({ data: { id: "user-3", display_name: "Carlo", member_number: 9, language: "it" }, error: null }) })) })),
+    });
+    mockGetUserById.mockResolvedValue({ data: { user: { id: "user-3", email: "carlo@example.com" } }, error: null });
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({ id: "email-3" }) });
+
+    const req = new Request("https://test.supabase.co", {
+      method: "POST",
+      body: JSON.stringify({ member_id: "user-3" }),
+    });
+    const res = await handler(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [, callInit] = mockFetch.mock.calls[0];
+    const payload = JSON.parse(callInit.body);
+
+    expect(payload.to).toEqual(["carlo@example.com"]);
+    expect(payload.subject).toBe("Alla ricerca di — socio #9");
+    expect(payload.html).toContain("Ciao,");
+    expect(payload.html).toContain("membro #9");
+    expect(payload.html).toContain("admin@lost-time.org");
+    expect(payload.html).toContain("Buona ricerca.");
   });
 
   it("returns 500 when Resend API fails", async () => {
