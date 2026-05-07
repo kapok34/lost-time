@@ -152,7 +152,7 @@ const Profile = () => {
       <div className="min-h-screen flex flex-col">
         <SiteHeader />
         <main className="flex-1 container max-w-2xl py-16 text-center text-muted-foreground italic">
-          Loading…
+          {t("profile.notFound")}
         </main>
         <Footer />
       </div>
