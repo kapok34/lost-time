@@ -33,11 +33,11 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/apply" element={<Apply />} />
             <Route path="/pending" element={<RequireAuth><Pending /></RequireAuth>} />
-            <Route path="/members" element={<RequireAuth><Members /></RequireAuth>} />
-            <Route path="/members/:memberNumber" element={<RequireAuth><Profile /></RequireAuth>} />
-            <Route path="/messages" element={<RequireAuth><Messages /></RequireAuth>} />
-            <Route path="/messages-demo" element={<RequireAuth><Messages /></RequireAuth>} />
-            <Route path="/messages/:id" element={<RequireAuth><Conversation /></RequireAuth>} />
+            <Route path="/members" element={<RequireAuth requireApproved><Members /></RequireAuth>} />
+            <Route path="/members/:memberNumber" element={<RequireAuth requireApproved><Profile /></RequireAuth>} />
+            <Route path="/messages" element={<RequireAuth requireApproved><Messages /></RequireAuth>} />
+            <Route path="/messages-demo" element={<RequireAuth requireApproved><Messages /></RequireAuth>} />
+            <Route path="/messages/:id" element={<RequireAuth requireApproved><Conversation /></RequireAuth>} />
             <Route path="/admin" element={<RequireAuth requireAdmin><Admin /></RequireAuth>} />
             <Route path="/delete-account" element={<DeleteAccount />} />
             <Route path="*" element={<NotFound />} />
