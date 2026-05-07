@@ -64,7 +64,7 @@ BEGIN
   INSERT INTO public.questionnaire_answers (user_id, question_id, answer)
   VALUES
     (uid2, 1, 'La gentillesse'),
-    (uid2, 2, 'L\'empathie et l\'humour'),
+    (uid2, 2, 'L''empathie et l''humour'),
     (uid2, 3, 'La rêverie'),
     (uid2, 4, 'Leur écoute'),
     (uid2, 5, 'La procrastination'),
@@ -88,14 +88,14 @@ BEGIN
     (uid2, 23, 'Les madeleines'),
     (uid2, 24, 'Le thé vert et les mochis'),
     (uid2, 25, 'Haru, Sora'),
-    (uid2, 26, 'L\'indifférence'),
+    (uid2, 26, 'L''indifférence'),
     (uid2, 27, 'Les dictateurs'),
     (uid2, 28, 'La liberation de Paris'),
     (uid2, 29, 'La semaine de quatre jours'),
     (uid2, 30, 'La mémoire photographique'),
     (uid2, 31, 'En paix, près de la mer'),
     (uid2, 32, 'Sereine'),
-    (uid2, 33, 'L\'arrogance'),
+    (uid2, 33, 'L''arrogance'),
     (uid2, 34, 'Prends ton temps')
   ON CONFLICT DO NOTHING;
 END $$;

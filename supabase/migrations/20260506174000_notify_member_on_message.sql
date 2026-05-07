@@ -15,7 +15,7 @@ BEGIN
     net.http_post(
       url := COALESCE(
         current_setting('app.settings.notify_member_function_url', true),
-        'https://' || COALESCE(current_setting('app.settings.supabase_project_id', true), 'ujwkmudumhlmgdyqcewj') || '.supabase.co/functions/v1/notify-member'
+        'https://' || COALESCE(current_setting('app.settings.supabase_project_id', true), 'ixxrqqdveyrjyjyhziap') || '.supabase.co/functions/v1/notify-member'
       ),
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
