@@ -98,4 +98,6 @@ BEGIN
     (uid2, 33, 'L''arrogance'),
     (uid2, 34, 'Prends ton temps')
   ON CONFLICT DO NOTHING;
+  -- Advance sequence past seeded member numbers
+  PERFORM setval('public.member_number_seq', 3, false);
 END $$;
