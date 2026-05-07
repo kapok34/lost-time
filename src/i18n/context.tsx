@@ -316,7 +316,7 @@ export const translations: Record<UILang, Record<string, string>> = {
     "conversation.minLength": "almeno 5 caratteri",
     "conversation.initialMinLength": "almeno 34 caratteri",
     "conversation.limitReached": "hai raggiunto il limite di messaggi per questa conversazione",
-    "conversation.waitForReply": "attendi fino a 34 ore",
+    "conversation.waitForReply": "aspetta fino a 34 ore",
     "conversation.noGhosting": "no ghosting",
     "pending.title": "Candidatura in attesa",
     "pending.subtitle": "Grazie per la candidatura. Le tue risposte sono in corso di revisione.",
