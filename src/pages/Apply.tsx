@@ -257,7 +257,7 @@ const Apply = () => {
       const { data: submitData, error: submitErr } = await supabase.rpc("submit_application", {
         _email: email,
         _password: password,
-        _display_name: email.split("@")[0] || "member",
+        _display_name: null,
         _language: lang,
         _location: location,
         _questionnaire_languages: Array.from(completedLangs),

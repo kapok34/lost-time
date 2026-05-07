@@ -6,7 +6,6 @@ type ProfileStatus = "pending" | "approved" | "suspended" | "rejected";
 
 interface ProfileLite {
   id: string;
-  display_name: string;
   avatar_url: string | null;
   language: string;
   location: string;
@@ -37,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loadProfile = async (uid: string) => {
     const [{ data: prof }, { data: roles }] = await Promise.all([
-      supabase.from("profiles").select("id, display_name, avatar_url, language, location, status, member_number, questionnaire_languages").eq("id", uid).maybeSingle(),
+      supabase.from("profiles").select("id, avatar_url, language, location, status, member_number, questionnaire_languages").eq("id", uid).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", uid),
     ]);
     setProfile((prof as ProfileLite) ?? null);
