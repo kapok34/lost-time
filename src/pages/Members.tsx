@@ -80,6 +80,7 @@ const Members = () => {
 
   const filtered = useMemo(() => {
     return members.filter((m) => {
+      if (user && m.id === user.id) return false;
       const parts = m.location.split(",").map((s) => s.trim());
       const country = parts.length > 1 ? parts[parts.length - 1] : parts[0];
       const city = parts.length > 1 ? parts.slice(0, parts.length - 1).join(", ") : "";
@@ -87,7 +88,7 @@ const Members = () => {
       if (cityFilter !== "all" && city !== cityFilter) return false;
       return true;
     });
-  }, [members, countryFilter, cityFilter]);
+  }, [members, countryFilter, cityFilter, user]);
 
   return (
     <div className="min-h-screen flex flex-col font-sans-ui">
