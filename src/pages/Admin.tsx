@@ -89,7 +89,17 @@ const Admin = () => {
     setSavingAnswers(true);
     try {
       const langAnswers = answers[reviewLang] ?? {};
-      const rows = getQuestions(reviewLang).map((q) => ({
+      const qs = getQuestions(reviewLang);
+      const isComplete = qs.every((q) => {
+        const len = (langAnswers[q.id] ?? "").trim().length;
+        return len >= 3 && len <= 200;
+      });
+      if (!isComplete) {
+        toast.error("please complete the questionnaire: each answer must be at least 3 characters");
+        setSavingAnswers(false);
+        return;
+      }
+      const rows = qs.map((q) => ({
         user_id: openId,
         question_id: q.id,
         answer: (langAnswers[q.id] ?? "").trim(),
@@ -101,11 +111,7 @@ const Admin = () => {
       const allProfiles = [...pending, ...members];
       const profile = allProfiles.find((p) => p.id === openId);
       const currentLangs = (profile?.questionnaire_languages ?? []) as QuestionnaireLang[];
-      const isComplete = getQuestions(reviewLang).every((q) => {
-        const len = (langAnswers[q.id] ?? "").trim().length;
-        return len >= 3 && len <= 200;
-      });
-      if (isComplete && !currentLangs.includes(reviewLang)) {
+      if (!currentLangs.includes(reviewLang)) {
         await supabase.from("profiles").update({ questionnaire_languages: [...currentLangs, reviewLang] }).eq("id", openId);
         load();
       }
