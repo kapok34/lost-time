@@ -106,7 +106,7 @@ const Members = () => {
       <main className="flex-1 container max-w-6xl py-12">
         <div className="flex justify-end gap-3 mb-8">
           <Select value={countryFilter} onValueChange={(v) => { setCountryFilter(v); setCityFilter("all"); }}>
-            <SelectTrigger className="w-40 bg-white border-input font-sans-ui justify-center">
+            <SelectTrigger className="w-40 bg-white border-input font-sans-ui justify-end">
               <SelectValue placeholder={t("members.filterCountry")} />
             </SelectTrigger>
             <SelectContent>
@@ -117,7 +117,7 @@ const Members = () => {
             </SelectContent>
           </Select>
           <Select value={cityFilter} onValueChange={setCityFilter}>
-            <SelectTrigger className="w-40 bg-white border-input font-sans-ui justify-center">
+            <SelectTrigger className="w-40 bg-white border-input font-sans-ui justify-end">
               <SelectValue placeholder={t("members.filterCity")} />
             </SelectTrigger>
             <SelectContent>
@@ -128,7 +128,7 @@ const Members = () => {
             </SelectContent>
           </Select>
           <Select value={languageFilter} onValueChange={setLanguageFilter}>
-            <SelectTrigger className="w-40 bg-white border-input font-sans-ui justify-center">
+            <SelectTrigger className="w-40 bg-white border-input font-sans-ui justify-end">
               <SelectValue placeholder={t("members.filterLanguage")} />
             </SelectTrigger>
             <SelectContent>
