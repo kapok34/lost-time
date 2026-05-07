@@ -74,7 +74,7 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Ciao,",
       approved: `La tua candidatura è stata approvata. Sei ora <strong style="color: #b91c1c;">membro #${memberNum}</strong> di lost time.`,
       login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #b91c1c; text-decoration: underline;">lost-time.org</a> per sfogliare le risposte dei membri e iniziare a corrispondere.`,
-      changeLabel: "Hai bisogno di modificare la tua localizzazione o le tue risposte? Vuoi aggiungere un'altra lingua?",
+      changeLabel: "Hai bisogno di modificare la tua località o le tue risposte? Vuoi aggiungere un'altra lingua?",
       changeText: "Scrivi ad admin@lost-time.org aggiorneremo il tuo profilo.",
       deleteLabel: "Vuoi eliminare il tuo account?",
       deleteText: `Elimina il tuo account</a> — questo rimuoverà permanentemente il tuo profilo, le tue risposte, i messaggi e tutti i dati associati.`,
