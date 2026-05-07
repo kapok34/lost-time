@@ -392,7 +392,25 @@ const Apply = () => {
             })}
           </section>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(t("apply.clearConfirm") ?? "Are you sure you want to clear all data?")) {
+                  localStorage.removeItem(STORAGE_KEY);
+                  setEmail("");
+                  setPassword("");
+                  setCity("");
+                  setCountry("");
+                  setAnswers({});
+                  setCompletedLangs(new Set());
+                  toast.info(t("apply.cleared") ?? "Draft cleared");
+                }
+              }}
+              className="text-base font-sans-ui bg-muted text-muted-foreground px-6 py-2 rounded hover:bg-muted/80 transition-colors"
+            >
+              {t("apply.clear") ?? "clear"}
+            </button>
             <button
               type="submit"
               disabled={submitting || completedLangs.size === 0 || !accountSchema.safeParse({ email, password, city, country }).success}
