@@ -131,6 +131,17 @@ const Members = () => {
               ))}
             </SelectContent>
           </Select>
+          <Select value={languageFilter} onValueChange={setLanguageFilter}>
+            <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
+              <SelectValue placeholder={t("members.filterLanguage")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="font-sans-ui">{t("members.allLanguages")}</SelectItem>
+              {languages.map((l) => (
+                <SelectItem key={l} value={l} className="font-sans-ui">{l.toUpperCase()}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -146,17 +157,6 @@ const Members = () => {
               className="w-44 bg-white border-input font-sans-ui"
             />
           </form>
-          <Select value={languageFilter} onValueChange={setLanguageFilter}>
-            <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
-              <SelectValue placeholder={t("members.filterLanguage")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="font-sans-ui">{t("members.allLanguages")}</SelectItem>
-              {languages.map((l) => (
-                <SelectItem key={l} value={l} className="font-sans-ui">{l.toUpperCase()}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         {loading ? (
