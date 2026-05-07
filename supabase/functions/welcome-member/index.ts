@@ -46,8 +46,8 @@ export async function handler(req: Request): Promise<Response> {
     en: {
       subject: `In search of — member #${memberNum}`,
       greeting: "Hello,",
-      approved: `Your application has been approved. You are now <strong style="color: #b91c1c;">member #${memberNum}</strong> of lost time.`,
-      login: `You can log in at <a href="https://lost-time.org/login" style="color: #b91c1c; text-decoration: underline;">lost-time.org</a> to browse members' answers and begin corresponding.`,
+      approved: `Your application has been approved. You are now <strong style="color: #800000;">member #${memberNum}</strong> of lost time.`,
+      login: `You can log in at <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> to browse members' answers and begin corresponding.`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "No juggling: each member can have only one active correspondence at a time.",
       manifestoHeyYou: `No "hey you": your first message to another member must contain at least 34 characters.`,
@@ -65,8 +65,8 @@ export async function handler(req: Request): Promise<Response> {
     fr: {
       subject: `À la recherche de — membre #${memberNum}`,
       greeting: "Bonjour,",
-      approved: `Ta candidature a été approuvée. Tu es désormais <strong style="color: #b91c1c;">membre #${memberNum}</strong> de lost time.`,
-      login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #b91c1c; text-decoration: underline;">lost-time.org</a> pour parcourir les réponses des membres et entamer une correspondance.`,
+      approved: `Ta candidature a été approuvée. Tu es désormais <strong style="color: #800000;">membre #${memberNum}</strong> de lost time.`,
+      login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> pour parcourir les réponses des membres et entamer une correspondance.`,
       manifestoTitle: "Manifeste",
       manifestoJuggling: "Pas de jonglage : chaque membre ne peut entretenir qu'une seule correspondance à la fois.",
       manifestoHeyYou: `Pas de « salut toi » : ton premier message à un autre membre doit contenir au moins 34 caractères.`,
@@ -84,8 +84,8 @@ export async function handler(req: Request): Promise<Response> {
     it: {
       subject: `Alla ricerca di — socio #${memberNum}`,
       greeting: "Ciao,",
-      approved: `La tua candidatura è stata approvata. Sei ora <strong style="color: #b91c1c;">membro #${memberNum}</strong> di lost time.`,
-      login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #b91c1c; text-decoration: underline;">lost-time.org</a> per sfogliare le risposte dei membri e iniziare a corrispondere.`,
+      approved: `La tua candidatura è stata approvata. Sei ora <strong style="color: #800000;">membro #${memberNum}</strong> di lost time.`,
+      login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> per sfogliare le risposte dei membri e iniziare a corrispondere.`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "Niente giocoleria: ogni socio può avere solo una corrispondenza attiva alla volta.",
       manifestoHeyYou: `Niente « ciao »: il tuo primo messaggio ad un altro socio deve contenere almeno 34 caratteri.`,
@@ -114,7 +114,7 @@ export async function handler(req: Request): Promise<Response> {
         to: [userData.user.email],
         subject: t.subject,
         html: `
-          <div style="max-width: 480px; margin: 0 auto; font-family: Georgia, serif; line-height: 1.65; color: #1a1a1a;">
+          <div style="max-width: 480px; margin: 0 auto; font-family: 'Cormorant Garamond', Georgia, serif; line-height: 1.65; color: #1a1a1a;">
             <p>${t.greeting}</p>
             <p>${t.approved}</p>
             <p>${t.login}</p>
@@ -133,11 +133,11 @@ export async function handler(req: Request): Promise<Response> {
             </p>
             <p style="color: #444; font-size: 0.95em;">
               <strong>${t.deleteLabel}</strong><br>
-              <a href="${deleteUrl}" style="color: #b91c1c; text-decoration: underline;">${t.deleteText}
+              <a href="${deleteUrl}" style="color: #800000; text-decoration: underline;">${t.deleteText}
             </p>
             <p style="margin-top: 1.5em;">${t.outro}</p>
             <p>${t.signoff}</p>
-            <p style="color: #888; font-size: 0.9em; margin-top: 2em;">${t.brand}</p>
+            <p style="color: #800000; font-size: 0.9em; margin-top: 2em;">${t.brand}</p>
           </div>
         `,
       }),

@@ -134,6 +134,24 @@ const Admin = () => {
   const reject = async (id: string) => {
     const { error } = await supabase.from("profiles").update({ status: "rejected", rejection_reason: reason || null }).eq("id", id);
     if (error) { toast.error(error.message); return; }
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (token) {
+        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reject-applicant`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ member_id: id, reason: reason || null }),
+        });
+      }
+    } catch {
+      // Silently ignore email errors — rejection is already persisted
+    }
+
     toast.success("Rejected");
     setReason("");
     setOpenId(null);
