@@ -143,7 +143,8 @@ const Members = () => {
             </SelectContent>
           </Select>
           <Input
-            type="number"
+            type="text"
+            inputMode="numeric"
             placeholder={t("members.searchByNumber")}
             value={searchNumber}
             onChange={(e) => setSearchNumber(e.target.value)}
