@@ -31,19 +31,6 @@ export const SiteHeader = () => {
           <Title />
         </Link>
 
-        {!onLanding && (
-          <nav className="hidden md:flex items-center gap-8">
-            {approved && (
-              <>
-                <NavLink to="/members" className={linkCls}>{t("members")}</NavLink>
-                <NavLink to="/messages" className={linkCls}>{t("messages")}</NavLink>
-                <NavLink to={`/members/${user?.id}`} className={linkCls}>{t("profile")}</NavLink>
-              </>
-            )}
-            {isAdmin && <NavLink to="/admin" className={linkCls}>{t("admin")}</NavLink>}
-          </nav>
-        )}
-
         <div className="flex items-center gap-3">
           {!user && (
             <>
