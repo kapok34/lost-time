@@ -20,7 +20,7 @@ interface ProfileFull {
 }
 
 const Profile = () => {
-  const { id } = useParams<{ id: string }>();
+  const { memberNumber } = useParams<{ memberNumber: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t } = useI18n();
@@ -34,21 +34,27 @@ const Profile = () => {
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
+    if (!memberNumber) return;
     (async () => {
-      const [{ data: prof }, { data: ans }, { data: convs }] = await Promise.all([
-      supabase.from("profiles").select("id, avatar_url, member_number, location, questionnaire_language, questionnaire_languages").eq("id", id).maybeSingle(),
-        supabase.from("questionnaire_answers").select("question_id, answer, lang").eq("user_id", id),
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("id, avatar_url, member_number, location, questionnaire_language, questionnaire_languages")
+        .eq("member_number", Number(memberNumber))
+        .maybeSingle();
+      const p = (prof as ProfileFull) ?? null;
+      setProfile(p);
+      if (!p) return;
+      const [{ data: ans }, { data: convs }] = await Promise.all([
+        supabase.from("questionnaire_answers").select("question_id, answer, lang").eq("user_id", p.id),
         supabase.from("conversations").select("id, member_a, member_b").eq("status", "active"),
       ]);
-      setProfile((prof as ProfileFull) ?? null);
       const map: Record<string, Record<number, string>> = {};
       (ans ?? []).forEach((a: any) => {
         if (!map[a.lang]) map[a.lang] = {};
         map[a.lang][a.question_id] = a.answer;
       });
       setAnswers(map);
-      const available = ((prof as ProfileFull)?.questionnaire_languages ?? []) as QuestionnaireLang[];
+      const available = (p.questionnaire_languages ?? []) as QuestionnaireLang[];
       if (available.length > 0) setViewLang(available[0]);
 
       const myActive = (convs ?? []).find((c: any) => c.member_a === user?.id || c.member_b === user?.id);
@@ -58,17 +64,17 @@ const Profile = () => {
         setActiveWith(other);
       }
 
-      const theirActive = (convs ?? []).find((c: any) => c.member_a === id || c.member_b === id);
+      const theirActive = (convs ?? []).find((c: any) => c.member_a === p.id || c.member_b === p.id);
       setOtherHasActive(!!theirActive);
       if (theirActive) {
-        const other = theirActive.member_a === id ? theirActive.member_b : theirActive.member_a;
+        const other = theirActive.member_a === p.id ? theirActive.member_b : theirActive.member_a;
         setOtherActiveWith(other);
       }
     })();
-  }, [id, user?.id]);
+  }, [memberNumber, user?.id]);
 
-  const isMe = user?.id === id;
-  const canMessage = !isMe && (!hasActive || activeWith === id) && (!otherHasActive || otherActiveWith === user?.id);
+  const isMe = user?.id === profile?.id;
+  const canMessage = !isMe && (!hasActive || activeWith === profile?.id) && (!otherHasActive || otherActiveWith === user?.id);
 
   const questions = useMemo(
     () => getQuestions(viewLang),
@@ -82,20 +88,20 @@ const Profile = () => {
 
 
   const onMessage = async () => {
-    if (!id) return;
-    if (hasActive && activeWith === id) {
+    if (!profile?.id) return;
+    if (hasActive && activeWith === profile.id) {
       // Open existing conversation: find it
       const { data } = await supabase
         .from("conversations")
         .select("id")
         .eq("status", "active")
-        .or(`and(member_a.eq.${user?.id},member_b.eq.${id}),and(member_a.eq.${id},member_b.eq.${user?.id})`)
+        .or(`and(member_a.eq.${user?.id},member_b.eq.${profile.id}),and(member_a.eq.${profile.id},member_b.eq.${user?.id})`)
         .maybeSingle();
       if (data) navigate(`/messages/${data.id}`);
       return;
     }
     setStarting(true);
-    const { data, error } = await supabase.rpc("start_conversation", { _other_user: id });
+    const { data, error } = await supabase.rpc("start_conversation", { _other_user: profile.id });
     setStarting(false);
     if (error) {
       toast.error(error.message);
@@ -144,7 +150,7 @@ const Profile = () => {
           {!isMe && (
             canMessage ? (
               <Button onClick={onMessage} disabled={starting} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">
-                {hasActive && activeWith === id ? t("conversation") : t("profile.beginCorrespondence")}
+                {hasActive && activeWith === profile?.id ? t("conversation") : t("profile.beginCorrespondence")}
               </Button>
             ) : (
               <div className="flex flex-col items-center">
@@ -182,7 +188,7 @@ const Profile = () => {
           canMessage ? (
             <div className="flex justify-center mt-8">
               <Button onClick={onMessage} disabled={starting} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">
-                {hasActive && activeWith === id ? t("conversation") : t("profile.connect")}
+                {hasActive && activeWith === profile?.id ? t("conversation") : t("profile.connect")}
               </Button>
             </div>
           ) : (
