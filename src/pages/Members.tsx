@@ -142,21 +142,20 @@ const Members = () => {
               ))}
             </SelectContent>
           </Select>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const num = searchNumber.trim();
-              if (num) navigate(`/members/${num}`);
+          <Input
+            type="number"
+            placeholder={t("members.searchByNumber")}
+            value={searchNumber}
+            onChange={(e) => setSearchNumber(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const num = searchNumber.trim();
+                if (num) navigate(`/members/${num}`);
+              }
             }}
-          >
-            <Input
-              type="number"
-              placeholder={t("members.searchByNumber")}
-              value={searchNumber}
-              onChange={(e) => setSearchNumber(e.target.value)}
-              className="w-44 bg-white border-input font-sans-ui"
-            />
-          </form>
+            className="w-44 bg-white border-input font-sans-ui"
+          />
         </div>
 
         {loading ? (
