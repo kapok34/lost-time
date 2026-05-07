@@ -198,6 +198,30 @@ const Admin = () => {
     load();
   };
 
+  const deleteMember = async (id: string) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) {
+      toast.error("Not authenticated");
+      return;
+    }
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-member`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ member_id: id }),
+    });
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast.error(result.error || "Failed to delete member");
+      return;
+    }
+    toast.success("Member deleted");
+    load();
+  };
+
   const approvedCount = members.filter((p) => p.status === "approved").length;
 
   const sendBroadcast = async () => {
@@ -294,6 +318,25 @@ const Admin = () => {
                     >
                       {p.status === "approved" ? (t("admin.suspend") || "suspend") : (t("admin.reinstate") || "reinstate")}
                     </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" className="hover:!bg-destructive hover:!text-white">{t("admin.delete") || "delete"}</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="font-sans-ui">Delete member?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete member #{p.member_number} and all their data.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteMember(p.id)} className="bg-destructive text-white hover:bg-destructive">
+                            {t("admin.delete") || "delete"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </li>
               ))}
