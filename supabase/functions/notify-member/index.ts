@@ -45,7 +45,7 @@ serve(async (req) => {
   // Get sender profile for member number
   const { data: senderProf } = await supabase
     .from("profiles")
-    .select("member_number, display_name")
+    .select("member_number")
     .eq("id", sender_id)
     .maybeSingle();
 
@@ -58,7 +58,6 @@ serve(async (req) => {
   }
 
   const senderNum = senderProf?.member_number ?? "—";
-  const senderName = senderProf?.display_name ?? "A member";
   const preview = body.length > 120 ? body.slice(0, 120) + "…" : body;
 
   try {
@@ -73,13 +72,17 @@ serve(async (req) => {
         to: [userData.user.email],
         subject: `New message from member #${senderNum}`,
         html: `
-          <p>Hello,</p>
-          <p>You have received a new message from <strong>member #${senderNum}</strong> (${senderName}):</p>
-          <blockquote style="border-left: 3px solid #ccc; padding-left: 1em; color: #555;">
-            ${preview.replace(/\n/g, "<br>")}
-          </blockquote>
-          <p><a href="https://lost-time.org/messages/${conversation_id}">Open conversation</a></p>
-          <p style="color: #999; font-size: 0.9em;">— lost time</p>
+          <div style="max-width: 480px; margin: 0 auto; font-family: 'Cormorant Garamond', Georgia, serif; line-height: 1.65; color: #1a1a1a;">
+            <p>Hello,</p>
+            <p>You have received a new message from <strong style="color: #800000;">member #${senderNum}</strong>:</p>
+            <blockquote style="border-left: 3px solid #ccc; padding-left: 1em; color: #555; margin: 1em 0;">
+              ${preview.replace(/\n/g, "<br>")}
+            </blockquote>
+            <p><a href="https://lost-time.org/messages/${conversation_id}" style="color: #800000; text-decoration: underline;">Open correspondence</a></p>
+            <p style="color: #666; font-size: 0.9em;">If you do not respond within 34 hours, member #${senderNum} may end this correspondence.</p>
+            <p style="color: #666; font-size: 0.9em;">You may end this correspondence only after you have responded.</p>
+            <p style="color: #888; font-size: 0.9em; margin-top: 2em;">— lost time</p>
+          </div>
         `,
       }),
     });
