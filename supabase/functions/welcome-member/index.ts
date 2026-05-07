@@ -49,7 +49,7 @@ export async function handler(req: Request): Promise<Response> {
       approved: `Your application has been approved. You are now <strong style="color: #800000;">member #${memberNum}</strong> of lost time.`,
       login: `You can log in at <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> to browse members' answers and begin corresponding.`,
       manifestoTitle: "Manifesto",
-      manifestoJuggling: "No juggling: each member can have only one active correspondence at a time.",
+      manifestoJuggling: "No juggling: each member can hold only one active correspondence at a time.",
       manifestoHeyYou: `No "hey you": your first message to another member must contain at least 34 characters.`,
       manifestoGhosting: "No ghosting: you can end a correspondence only after you have responded, or if your correspondent has not responded for over 34 hours.",
       manifestoBenching: "No zapping: if you end a correspondence, you have to wait 34 days before you can restart it.",

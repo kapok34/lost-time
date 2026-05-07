@@ -2,6 +2,7 @@ import { useI18n } from "@/i18n/context";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
 import { SeedButton } from "@/components/SeedButton";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const { t } = useI18n();
@@ -21,7 +22,16 @@ const Index = () => {
           lost time
         </h1>
 
-        <div className="flex-[2]" />
+        <div className="flex-[1]" />
+
+        <Link
+          to="/preface"
+          className="text-xs font-sans-ui tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+        >
+          preface
+        </Link>
+
+        <div className="flex-[1]" />
       </div>
 
       <Footer />

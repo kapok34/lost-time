@@ -69,10 +69,10 @@ describe("DeleteAccount end-to-end flow", () => {
 
     expect(screen.getByText(/Delete your account/i)).toBeInTheDocument();
     expect(screen.getByText(/permanently erase/i)).toBeInTheDocument();
-    expect(screen.getByText(/Your profile and avatar/i)).toBeInTheDocument();
+expect(screen.getByText(/Your portrait and avatar/i)).toBeInTheDocument();
     expect(screen.getByText(/Your questionnaire answers/i)).toBeInTheDocument();
     expect(screen.getByText(/All messages you have sent and received/i)).toBeInTheDocument();
-    expect(screen.getByText(/All active and archived conversations/i)).toBeInTheDocument();
+    expect(screen.getByText(/All active and archived correspondences/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Delete my account/i })).toBeInTheDocument();
   });
 
