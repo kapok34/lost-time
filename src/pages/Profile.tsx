@@ -164,9 +164,6 @@ const Profile = () => {
               </div>
             )
           )}
-          {isMe && (
-            <Button asChild variant="outline"><Link to="/settings">{t("profile.edit")}</Link></Button>
-          )}
         </div>
 
         <div className="space-y-10">

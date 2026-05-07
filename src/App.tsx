@@ -12,7 +12,6 @@ import Apply from "./pages/Apply.tsx";
 import Pending from "./pages/Pending.tsx";
 import Members from "./pages/Members.tsx";
 import Profile from "./pages/Profile.tsx";
-import Settings from "./pages/Settings.tsx";
 import Messages from "./pages/Messages.tsx";
 import Conversation from "./pages/Conversation.tsx";
 import Admin from "./pages/Admin.tsx";
@@ -36,7 +35,6 @@ const App = () => (
             <Route path="/pending" element={<RequireAuth><Pending /></RequireAuth>} />
             <Route path="/members" element={<Members />} />
             <Route path="/members/:id" element={<Profile />} />
-            <Route path="/settings" element={<RequireAuth requireApproved><Settings /></RequireAuth>} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/messages-demo" element={<Messages />} />
             <Route path="/messages/:id" element={<Conversation />} />
