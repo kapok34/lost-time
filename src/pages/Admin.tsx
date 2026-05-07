@@ -17,7 +17,7 @@ import {
 
 interface Profile {
   id: string;
-  display_name: string;
+  member_number: number | null;
   language: string;
   location: string;
   status: string;
@@ -44,7 +44,7 @@ const Admin = () => {
   const load = async () => {
     const { data } = await supabase
       .from("profiles")
-      .select("id, display_name, language, location, status, created_at, rejection_reason, questionnaire_languages")
+      .select("id, member_number, language, location, status, created_at, rejection_reason, questionnaire_languages")
       .order("created_at", { ascending: false });
     const all = (data as Profile[]) ?? [];
     setPending(all.filter((p) => p.status === "pending"));
@@ -199,7 +199,6 @@ const Admin = () => {
                 {pending.map((p) => (
                   <li key={p.id} className="border border-border p-4 flex items-center justify-between">
                     <div>
-                      <h3 className="font-display text-xl">{p.display_name}</h3>
                       <p className="text-base text-muted-foreground italic">
                         {p.location} · {p.language} · applied {new Date(p.created_at).toLocaleDateString()}
                       </p>
@@ -216,7 +215,7 @@ const Admin = () => {
               {members.map((p) => (
                 <li key={p.id} className="border border-border p-4 flex items-center justify-between">
                   <div>
-                    <h3 className="font-display text-xl">{p.display_name}</h3>
+                    <h3 className="font-display text-xl">Member #{p.member_number}</h3>
                     <p className="text-base text-muted-foreground italic">
                       {p.location} · {p.language} · {p.status}
                     </p>
@@ -291,7 +290,7 @@ const Admin = () => {
             <div className="container max-w-3xl py-12">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="font-display text-3xl">
-                  {[...pending, ...members].find((p) => p.id === openId)?.display_name}
+                  {[...pending, ...members].find((p) => p.id === openId)?.member_number ?? "—"}
                 </h2>
                 <Button variant="ghost" onClick={() => setOpenId(null)}>Close</Button>
               </div>

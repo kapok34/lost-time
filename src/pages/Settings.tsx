@@ -19,7 +19,6 @@ const Settings = () => {
   const { user, profile, refreshProfile } = useAuth();
   const { t } = useI18n();
 
-  const [displayName, setDisplayName] = useState("");
   const [language, setLanguage] = useState("");
   const [location, setLocation] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -31,7 +30,6 @@ const Settings = () => {
 
   useEffect(() => {
     if (!user || !profile) return;
-    setDisplayName(profile.display_name);
     setLanguage(profile.language);
     setLocation(profile.location);
     setAvatarUrl(profile.avatar_url ?? "");
@@ -90,7 +88,7 @@ const Settings = () => {
     try {
       const { error: pErr } = await supabase
         .from("profiles")
-        .update({ display_name: displayName, language, location, avatar_url: avatarUrl || null })
+        .update({ language, location, avatar_url: avatarUrl || null })
         .eq("id", user.id);
       if (pErr) throw pErr;
 
@@ -137,10 +135,6 @@ const Settings = () => {
         <h1 className="font-display text-4xl mb-10">{t("settings.title")}</h1>
 
         <section className="space-y-5 mb-12">
-          <div>
-            <Label>{t("apply.displayName")}</Label>
-            <Input value={displayName} maxLength={60} onChange={(e) => setDisplayName(e.target.value)} className="bg-white border-input" />
-          </div>
           <div>
             <Label>Avatar URL</Label>
             <Input value={avatarUrl} placeholder="https://…" onChange={(e) => setAvatarUrl(e.target.value)} className="bg-white border-input" />
