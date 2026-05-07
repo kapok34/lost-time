@@ -5,8 +5,8 @@
 CREATE OR REPLACE FUNCTION public.submit_application(
   _email TEXT,
   _password TEXT,
-  _display_name TEXT DEFAULT NULL,
-  _language TEXT DEFAULT NULL,
+  _display_name TEXT,
+  _language TEXT,
   _location TEXT,
   _questionnaire_language TEXT,
   _answers JSONB  -- { "1": "answer text", "2": "...", ... }

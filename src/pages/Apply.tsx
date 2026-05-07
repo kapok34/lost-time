@@ -223,17 +223,24 @@ const Apply = () => {
 
     setSubmitting(true);
     try {
-      const { data: authData, error: authErr } = await supabase.auth.signUp({
+      let authData = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: `${window.location.origin}/` },
       });
-      if (authErr) throw authErr;
-      const uid = authData.user?.id;
+      // If user already exists, sign in instead and continue
+      if (authData.error && authData.error.message.toLowerCase().includes('already registered')) {
+        const signInData = await supabase.auth.signInWithPassword({ email, password });
+        if (signInData.error) throw signInData.error;
+        authData = { data: { user: signInData.data.user, session: signInData.data.session }, error: null };
+      } else if (authData.error) {
+        throw authData.error;
+      }
+      const uid = authData.data.user?.id;
       if (!uid) throw new Error("Could not create account");
 
       // If session not auto-created, sign in
-      if (!authData.session) {
+      if (!authData.data.session) {
         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
         if (signInErr) throw signInErr;
       }

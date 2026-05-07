@@ -13,7 +13,7 @@ BEGIN
   IF OLD.status = 'pending' AND NEW.status = 'approved' THEN
     _project_id := COALESCE(
       current_setting('app.settings.supabase_project_id', true),
-      'ujwkmudumhlmgdyqcewj'
+      'ixxrqqdveyrjyjyhziap'
     );
     _function_url := 'https://' || _project_id || '.supabase.co/functions/v1/welcome-member';
 

@@ -1,5 +1,5 @@
 -- Create this file and run its contents in Supabase Dashboard SQL Editor:
--- https://supabase.com/dashboard/project/ujwkmudumhlmgdyqcewj/sql
+-- https://supabase.com/dashboard/project/ixxrqqdveyrjyjyhziap/sql
 
 -- 1. Add member_number column (safe to re-run)
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS member_number INTEGER UNIQUE;

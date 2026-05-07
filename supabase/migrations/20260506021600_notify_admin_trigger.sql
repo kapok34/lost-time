@@ -14,7 +14,7 @@ BEGIN
     -- Read project ID from config or fall back to env
     _project_id := COALESCE(
       current_setting('app.settings.supabase_project_id', true),
-      'ujwkmudumhlmgdyqcewj'
+      'ixxrqqdveyrjyjyhziap'
     );
     _function_url := 'https://' || _project_id || '.supabase.co/functions/v1/notify-admin';
 
@@ -46,4 +46,10 @@ CREATE TRIGGER notify_admin_on_apply_trigger
   EXECUTE FUNCTION public.notify_admin_on_apply();
 
 -- Grant execute on net extension (if using supabase net extension)
-GRANT USAGE ON SCHEMA net TO supabase_functions_admin;
+-- Note: the 'net' schema comes from the pg_net extension, which may need to be enabled first.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'net') THEN
+    GRANT USAGE ON SCHEMA net TO supabase_functions_admin;
+  END IF;
+END $$;
