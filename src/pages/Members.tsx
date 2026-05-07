@@ -46,8 +46,7 @@ const Members = () => {
         console.warn("Members fetch error:", error.message);
       }
       const fetched = (data as Member[]) ?? [];
-      // Fallback to demo members when database is empty or unreachable
-      setMembers([...fetched, ...DEMO_MEMBERS]);
+      setMembers(fetched);
       setLoading(false);
     })();
   }, []);
