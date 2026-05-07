@@ -13,7 +13,6 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 interface Member {
@@ -110,23 +109,6 @@ const Members = () => {
       <SiteHeader />
       <main className="flex-1 container max-w-6xl py-12">
         <div className="flex justify-end gap-3 mb-8">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const num = searchNumber.trim();
-              if (num) navigate(`/members/${num}`);
-            }}
-            className="flex gap-2"
-          >
-            <Input
-              type="number"
-              placeholder={t("members.searchByNumber")}
-              value={searchNumber}
-              onChange={(e) => setSearchNumber(e.target.value)}
-              className="w-44 bg-white border-input font-sans-ui"
-            />
-            <Button type="submit" variant="outline" className="px-3 font-sans-ui">→</Button>
-          </form>
           <Select value={countryFilter} onValueChange={(v) => { setCountryFilter(v); setCityFilter("all"); }}>
             <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
               <SelectValue placeholder={t("members.filterCountry")} />
@@ -149,6 +131,21 @@ const Members = () => {
               ))}
             </SelectContent>
           </Select>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const num = searchNumber.trim();
+              if (num) navigate(`/members/${num}`);
+            }}
+          >
+            <Input
+              type="number"
+              placeholder={t("members.searchByNumber")}
+              value={searchNumber}
+              onChange={(e) => setSearchNumber(e.target.value)}
+              className="w-44 bg-white border-input font-sans-ui"
+            />
+          </form>
           <Select value={languageFilter} onValueChange={setLanguageFilter}>
             <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
               <SelectValue placeholder={t("members.filterLanguage")} />
