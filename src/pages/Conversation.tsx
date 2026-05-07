@@ -38,7 +38,13 @@ const Conversation = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
+  const [now, setNow] = useState(Date.now());
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
 
   const myCount = messages.filter((m) => m.sender_id === user?.id).length;
@@ -119,10 +125,13 @@ const Conversation = () => {
   }
 
   const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-  const bothHaveSent = messages.some((m) => m.sender_id === user?.id) && messages.some((m) => m.sender_id === other!.id);
-  const canEnd = bothHaveSent && lastMessage?.sender_id === user?.id;
-  const hoursSinceLastMessage = lastMessage ? (Date.now() - new Date(lastMessage.created_at).getTime()) / (1000 * 60 * 60) : null;
-  const canEndDueToInactivity = lastMessage?.sender_id === user?.id && hoursSinceLastMessage !== null && hoursSinceLastMessage > 34;
+  const iAmLastSender = lastMessage?.sender_id === user?.id;
+  const hoursSinceLastMessage = lastMessage ? (now - new Date(lastMessage.created_at).getTime()) / (1000 * 60 * 60) : null;
+  const canEnd = iAmLastSender && hoursSinceLastMessage !== null && hoursSinceLastMessage > 34;
+
+  const remainingMs = lastMessage ? Math.max(0, 34 * 60 * 60 * 1000 - (now - new Date(lastMessage.created_at).getTime())) : 0;
+  const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+  const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
 
   const archived = conv?.status === "archived";
 
@@ -136,7 +145,7 @@ const Conversation = () => {
           </Link>
           {archived ? (
             <p className="text-base text-muted-foreground italic">{t("conversation.ended")}</p>
-          ) : canEnd || canEndDueToInactivity ? (
+          ) : canEnd ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">{t("conversation.end")}</Button>
@@ -154,6 +163,12 @@ const Conversation = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          ) : messages.length > 0 && !iAmLastSender ? (
+            <p className="text-base text-muted-foreground italic">{t("conversation.noGhosting")}</p>
+          ) : messages.length > 0 && iAmLastSender ? (
+            <p className="text-base text-muted-foreground italic">
+              {t("conversation.waitForReply")} {remainingHours}h {remainingMinutes}m
+            </p>
           ) : null}
         </div>
         <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 py-4 min-h-[40vh] max-h-[60vh]">
