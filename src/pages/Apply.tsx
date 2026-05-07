@@ -170,6 +170,36 @@ const Apply = () => {
     }));
   }, [email, city, country, answers, activeLang, completedLangs]);
 
+  // Immediately persist on page hide (mobile tab kills, app switches)
+  useEffect(() => {
+    const flush = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        email, city, country, answers, activeLang, completedLangs: Array.from(completedLangs)
+      }));
+    };
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") flush();
+    });
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", flush);
+    };
+  }, [email, city, country, answers, activeLang, completedLangs]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const hasContent = email || city || country || Object.keys(answers).length > 0;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasContent && !submitted) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [email, city, country, answers, submitted]);
+
   // If user is already signed in & has a profile, send them home
   useEffect(() => {
     if (submitted) return;
