@@ -172,10 +172,11 @@ const Apply = () => {
 
   // If user is already signed in & has a profile, send them home
   useEffect(() => {
+    if (submitted) return;
     if (!loading && user && profile) {
       navigate(profile.status === "approved" ? "/members" : "/pending");
     }
-  }, [loading, user, profile, navigate]);
+  }, [loading, user, profile, submitted, navigate]);
 
   const questions = useMemo(() => getQuestions(activeLang), [activeLang]);
 
@@ -259,6 +260,7 @@ const Apply = () => {
 
       await supabase.auth.signOut();
       localStorage.removeItem(STORAGE_KEY);
+      toast.success(t("apply.submitted"));
       setSubmitted(true);
     } catch (err: any) {
       toast.error(err.message ?? "Something went wrong");
