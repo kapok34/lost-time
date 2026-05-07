@@ -204,6 +204,7 @@ const Apply = () => {
   useEffect(() => {
     if (submitted) return;
     if (!loading && user && profile) {
+      if (profile.status === "rejected") return; // allow rejected users to reapply
       navigate(profile.status === "approved" ? "/members" : "/pending");
     }
   }, [loading, user, profile, submitted, navigate]);
