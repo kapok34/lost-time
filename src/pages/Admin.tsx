@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -182,13 +183,11 @@ const Admin = () => {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 container max-w-5xl py-12">
-        <h1 className="font-display text-4xl mb-8">{t("admin.title")}</h1>
-
         <Tabs defaultValue="pending">
-          <TabsList>
-            <TabsTrigger value="pending">{t("admin.pendingApplications")} ({pending.length})</TabsTrigger>
-            <TabsTrigger value="members">Members ({members.length})</TabsTrigger>
-            <TabsTrigger value="broadcast">{t("admin.broadcast") || "Broadcast"}</TabsTrigger>
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="pending" className="font-sans-ui">{t("admin.pendingApplications")} ({pending.length})</TabsTrigger>
+            <TabsTrigger value="members" className="font-sans-ui">Members ({members.length})</TabsTrigger>
+            <TabsTrigger value="broadcast" className="font-sans-ui">{t("admin.broadcast") || "Broadcast"}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending" className="mt-8">
@@ -197,13 +196,13 @@ const Admin = () => {
             ) : (
               <ul className="space-y-3">
                 {pending.map((p) => (
-                  <li key={p.id} className="border border-border p-4 flex items-center justify-between">
+                  <li key={p.id} className="border border-border p-4 flex items-center justify-between hover:border-[#800000] transition-colors cursor-pointer" onClick={() => openApplicant(p.id)}>
                     <div>
                       <p className="text-base text-muted-foreground italic">
                         {p.location} · {p.language} · applied {new Date(p.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <Button variant="outline" onClick={() => openApplicant(p.id)}>Review</Button>
+                    <Button variant="outline" onClick={(e) => { e.stopPropagation(); openApplicant(p.id); }}>Review</Button>
                   </li>
                 ))}
               </ul>
@@ -213,7 +212,7 @@ const Admin = () => {
           <TabsContent value="members" className="mt-8">
             <ul className="space-y-3">
               {members.map((p) => (
-                <li key={p.id} className="border border-border p-4 flex items-center justify-between">
+                <li key={p.id} className="border border-border p-4 flex items-center justify-between hover:border-[#800000] transition-colors">
                   <div>
                     <h3 className="font-display text-xl">Member #{p.member_number}</h3>
                     <p className="text-base text-muted-foreground italic">
@@ -262,7 +261,7 @@ const Admin = () => {
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button className="w-full" disabled={sending || !broadcastSubject.trim() || !broadcastBody.trim()}>
+                  <Button className="w-full bg-[hsl(350,55%,35%)] text-white hover:bg-[#800000]" disabled={sending || !broadcastSubject.trim() || !broadcastBody.trim()}>
                     {sending ? (t("conversation.sending") || "sending…") : (t("admin.broadcastSend") || "Send")}
                   </Button>
                 </AlertDialogTrigger>
@@ -308,12 +307,12 @@ const Admin = () => {
                           <Globe size={16} className="text-muted-foreground" />
                           <Select value={reviewLang} onValueChange={(val) => setReviewLang(val as QuestionnaireLang)}>
                             <SelectTrigger className="w-auto min-w-[200px]">
-                              {QUESTIONNAIRE_LANG_LABELS[reviewLang]} ({reviewLang.toUpperCase()})
+                              {QUESTIONNAIRE_LANG_LABELS[reviewLang]} ({reviewLang})
                             </SelectTrigger>
                             <SelectContent>
                               {QUESTIONNAIRE_LANGS.map((l) => (
                                 <SelectItem key={l} value={l}>
-                                  {QUESTIONNAIRE_LANG_LABELS[l]} ({l.toUpperCase()})
+                                  {QUESTIONNAIRE_LANG_LABELS[l]} ({l})
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -331,27 +330,37 @@ const Admin = () => {
                                   : "border-border text-muted-foreground hover:border-[hsl(350,55%,35%)] hover:text-foreground"
                               }`}
                             >
-                              {l.toUpperCase()}
+                              {l}
                             </button>
                           ))}
                         </div>
                       ) : null}
                       {editMode ? (
-                        <div className="space-y-6">
+                        <div className="space-y-8 font-sans-ui">
+                          <div className="border-b border-border pb-2">
+                            <h2 className="font-sans-ui text-2xl tracking-tight text-black font-medium">{t("apply.questionnaire")}</h2>
+                          </div>
                           {qs.map((q) => (
-                            <div key={q.id}>
-                              <h3 className="font-display text-lg mb-1">
-                                <span className="text-primary mr-2">{q.id}.</span>{q.text}
-                              </h3>
-                              <Textarea
-                                rows={2}
-                                value={answers[currentLang]?.[q.id] ?? ""}
-                                onChange={(e) => setAnswers((a) => ({
-                                  ...a,
-                                  [currentLang]: { ...(a[currentLang] ?? {}), [q.id]: e.target.value },
-                                }))}
-                                className="bg-white border-input"
-                              />
+                            <div key={q.id} className="space-y-2">
+                              <Label className="font-cormorant text-xl leading-snug">
+                                <span className="text-foreground mr-2">{q.id}.</span>{q.text}
+                              </Label>
+                              <div className="relative">
+                                <Textarea
+                                  rows={3}
+                                  minLength={3}
+                                  maxLength={200}
+                                  value={answers[currentLang]?.[q.id] ?? ""}
+                                  onChange={(e) => setAnswers((a) => ({
+                                    ...a,
+                                    [currentLang]: { ...(a[currentLang] ?? {}), [q.id]: e.target.value },
+                                  }))}
+                                  className="bg-white border-input pr-12"
+                                />
+                                <div className="absolute bottom-1.5 right-2 text-[10px] text-muted-foreground pointer-events-none">
+                                  {(answers[currentLang]?.[q.id] ?? "").length}/200
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
