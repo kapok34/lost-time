@@ -27,6 +27,7 @@ const Members = () => {
   const [contactedIds, setContactedIds] = useState<Set<string>>(new Set());
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [cityFilter, setCityFilter] = useState<string>("all");
+  const [languageFilter, setLanguageFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,7 +60,7 @@ const Members = () => {
     })();
   }, [user]);
 
-  const { countries, citiesByCountry } = useMemo(() => {
+  const { countries, citiesByCountry, languages } = useMemo(() => {
     const parsed = members.map((m) => {
       const parts = m.location.split(",").map((s) => s.trim());
       const country = parts.length > 1 ? parts[parts.length - 1] : parts[0];
@@ -75,7 +76,14 @@ const Members = () => {
       }
     });
     Object.keys(citiesByCountry).forEach((c) => citiesByCountry[c].sort());
-    return { countries, citiesByCountry, parsed };
+    const languageSet = new Set<string>();
+    members.forEach((m) => {
+      if (m.questionnaire_languages) {
+        m.questionnaire_languages.forEach((l) => languageSet.add(l));
+      }
+    });
+    const languages = Array.from(languageSet).sort();
+    return { countries, citiesByCountry, languages, parsed };
   }, [members]);
 
   const filtered = useMemo(() => {
@@ -86,9 +94,10 @@ const Members = () => {
       const city = parts.length > 1 ? parts.slice(0, parts.length - 1).join(", ") : "";
       if (countryFilter !== "all" && country !== countryFilter) return false;
       if (cityFilter !== "all" && city !== cityFilter) return false;
+      if (languageFilter !== "all" && (!m.questionnaire_languages || !m.questionnaire_languages.includes(languageFilter))) return false;
       return true;
     });
-  }, [members, countryFilter, cityFilter, user]);
+  }, [members, countryFilter, cityFilter, languageFilter, user]);
 
   return (
     <div className="min-h-screen flex flex-col font-sans-ui">
@@ -114,6 +123,17 @@ const Members = () => {
               <SelectItem value="all" className="font-sans-ui">{t("members.allCities")}</SelectItem>
               {(citiesByCountry[countryFilter] ?? []).map((c) => (
                 <SelectItem key={c} value={c} className="font-sans-ui">{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={languageFilter} onValueChange={setLanguageFilter}>
+            <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
+              <SelectValue placeholder={t("members.filterLanguage")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="font-sans-ui">{t("members.allLanguages")}</SelectItem>
+              {languages.map((l) => (
+                <SelectItem key={l} value={l} className="font-sans-ui">{l.toUpperCase()}</SelectItem>
               ))}
             </SelectContent>
           </Select>
