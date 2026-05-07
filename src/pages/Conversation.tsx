@@ -119,9 +119,7 @@ const Conversation = () => {
   }
 
   const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-  const daysSinceLastMessage = lastMessage ? (Date.now() - new Date(lastMessage.created_at).getTime()) / (1000 * 60 * 60 * 24) : null;
-  const canEnd = messages.some((m) => m.sender_id === user?.id) && messages.some((m) => m.sender_id === other!.id);
-  const canEndDueToInactivity = lastMessage?.sender_id === user?.id && daysSinceLastMessage !== null && daysSinceLastMessage > 7;
+  const canEnd = lastMessage?.sender_id === user?.id && messages.some((m) => m.sender_id === other!.id);
 
   const archived = conv?.status === "archived";
 
@@ -135,7 +133,7 @@ const Conversation = () => {
           </Link>
           {archived ? (
             <p className="text-base text-muted-foreground italic">{t("conversation.ended")}</p>
-          ) : canEnd || canEndDueToInactivity ? (
+          ) : canEnd ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">{t("conversation.end")}</Button>
