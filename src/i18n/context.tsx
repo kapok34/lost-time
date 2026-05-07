@@ -201,7 +201,7 @@ export const translations: Record<UILang, Record<string, string>> = {
     "apply.submit": "envoyer",
     "apply.submitting": "envoi en cours…",
     "apply.questionnairePrompt.zero": "Réponds à toutes les questions dans au moins une langue. Tu peux répondre dans plusieurs langues.",
-    "apply.questionnairePrompt.one": "Complété en {lang}. Vous pouvez aussi répondre en {other}.",
+    "apply.questionnairePrompt.one": "Complété en {lang}. Tu peux aussi répondre en {other}.",
     "apply.questionnairePrompt.both": "Complété dans toutes les langues.",
     "apply.error.allQuestions": "veuillez répondre à toutes les questions avant d'envoyer.",
     "apply.error.answerLength": "chaque réponse doit comporter entre 3 et 200 caractères.",
