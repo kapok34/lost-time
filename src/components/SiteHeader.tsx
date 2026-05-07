@@ -37,7 +37,7 @@ export const SiteHeader = () => {
               <>
                 <NavLink to="/members" className={linkCls}>{t("members")}</NavLink>
                 <NavLink to="/messages" className={linkCls}>{t("messages")}</NavLink>
-                <NavLink to="/settings" className={linkCls}>{t("profile")}</NavLink>
+                <NavLink to={`/members/${user?.id}`} className={linkCls}>{t("profile")}</NavLink>
               </>
             )}
             {isAdmin && <NavLink to="/admin" className={linkCls}>{t("admin")}</NavLink>}
