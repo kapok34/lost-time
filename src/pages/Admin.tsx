@@ -217,7 +217,7 @@ const Admin = () => {
         <Tabs defaultValue="pending">
           <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="pending" className="font-sans-ui">{t("admin.pendingApplications")} ({pending.length})</TabsTrigger>
-            <TabsTrigger value="members" className="font-sans-ui">Members ({members.length})</TabsTrigger>
+            <TabsTrigger value="members" className="font-sans-ui">{t("admin.members") || "Members"} ({members.length})</TabsTrigger>
             <TabsTrigger value="broadcast" className="font-sans-ui">{t("admin.broadcast") || "Broadcast"}</TabsTrigger>
           </TabsList>
 
