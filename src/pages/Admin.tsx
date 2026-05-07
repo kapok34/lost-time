@@ -167,6 +167,30 @@ const Admin = () => {
     load();
   };
 
+  const deleteQuestionnaire = async () => {
+    if (!openId) return;
+    const allProfiles = [...pending, ...members];
+    const profile = allProfiles.find((p) => p.id === openId);
+    const currentLangs = (profile?.questionnaire_languages ?? []) as QuestionnaireLang[];
+    if (currentLangs.length <= 1) {
+      toast.error("cannot delete: at least one questionnaire must remain");
+      return;
+    }
+    const { error: delErr } = await supabase.from("questionnaire_answers").delete().eq("user_id", openId).eq("lang", reviewLang);
+    if (delErr) { toast.error(delErr.message); return; }
+    const { error: updErr } = await supabase.from("profiles").update({ questionnaire_languages: currentLangs.filter((l) => l !== reviewLang) }).eq("id", openId);
+    if (updErr) { toast.error(updErr.message); return; }
+    setAnswers((prev) => {
+      const next = { ...prev };
+      delete next[reviewLang];
+      return next;
+    });
+    const remaining = currentLangs.filter((l) => l !== reviewLang);
+    setReviewLang(remaining[0]);
+    toast.success("questionnaire deleted");
+    load();
+  };
+
   const suspend = async (id: string, suspend: boolean) => {
     const { error } = await supabase.from("profiles").update({ status: suspend ? "suspended" : "approved" }).eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -258,17 +282,17 @@ const Admin = () => {
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => openMember(p.id)}>
-                      edit questionnaire
+                      {t("admin.editQuestionnaire") || "edit questionnaire"}
                     </Button>
                     <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => openLocationEdit(p.id)}>
-                      edit location
+                      {t("admin.editLocation") || "edit location"}
                     </Button>
                     <Button
                       variant="outline"
                       className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white"
                       onClick={() => suspend(p.id, p.status === "approved")}
                     >
-                      {p.status === "approved" ? "suspend" : "reinstate"}
+                      {p.status === "approved" ? (t("admin.suspend") || "suspend") : (t("admin.reinstate") || "reinstate")}
                     </Button>
                   </div>
                 </li>
@@ -382,6 +406,27 @@ const Admin = () => {
                               ))}
                             </SelectContent>
                           </Select>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" className="text-xs hover:!bg-destructive hover:!text-white">
+                                {t("admin.deleteQuestionnaire") || "delete"}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>delete questionnaire?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will remove all {reviewLang.toUpperCase()} answers. At least one questionnaire must remain.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={deleteQuestionnaire} className="hover:!bg-destructive hover:!text-white">
+                                  {t("admin.delete") || "delete"}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       ) : langs.length > 1 ? (
                         <div className="flex gap-2 mb-4">
