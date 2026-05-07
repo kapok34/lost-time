@@ -61,7 +61,8 @@ const Members = () => {
   }, [user]);
 
   const { countries, citiesByCountry, languages } = useMemo(() => {
-    const parsed = members.map((m) => {
+    const otherMembers = members.filter((m) => !(user && m.id === user.id));
+    const parsed = otherMembers.map((m) => {
       const parts = m.location.split(",").map((s) => s.trim());
       const country = parts.length > 1 ? parts[parts.length - 1] : parts[0];
       const city = parts.length > 1 ? parts.slice(0, parts.length - 1).join(", ") : "";
@@ -77,14 +78,14 @@ const Members = () => {
     });
     Object.keys(citiesByCountry).forEach((c) => citiesByCountry[c].sort());
     const languageSet = new Set<string>();
-    members.forEach((m) => {
+    otherMembers.forEach((m) => {
       if (m.questionnaire_languages) {
         m.questionnaire_languages.forEach((l) => languageSet.add(l));
       }
     });
     const languages = Array.from(languageSet).sort();
     return { countries, citiesByCountry, languages, parsed };
-  }, [members]);
+  }, [members, user]);
 
   const filtered = useMemo(() => {
     return members.filter((m) => {
