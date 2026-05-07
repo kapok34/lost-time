@@ -408,20 +408,20 @@ const Admin = () => {
                           </Select>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="outline" className="text-xs hover:!bg-destructive hover:!text-white">
+                              <Button variant="outline" className="text-xs hover:!bg-destructive hover:!text-white" disabled={langs.length <= 1}>
                                 {t("admin.deleteQuestionnaire") || "delete"}
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>delete questionnaire?</AlertDialogTitle>
+                                <AlertDialogTitle className="font-sans-ui">Delete questionnaire?</AlertDialogTitle>
                                 <AlertDialogDescription>
                                   This will remove all {reviewLang.toUpperCase()} answers. At least one questionnaire must remain.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={deleteQuestionnaire} className="hover:!bg-destructive hover:!text-white">
+                                <AlertDialogAction onClick={deleteQuestionnaire} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">
                                   {t("admin.delete") || "delete"}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
