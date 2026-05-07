@@ -1,6 +1,6 @@
 # lost time
 
-An asocial network — a private, members-only society of curious people exchanging answers to the Proust Questionnaire.
+An asocial network — a members-only society of great minds connecting through the Proust questionnaire.
 
 ## Tech stack
 - **Frontend:** Vite + React + TypeScript + Tailwind CSS + shadcn/ui
