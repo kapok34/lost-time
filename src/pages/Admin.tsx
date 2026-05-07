@@ -350,7 +350,7 @@ const Admin = () => {
                 <h2 className="font-display text-3xl">
                   {[...pending, ...members].find((p) => p.id === openId)?.member_number ?? "—"}
                 </h2>
-                <Button variant="ghost" onClick={() => setOpenId(null)}>close</Button>
+                <Button variant="ghost" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setOpenId(null)}>close</Button>
               </div>
 
               <div className="space-y-8 mb-12">
