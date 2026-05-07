@@ -38,17 +38,13 @@ const Conversation = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
-  const [now, setNow] = useState(Date.now());
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 60000);
-    return () => clearInterval(timer);
-  }, []);
 
 
   const myCount = messages.filter((m) => m.sender_id === user?.id).length;
+  const otherCount = messages.filter((m) => m.sender_id !== user?.id).length;
   const atLimit = myCount >= 10;
+  const bothAtLimit = myCount >= 10 && otherCount >= 10;
   const isInitialMessage = messages.length === 0;
   const minLength = isInitialMessage ? 34 : 5;
   const bodyValid = body.trim().length >= minLength;
@@ -126,12 +122,8 @@ const Conversation = () => {
 
   const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
   const iAmLastSender = lastMessage?.sender_id === user?.id;
-  const hoursSinceLastMessage = lastMessage ? (now - new Date(lastMessage.created_at).getTime()) / (1000 * 60 * 60) : null;
+  const hoursSinceLastMessage = lastMessage ? (Date.now() - new Date(lastMessage.created_at).getTime()) / (1000 * 60 * 60) : null;
   const canEnd = iAmLastSender && hoursSinceLastMessage !== null && hoursSinceLastMessage > 34;
-
-  const remainingMs = lastMessage ? Math.max(0, 34 * 60 * 60 * 1000 - (now - new Date(lastMessage.created_at).getTime())) : 0;
-  const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
-  const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
 
   const archived = conv?.status === "archived";
 
@@ -144,7 +136,7 @@ const Conversation = () => {
             {other.member_number ?? "—"}
           </Link>
           {archived ? (
-            <p className="text-base text-muted-foreground italic">{t("conversation.ended")}</p>
+            <p className="text-base text-muted-foreground italic">{bothAtLimit ? t("conversation.endedAuto") : t("conversation.ended")}</p>
           ) : canEnd ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -167,7 +159,7 @@ const Conversation = () => {
             <p className="text-base text-muted-foreground italic">{t("conversation.noGhosting")}</p>
           ) : messages.length > 0 && iAmLastSender ? (
             <p className="text-base text-muted-foreground italic">
-              {t("conversation.waitForReply")} {remainingHours}h {remainingMinutes}m
+              {t("conversation.waitForReply")}
             </p>
           ) : null}
         </div>

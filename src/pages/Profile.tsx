@@ -19,6 +19,22 @@ interface ProfileFull {
   questionnaire_languages: QuestionnaireLang[] | null;
 }
 
+interface ConvWithProfile {
+  id: string;
+  member_a: string;
+  member_b: string;
+  status: "active" | "archived";
+  created_at: string;
+  archived_at: string | null;
+  ended_by: string | null;
+}
+
+type MessageState =
+  | { type: "active"; convId: string }
+  | { type: "canStart" }
+  | { type: "canRestart" }
+  | { type: "blocked"; reason: "hasActiveElsewhere" | "otherHasActiveElsewhere" | "endedAuto" | "endedByOther" | "wait34Days" };
+
 const Profile = () => {
   const { memberNumber } = useParams<{ memberNumber: string }>();
   const navigate = useNavigate();
@@ -27,10 +43,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<ProfileFull | null>(null);
   const [answers, setAnswers] = useState<Record<string, Record<number, string>>>({});
   const [viewLang, setViewLang] = useState<QuestionnaireLang>("en");
-  const [hasActive, setHasActive] = useState(false);
-  const [activeWith, setActiveWith] = useState<string | null>(null);
-  const [otherHasActive, setOtherHasActive] = useState(false);
-  const [otherActiveWith, setOtherActiveWith] = useState<string | null>(null);
+  const [messageState, setMessageState] = useState<MessageState | null>(null);
   const [starting, setStarting] = useState(false);
 
   useEffect(() => {
@@ -46,7 +59,7 @@ const Profile = () => {
       if (!p) return;
       const [{ data: ans }, { data: convs }] = await Promise.all([
         supabase.from("questionnaire_answers").select("question_id, answer, lang").eq("user_id", p.id),
-        supabase.from("conversations").select("id, member_a, member_b").eq("status", "active"),
+        supabase.from("conversations").select("id, member_a, member_b, status, archived_at, ended_by"),
       ]);
       const map: Record<string, Record<number, string>> = {};
       (ans ?? []).forEach((a: any) => {
@@ -57,24 +70,55 @@ const Profile = () => {
       const available = (p.questionnaire_languages ?? []) as QuestionnaireLang[];
       if (available.length > 0) setViewLang(available[0]);
 
-      const myActive = (convs ?? []).find((c: any) => c.member_a === user?.id || c.member_b === user?.id);
-      setHasActive(!!myActive);
+      const allConvs = (convs as ConvWithProfile[]) ?? [];
+      const myActive = allConvs.find((c) => c.status === "active" && (c.member_a === user?.id || c.member_b === user?.id));
+      const theirActive = allConvs.find((c) => c.status === "active" && (c.member_a === p.id || c.member_b === p.id));
+
       if (myActive) {
         const other = myActive.member_a === user?.id ? myActive.member_b : myActive.member_a;
-        setActiveWith(other);
+        if (other === p.id) {
+          setMessageState({ type: "active", convId: myActive.id });
+        } else {
+          setMessageState({ type: "blocked", reason: "hasActiveElsewhere" });
+        }
+        return;
       }
 
-      const theirActive = (convs ?? []).find((c: any) => c.member_a === p.id || c.member_b === p.id);
-      setOtherHasActive(!!theirActive);
       if (theirActive) {
         const other = theirActive.member_a === p.id ? theirActive.member_b : theirActive.member_a;
-        setOtherActiveWith(other);
+        if (other !== user?.id) {
+          setMessageState({ type: "blocked", reason: "otherHasActiveElsewhere" });
+          return;
+        }
       }
+
+      // No active conversations: check prior history
+      const pairConvs = allConvs
+        .filter((c) =>
+          (c.member_a === user?.id && c.member_b === p.id) ||
+          (c.member_a === p.id && c.member_b === user?.id)
+        )
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      const prev = pairConvs[0];
+      if (prev && prev.status === "archived") {
+        if (!prev.ended_by) {
+          setMessageState({ type: "blocked", reason: "endedAuto" });
+        } else if (prev.ended_by !== user?.id) {
+          setMessageState({ type: "blocked", reason: "endedByOther" });
+        } else if (prev.archived_at && new Date(prev.archived_at) > new Date(Date.now() - 34 * 24 * 60 * 60 * 1000)) {
+          setMessageState({ type: "blocked", reason: "wait34Days" });
+        } else {
+          setMessageState({ type: "canRestart" });
+        }
+        return;
+      }
+
+      setMessageState({ type: "canStart" });
     })();
   }, [memberNumber, user?.id]);
 
   const isMe = user?.id === profile?.id;
-  const canMessage = !isMe && (!hasActive || activeWith === profile?.id) && (!otherHasActive || otherActiveWith === user?.id);
 
   const questions = useMemo(
     () => getQuestions(viewLang),
@@ -86,18 +130,10 @@ const Profile = () => {
     [profile?.questionnaire_languages]
   );
 
-
   const onMessage = async () => {
     if (!profile?.id) return;
-    if (hasActive && activeWith === profile.id) {
-      // Open existing conversation: find it
-      const { data } = await supabase
-        .from("conversations")
-        .select("id")
-        .eq("status", "active")
-        .or(`and(member_a.eq.${user?.id},member_b.eq.${profile.id}),and(member_a.eq.${profile.id},member_b.eq.${user?.id})`)
-        .maybeSingle();
-      if (data) navigate(`/messages/${data.id}`);
+    if (messageState?.type === "active") {
+      navigate(`/messages/${messageState.convId}`);
       return;
     }
     setStarting(true);
@@ -147,26 +183,36 @@ const Profile = () => {
               ))}
             </div>
           )}
-          {!isMe && (
-            canMessage ? (
+          {!isMe && messageState && (
+            (messageState.type === "active" || messageState.type === "canStart" || messageState.type === "canRestart") ? (
               <Button onClick={onMessage} disabled={starting} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">
-                {hasActive && activeWith === profile?.id ? t("conversation") : t("profile.beginCorrespondence")}
+                {messageState.type === "active" ? t("conversation") :
+                  messageState.type === "canRestart" ? t("profile.restartCorrespondence") :
+                  t("profile.beginCorrespondence")}
               </Button>
             ) : (
               <div className="flex flex-col items-center">
-                <p className="text-sm font-sans-ui text-[hsl(350,55%,35%)] mb-2">{t("profile.oneConversationHint")}</p>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span tabIndex={0}>
-                      <Button disabled className="bg-[hsl(350,55%,35%)] text-white opacity-50">{t("profile.beginCorrespondence")}</Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs" dangerouslySetInnerHTML={{
-                      __html: t("profile.endCurrent").replace(/Messages/, '<Link to="/messages" class="underline">Messages</Link>')
-                    }} />
-                  </TooltipContent>
-                </Tooltip>
+                <p className="text-sm font-sans-ui text-[hsl(350,55%,35%)] mb-2">
+                  {messageState.reason === "hasActiveElsewhere" || messageState.reason === "otherHasActiveElsewhere"
+                    ? t("profile.oneConversationHint")
+                    : messageState.reason === "endedAuto"
+                    ? t("profile.endedAuto")
+                    : messageState.reason === "endedByOther"
+                    ? t("profile.endedByOther")
+                    : t("profile.wait34Days")}
+                </p>
+                {(messageState.reason === "hasActiveElsewhere" || messageState.reason === "otherHasActiveElsewhere") && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span tabIndex={0}>
+                        <Button disabled className="bg-[hsl(350,55%,35%)] text-white opacity-50">{t("profile.beginCorrespondence")}</Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{t("profile.endCurrent")}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
               </div>
             )
           )}
@@ -184,28 +230,38 @@ const Profile = () => {
             </div>
           ))}
         </div>
-        {!isMe && (
-          canMessage ? (
+        {!isMe && messageState && (
+          (messageState.type === "active" || messageState.type === "canStart" || messageState.type === "canRestart") ? (
             <div className="flex justify-center mt-8">
               <Button onClick={onMessage} disabled={starting} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">
-                {hasActive && activeWith === profile?.id ? t("conversation") : t("profile.connect")}
+                {messageState.type === "active" ? t("conversation") :
+                  messageState.type === "canRestart" ? t("profile.restartCorrespondence") :
+                  t("profile.connect")}
               </Button>
             </div>
           ) : (
             <div className="flex flex-col items-center mt-8">
-              <p className="text-sm font-sans-ui text-[hsl(350,55%,35%)] mb-2">{t("profile.oneConversationHint")}</p>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span tabIndex={0}>
-                    <Button disabled className="bg-[hsl(350,55%,35%)] text-white opacity-50">{t("profile.connect")}</Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs" dangerouslySetInnerHTML={{
-                    __html: t("profile.endCurrent").replace(/Messages/, '<Link to="/messages" class="underline">Messages</Link>')
-                  }} />
-                </TooltipContent>
-              </Tooltip>
+              <p className="text-sm font-sans-ui text-[hsl(350,55%,35%)] mb-2">
+                {messageState.reason === "hasActiveElsewhere" || messageState.reason === "otherHasActiveElsewhere"
+                  ? t("profile.oneConversationHint")
+                  : messageState.reason === "endedAuto"
+                  ? t("profile.endedAuto")
+                  : messageState.reason === "endedByOther"
+                  ? t("profile.endedByOther")
+                  : t("profile.wait34Days")}
+              </p>
+              {(messageState.reason === "hasActiveElsewhere" || messageState.reason === "otherHasActiveElsewhere") && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span tabIndex={0}>
+                      <Button disabled className="bg-[hsl(350,55%,35%)] text-white opacity-50">{t("profile.connect")}</Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">{t("profile.endCurrent")}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
           )
         )}
