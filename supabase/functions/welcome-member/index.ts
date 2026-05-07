@@ -23,7 +23,7 @@ export async function handler(req: Request): Promise<Response> {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("id, display_name, member_number, language")
+    .select("id, member_number, language")
     .eq("id", member_id)
     .maybeSingle();
 
@@ -48,6 +48,12 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Hello,",
       approved: `Your application has been approved. You are now <strong style="color: #b91c1c;">member #${memberNum}</strong> of lost time.`,
       login: `You can log in at <a href="https://lost-time.org/login" style="color: #b91c1c; text-decoration: underline;">lost-time.org</a> to browse members' answers and begin corresponding.`,
+      manifestoTitle: "Manifesto",
+      manifestoJuggling: "No juggling: each member can have only one active correspondence at a time.",
+      manifestoHeyYou: `No "hey you": your first message to another member must contain at least 34 characters.`,
+      manifestoGhosting: "No ghosting: you can end a correspondence only after you have responded, or if your correspondent has not responded for over 34 hours.",
+      manifestoBenching: "No zapping: if you end a correspondence, you have to wait 34 days before you can restart it.",
+      manifestoPenPals: "No pen pals: you get 10 messages each before the correspondence ends automatically. Move the conversation elsewhere if you click.",
       changeLabel: "Need to change your location or your answers? Want to add another language?",
       changeText: "Write to admin@lost-time.org and we will update your profile for you.",
       deleteLabel: "Want to delete your account?",
@@ -61,6 +67,12 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Bonjour,",
       approved: `Ta candidature a été approuvée. Tu es désormais <strong style="color: #b91c1c;">membre #${memberNum}</strong> de lost time.`,
       login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #b91c1c; text-decoration: underline;">lost-time.org</a> pour parcourir les réponses des membres et entamer une correspondance.`,
+      manifestoTitle: "Manifeste",
+      manifestoJuggling: "Pas de jonglage : chaque membre ne peut entretenir qu'une seule correspondance à la fois.",
+      manifestoHeyYou: `Pas de « salut toi » : ton premier message à un autre membre doit contenir au moins 34 caractères.`,
+      manifestoGhosting: "Pas de fantômisation : tu ne peux mettre fin à une correspondance qu'après avoir répondu, ou si ton correspondant n'a pas répondu depuis plus de 34 heures.",
+      manifestoBenching: "Pas de zapping : si tu mets fin à une correspondance, tu dois attendre 34 jours avant de la reprendre.",
+      manifestoPenPals: "Pas d'éternels correspondants : vous avez droit à 10 messages chacun avant que la correspondance ne se termine automatiquement. Poursuivez la conversation ailleurs si vous vous entendez.",
       changeLabel: "Besoin de modifier ta localisation ou tes réponses ? Envie d'ajouter une autre langue ?",
       changeText: "Écris à admin@lost-time.org et nous mettrons ton profil à jour.",
       deleteLabel: "Tu souhaites supprimer ton compte ?",
@@ -74,6 +86,12 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Ciao,",
       approved: `La tua candidatura è stata approvata. Sei ora <strong style="color: #b91c1c;">membro #${memberNum}</strong> di lost time.`,
       login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #b91c1c; text-decoration: underline;">lost-time.org</a> per sfogliare le risposte dei membri e iniziare a corrispondere.`,
+      manifestoTitle: "Manifesto",
+      manifestoJuggling: "Niente giocoleria: ogni socio può avere solo una corrispondenza attiva alla volta.",
+      manifestoHeyYou: `Niente « ciao »: il tuo primo messaggio ad un altro socio deve contenere almeno 34 caratteri.`,
+      manifestoGhosting: "Niente ghosting: puoi terminare una corrispondenza solo dopo aver risposto, o se il tuo corrispondente non ha risposto per più di 34 ore.",
+      manifestoBenching: "Niente zapping: se termini una corrispondenza, devi aspettare 34 giorni prima di poterla riprendere.",
+      manifestoPenPals: "Niente pen friends: avete 10 messaggi ciascuno prima che la corrispondenza finisca automaticamente. Sposta la conversazione altrove se c'è feeling.",
       changeLabel: "Hai bisogno di modificare la tua località o le tue risposte? Vuoi aggiungere un'altra lingua?",
       changeText: "Scrivi ad admin@lost-time.org aggiorneremo il tuo profilo.",
       deleteLabel: "Vuoi eliminare il tuo account?",
@@ -100,6 +118,14 @@ export async function handler(req: Request): Promise<Response> {
             <p>${t.greeting}</p>
             <p>${t.approved}</p>
             <p>${t.login}</p>
+            <p style="margin-top: 1.5em; font-weight: bold;">${t.manifestoTitle}</p>
+            <ul style="padding-left: 1.2em; margin: 0.5em 0; color: #333;">
+              <li style="margin-bottom: 0.5em;">${t.manifestoJuggling}</li>
+              <li style="margin-bottom: 0.5em;">${t.manifestoHeyYou}</li>
+              <li style="margin-bottom: 0.5em;">${t.manifestoGhosting}</li>
+              <li style="margin-bottom: 0.5em;">${t.manifestoBenching}</li>
+              <li>${t.manifestoPenPals}</li>
+            </ul>
             <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 2em 0;" />
             <p style="color: #444; font-size: 0.95em;">
               <strong>${t.changeLabel}</strong><br>
