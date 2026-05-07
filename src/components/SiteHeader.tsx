@@ -62,6 +62,14 @@ export const SiteHeader = () => {
                 >
                 {t("conversation")}
               </button>
+              {isAdmin && (
+                <button
+                  onClick={() => navigate("/admin")}
+                  className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
+                >
+                  {t("admin")}
+                </button>
+              )}
               <button
                 onClick={async () => { await signOut(); navigate("/"); }}
                 className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
