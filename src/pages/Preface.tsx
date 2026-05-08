@@ -30,13 +30,13 @@ const EnglishPreface = () => {
       <div>
         <p
           className="text-muted-foreground md:pl-20"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           Apply by filling out
         </p>
         <p
           className="text-muted-foreground md:pl-36"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           the Proust questionnaire.
         </p>
@@ -86,13 +86,13 @@ const EnglishPreface = () => {
       <div className="text-right">
         <p
           className="text-muted-foreground"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           Hold correspondences,
         </p>
         <p
           className="text-muted-foreground"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           but only one at a time.
         </p>
@@ -152,13 +152,13 @@ const FrenchPreface = () => {
       <div>
         <p
           className="text-muted-foreground md:pl-20"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           Remplis le questionnaire de Proust
         </p>
         <p
           className="text-muted-foreground md:pl-36"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           pour postuler.
         </p>
@@ -208,13 +208,13 @@ const FrenchPreface = () => {
       <div className="text-right">
         <p
           className="text-muted-foreground"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           Tiens correspondance,
         </p>
         <p
           className="text-muted-foreground"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1vw, 1rem)", lineHeight: 1.6, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.6, fontWeight: 400 }}
         >
           mais une seule à la fois.
         </p>
@@ -262,7 +262,7 @@ const ItalianPreface = () => {
       <div className="md:pl-[8%]">
         <p
           className="text-muted-foreground"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1.2vw, 1.1rem)", lineHeight: 1.5, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.5, fontWeight: 400 }}
         >
           Compila il questionario di Proust
         </p>
@@ -320,7 +320,7 @@ const ItalianPreface = () => {
       <div className="md:pl-[8%]">
         <p
           className="text-muted-foreground"
-          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.8rem, 1.2vw, 1.1rem)", lineHeight: 1.5, fontWeight: 400 }}
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.5, fontWeight: 400 }}
         >
           Tieniti in corrispondenza,
         </p>
