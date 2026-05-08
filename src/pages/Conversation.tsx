@@ -110,11 +110,10 @@ const Conversation = () => {
     navigate("/messages");
   };
 
-  const onCancel = async () => {
+    const onCancel = async () => {
     if (!id) return;
     const { error } = await supabase.rpc("cancel_conversation", { _conv_id: id });
     if (error) { toast.error(error.message); return; }
-    toast.success("Correspondence cancelled");
     navigate("/members");
   };
 
@@ -227,7 +226,7 @@ const Conversation = () => {
                 </div>
                 <div className="flex justify-center items-center gap-3 mt-3">
                   {isInitialMessage && (
-                    <Button variant="outline" onClick={onCancel} disabled={sending} className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">{t("conversation.cancel")}</Button>
+                    <Button variant="outline" onClick={onCancel} disabled={sending} className="bg-muted text-muted-foreground hover:bg-muted/80 hover:text-muted-foreground px-6 py-2 rounded">{t("conversation.cancel")}</Button>
                   )}
                   <Button onClick={onSend} disabled={sending || !bodyValid || atLimit} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">{t("conversation.send")}</Button>
                 </div>

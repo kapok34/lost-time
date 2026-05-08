@@ -4,6 +4,13 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "admin@example.com";
 
 serve(async (req) => {
+  // Validate internal apikey header (trigger calls only)
+  const apiKey = req.headers.get("apikey");
+  const expectedKey = Deno.env.get("INTERNAL_API_KEY");
+  if (!expectedKey || apiKey !== expectedKey) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const { id, display_name, location, language, created_at } = await req.json();
 
   if (!RESEND_API_KEY) {

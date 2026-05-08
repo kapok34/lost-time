@@ -12,6 +12,7 @@ interface ConvRow {
   member_b: string;
   status: string;
   archived_at: string | null;
+  ended_by: string | null;
   created_at: string;
 }
 
@@ -86,7 +87,7 @@ const Messages = () => {
             ) : (
               <button
                 onClick={() => navigate(`/messages/${active.conv.id}`)}
-                className="flex items-center justify-center w-16 h-16 rounded-full border border-border bg-card transition-colors hover:border-foreground"
+                className="flex items-center justify-center w-16 h-16 rounded-full border border-[hsl(350,55%,35%)] bg-card transition-colors hover:border-foreground"
               >
                 <span className="text-xl font-sans-ui">{active.other.member_number ?? "—"}</span>
               </button>
@@ -96,20 +97,32 @@ const Messages = () => {
 
         <section>
           <h2 className="font-sans-ui text-xl text-black font-normal mb-4">{t("messages.past")}</h2>
-          <div className="border border-border p-6 opacity-50">
+          <div className="border border-border p-6">
             {archived.length === 0 ? (
               <p className="text-muted-foreground italic text-center font-sans-ui">{t("messages.noArchive")}</p>
             ) : (
               <div className="flex flex-wrap gap-4">
-                {archived.map(({ conv, other }) => (
-                  <Link
-                    key={conv.id}
-                    to={`/messages/${conv.id}`}
-                    className="flex items-center justify-center w-14 h-14 rounded-full border border-border bg-card transition-colors hover:border-foreground"
-                  >
-                    <span className="text-lg font-sans-ui">{other.member_number ?? "—"}</span>
-                  </Link>
-                ))}
+                {archived.map(({ conv, other }) => {
+                  const canRestart = (() => {
+                    if (conv.status === "active") return false;
+                    if (!conv.ended_by) return false;
+                    if (conv.ended_by !== user?.id) return false;
+                    if (conv.archived_at && new Date(conv.archived_at) > new Date(Date.now() - 34 * 24 * 60 * 60 * 1000)) return false;
+                    return true;
+                  })();
+                  const classes = canRestart
+                    ? "flex items-center justify-center w-14 h-14 rounded-full border border-muted-foreground bg-card transition-colors hover:border-[hsl(350,55%,35%)]"
+                    : "flex items-center justify-center w-14 h-14 rounded-full border border-border bg-card transition-colors hover:border-foreground opacity-40";
+                  return (
+                    <Link
+                      key={conv.id}
+                      to={`/messages/${conv.id}`}
+                      className={classes}
+                    >
+                      <span className="text-lg font-sans-ui">{other.member_number ?? "—"}</span>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>

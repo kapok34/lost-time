@@ -1,1 +1,11 @@
 project_id = "ixxrqqdveyrjyjyhziap"
+
+# Trigger-called functions: disable JWT verification, validate apikey header instead
+[functions.notify-admin]
+verify_jwt = false
+
+[functions.welcome-member]
+verify_jwt = false
+
+[functions.notify-member]
+verify_jwt = false

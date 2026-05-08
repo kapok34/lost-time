@@ -26,7 +26,8 @@ const Members = () => {
   const { user } = useAuth();
   const { t } = useI18n();
   const [members, setMembers] = useState<Member[]>([]);
-  const [contactedIds, setContactedIds] = useState<Set<string>>(new Set());
+  type MemberConvState = "active" | "canRestart" | "blocked" | "none";
+  const [memberStates, setMemberStates] = useState<Record<string, MemberConvState>>({});
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [cityFilter, setCityFilter] = useState<string>("all");
   const [languageFilter, setLanguageFilter] = useState<string>("all");
@@ -54,13 +55,37 @@ const Members = () => {
     (async () => {
       const { data } = await supabase
         .from("conversations")
-        .select("member_a, member_b")
+        .select("member_a, member_b, status, ended_by, archived_at, created_at")
         .or(`member_a.eq.${user.id},member_b.eq.${user.id}`);
-      const ids = new Set<string>();
-      (data ?? []).forEach((c: any) => {
-        ids.add(c.member_a === user.id ? c.member_b : c.member_a);
-      });
-      setContactedIds(ids);
+      const convs = (data ?? []) as any[];
+      const pairConvs = convs
+        .filter((c) => c.member_a === user.id || c.member_b === user.id)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      const seen = new Set<string>();
+      const states: Record<string, MemberConvState> = {};
+
+      for (const c of pairConvs) {
+        const otherId = c.member_a === user.id ? c.member_b : c.member_a;
+        if (seen.has(otherId)) continue;
+        seen.add(otherId);
+
+        if (c.status === "active") {
+          states[otherId] = "active";
+        } else if (c.status === "archived") {
+          if (!c.ended_by) {
+            states[otherId] = "blocked";
+          } else if (c.ended_by !== user.id) {
+            states[otherId] = "blocked";
+          } else if (c.archived_at && new Date(c.archived_at) > new Date(Date.now() - 34 * 24 * 60 * 60 * 1000)) {
+            states[otherId] = "blocked";
+          } else {
+            states[otherId] = "canRestart";
+          }
+        }
+      }
+
+      setMemberStates(states);
     })();
   }, [user]);
 
@@ -166,12 +191,19 @@ const Members = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {filtered.map((m) => {
-              const contacted = contactedIds.has(m.id);
+              const state = memberStates[m.id] ?? "none";
+              const cardClasses = (() => {
+                const base = "flex flex-col items-center justify-center aspect-square border bg-card transition-colors";
+                if (state === "active") return `${base} border-[hsl(350,55%,35%)]`;
+                if (state === "canRestart") return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)]`;
+                if (state === "blocked") return `${base} border-border opacity-40`;
+                return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)]`;
+              })();
               return (
                 <Link
                   to={`/members/${m.member_number}`}
                   key={m.id}
-                  className={`flex flex-col items-center justify-center aspect-square border border-border bg-card transition-colors hover:border-[hsl(350,55%,35%)] ${contacted ? "opacity-40" : ""}`}
+                  className={cardClasses}
                 >
                   <span className="text-4xl font-bold font-sans-ui">{m.member_number ?? "—"}</span>
                   <span className="text-base text-muted-foreground mt-1">{m.location}</span>
