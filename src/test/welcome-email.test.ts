@@ -30,7 +30,7 @@ describe("welcome-member edge function", () => {
     (globalThis as any).Deno.env._store = {
       RESEND_API_KEY: "re_test_key",
       SUPABASE_URL: "https://test.supabase.co",
-      SUPABASE_SERVICE_ROLE_KEY: "test_service_role",
+      SB_SERVICE_ROLE_KEY: "test_service_role",
     };
   });
 
