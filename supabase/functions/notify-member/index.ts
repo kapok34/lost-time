@@ -1,11 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+export async function handler(req: Request): Promise<Response> {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS")!);
 
-serve(async (req) => {
   const { message_id, conversation_id, sender_id, body } = await req.json();
 
   if (!RESEND_API_KEY) {
@@ -13,7 +13,7 @@ serve(async (req) => {
     return new Response("RESEND_API_KEY not configured", { status: 500 });
   }
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEYS['default'], {
     auth: { persistSession: false },
   });
 
@@ -49,6 +49,13 @@ serve(async (req) => {
     .eq("id", sender_id)
     .maybeSingle();
 
+  // Get recipient's profile for language preference
+  const { data: recipientProf } = await supabase
+    .from("profiles")
+    .select("language")
+    .eq("id", recipientId)
+    .maybeSingle();
+
   // Get recipient's auth email
   const { data: userData, error: userError } = await supabase.auth.admin.getUserById(recipientId);
 
@@ -59,6 +66,37 @@ serve(async (req) => {
 
   const senderNum = senderProf?.member_number ?? "—";
   const preview = body.length > 120 ? body.slice(0, 120) + "…" : body;
+  const lang = (recipientProf?.language === "fr" || recipientProf?.language === "it") ? recipientProf.language : "en";
+
+  const t = {
+    en: {
+      subject: `New message from member #${senderNum}`,
+      greeting: "Hello,",
+      received: `You have received a new message from <strong style="color: #800000;">member #${senderNum}</strong>:`,
+      openLink: "Open correspondence",
+      respondWarning: `Member #${senderNum} may end this correspondence if you do not reply within 34 hours.`,
+      endRule: "You may end this correspondence only after you have replied.",
+      brand: "— lost time",
+    },
+    fr: {
+      subject: `Nouveau message du membre #${senderNum}`,
+      greeting: "Bonjour,",
+      received: `Tu as reçu un nouveau message de la part de <strong style="color: #800000;">membre #${senderNum}</strong> :`,
+      openLink: "Ouvrir la correspondance",
+      respondWarning: `Sans réponse de ta part sous 34 heures, membre #${senderNum} pourra mettre fin à cette correspondance.`,
+      endRule: "Tu ne peux mettre fin à cette correspondance qu'après avoir répondu.",
+      brand: "— lost time",
+    },
+    it: {
+      subject: `Nuovo messaggio dal socio #${senderNum}`,
+      greeting: "Ciao,",
+      received: `Hai ricevuto un nuovo messaggio da <strong style="color: #800000;">socio #${senderNum}</strong>:` ,
+      openLink: "Apri la corrispondenza",
+      respondWarning: `Se non rispondi entro 34 ore, socio #${senderNum} potrà terminare questa corrispondenza.`,
+      endRule: "Puoi terminare questa corrispondenza solo dopo aver risposto.",
+      brand: "— lost time",
+    },
+  }[lang];
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -68,20 +106,20 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Lost Time <noreply@losttime.app>",
+        from: "lost time <noreply@lost-time.org>",
         to: [userData.user.email],
-        subject: `New message from member #${senderNum}`,
+        subject: t.subject,
         html: `
           <div style="max-width: 480px; margin: 0 auto; font-family: 'Cormorant Garamond', Georgia, serif; line-height: 1.65; color: #1a1a1a;">
-            <p>Hello,</p>
-            <p>You have received a new message from <strong style="color: #800000;">member #${senderNum}</strong>:</p>
+            <p>${t.greeting}</p>
+            <p>${t.received}</p>
             <blockquote style="border-left: 3px solid #ccc; padding-left: 1em; color: #555; margin: 1em 0;">
               ${preview.replace(/\n/g, "<br>")}
             </blockquote>
-            <p><a href="https://lost-time.org/messages/${conversation_id}" style="color: #800000; text-decoration: underline;">Open correspondence</a></p>
-            <p style="color: #666; font-size: 0.9em;">If you do not respond within 34 hours, member #${senderNum} may end this correspondence.</p>
-            <p style="color: #666; font-size: 0.9em;">You may end this correspondence only after you have responded.</p>
-            <p style="color: #888; font-size: 0.9em; margin-top: 2em;">— lost time</p>
+            <p><a href="https://lost-time.org/messages/${conversation_id}" style="color: #800000; text-decoration: underline;">${t.openLink}</a></p>
+            <p style="color: #666; font-size: 0.9em;">${t.respondWarning}</p>
+            <p style="color: #666; font-size: 0.9em;">${t.endRule}</p>
+            <p style="color: #888; font-size: 0.9em; margin-top: 2em;">${t.brand}</p>
           </div>
         `,
       }),
@@ -100,4 +138,6 @@ serve(async (req) => {
     console.error("Function error:", err);
     return new Response("Internal error", { status: 500 });
   }
-});
+}
+
+serve(handler);

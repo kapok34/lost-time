@@ -19,7 +19,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Lost Time <noreply@losttime.app>",
+        from: "lost time <noreply@lost-time.org>",
         to: [ADMIN_EMAIL],
         subject: "New membership application",
         html: `
