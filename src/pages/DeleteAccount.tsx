@@ -59,15 +59,9 @@ const DeleteAccount = () => {
       <SiteHeader />
       <main className="flex-1 container max-w-xl py-16 flex flex-col items-center text-center">
         <h1 className="font-display text-4xl mb-6">{t("deleteAccount.title")}</h1>
-        <p className="text-base text-muted-foreground italic mb-8 leading-relaxed">
+        <p className="text-base text-muted-foreground leading-relaxed">
           {t("deleteAccount.description")}
         </p>
-        <ul className="text-left text-muted-foreground italic space-y-2 mb-10">
-          <li>{t("deleteAccount.itemProfile")}</li>
-          <li>{t("deleteAccount.itemAnswers")}</li>
-          <li>{t("deleteAccount.itemMessages")}</li>
-          <li>{t("deleteAccount.itemConversations")}</li>
-        </ul>
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
