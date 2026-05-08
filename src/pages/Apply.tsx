@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -332,14 +332,6 @@ const Apply = () => {
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-16">
         <form onSubmit={onSubmit} className="space-y-12">
-          <div className="pb-2">
-            <Link
-              to="/preface"
-              className="font-sans-ui text-2xl tracking-tight font-medium text-[hsl(350,40%,45%)] hover:text-[hsl(350,40%,35%)] transition-colors"
-            >
-              preface
-            </Link>
-          </div>
           <section className="space-y-5">
             <h2 className="font-sans-ui text-2xl tracking-tight text-black font-medium border-b border-border pb-2">{t("apply.account")}</h2>
             <div className="grid md:grid-cols-2 gap-4">

@@ -26,9 +26,10 @@ const Index = () => {
 
         <Link
           to="/preface"
-          className="text-xs font-sans-ui tracking-[0.25em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xl tracking-widest text-foreground hover:text-[hsl(350,55%,35%)] transition-colors underline underline-offset-4"
+          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontVariant: "small-caps" }}
         >
-          preface
+          {t("prefaceLink")}
         </Link>
 
         <div className="flex-[1]" />
