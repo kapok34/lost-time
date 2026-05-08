@@ -218,6 +218,7 @@ export type Database = {
         Args: { _conv_id: string; _user_id: string }
         Returns: boolean
       }
+      cancel_conversation: { Args: { _conv_id: string }; Returns: undefined }
       start_conversation: { Args: { _other_user: string }; Returns: string }
     }
     Enums: {

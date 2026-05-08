@@ -25,6 +25,11 @@ if (!window.HTMLElement.prototype.scrollIntoView) {
   window.HTMLElement.prototype.scrollIntoView = () => {};
 }
 
+// Mock scrollTo for conversation scroll ref
+if (!window.HTMLElement.prototype.scrollTo) {
+  window.HTMLElement.prototype.scrollTo = () => {};
+}
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({

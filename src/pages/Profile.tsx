@@ -183,39 +183,6 @@ const Profile = () => {
               ))}
             </div>
           )}
-          {!isMe && messageState && (
-            (messageState.type === "active" || messageState.type === "canStart" || messageState.type === "canRestart") ? (
-              <Button onClick={onMessage} disabled={starting} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">
-                {messageState.type === "active" ? t("conversation") :
-                  messageState.type === "canRestart" ? t("profile.restartCorrespondence") :
-                  t("profile.beginCorrespondence")}
-              </Button>
-            ) : (
-              <div className="flex flex-col items-center">
-                <p className="text-sm font-sans-ui text-[hsl(350,55%,35%)] mb-2">
-                  {messageState.reason === "hasActiveElsewhere" || messageState.reason === "otherHasActiveElsewhere"
-                    ? t("profile.oneConversationHint")
-                    : messageState.reason === "endedAuto"
-                    ? t("profile.endedAuto")
-                    : messageState.reason === "endedByOther"
-                    ? t("profile.endedByOther")
-                    : t("profile.wait34Days")}
-                </p>
-                {(messageState.reason === "hasActiveElsewhere" || messageState.reason === "otherHasActiveElsewhere") && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span tabIndex={0}>
-                        <Button disabled className="bg-[hsl(350,55%,35%)] text-white opacity-50">{t("profile.beginCorrespondence")}</Button>
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs">{t("profile.endCurrent")}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
-            )
-          )}
         </div>
 
         <div className="space-y-10">
@@ -236,7 +203,7 @@ const Profile = () => {
               <Button onClick={onMessage} disabled={starting} className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]">
                 {messageState.type === "active" ? t("conversation") :
                   messageState.type === "canRestart" ? t("profile.restartCorrespondence") :
-                  t("profile.connect")}
+                  t("profile.beginCorrespondence")}
               </Button>
             </div>
           ) : (
@@ -254,7 +221,7 @@ const Profile = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span tabIndex={0}>
-                      <Button disabled className="bg-[hsl(350,55%,35%)] text-white opacity-50">{t("profile.connect")}</Button>
+                      <Button disabled className="bg-[hsl(350,55%,35%)] text-white opacity-50">{t("profile.beginCorrespondence")}</Button>
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
