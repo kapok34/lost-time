@@ -59,7 +59,7 @@ const DeleteAccount = () => {
       <SiteHeader />
       <main className="flex-1 container max-w-xl py-16 flex flex-col items-center text-center">
         <h1 className="font-display text-4xl mb-6">{t("deleteAccount.title")}</h1>
-        <p className="font-sans-ui text-xl text-muted-foreground mb-12 leading-relaxed">
+        <p className="font-sans-ui text-base text-muted-foreground mb-12 leading-relaxed">
           {t("deleteAccount.description")}
         </p>
 
