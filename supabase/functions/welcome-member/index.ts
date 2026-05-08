@@ -51,7 +51,7 @@ export async function handler(req: Request): Promise<Response> {
 
   const t = {
     en: {
-      subject: `in search of member #${memberNum}`,
+      subject: `in search of member no.${memberNum}`,
       greeting: "Hello,",
       approved: `Your application has been approved. You are now lost time's <strong style="color: #800000;">member no.${memberNum}</strong>.`,
       login: `You can log in at <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> to browse members' portraits and begin corresponding.`,
