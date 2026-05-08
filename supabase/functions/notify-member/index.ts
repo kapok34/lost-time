@@ -68,7 +68,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Lost Time <noreply@losttime.app>",
+        from: "lost time <noreply@losttime.app>",
         to: [userData.user.email],
         subject: `New message from member #${senderNum}`,
         html: `
@@ -79,8 +79,8 @@ serve(async (req) => {
               ${preview.replace(/\n/g, "<br>")}
             </blockquote>
             <p><a href="https://lost-time.org/messages/${conversation_id}" style="color: #800000; text-decoration: underline;">Open correspondence</a></p>
-            <p style="color: #666; font-size: 0.9em;">If you do not respond within 34 hours, member #${senderNum} may end this correspondence.</p>
-            <p style="color: #666; font-size: 0.9em;">You may end this correspondence only after you have responded.</p>
+            <p style="color: #666; font-size: 0.9em;">Member #${senderNum} may end this correspondence if you do not reply within 34 hours.</p>
+            <p style="color: #666; font-size: 0.9em;">You may end this correspondence only after you have replied.</p>
             <p style="color: #888; font-size: 0.9em; margin-top: 2em;">— lost time</p>
           </div>
         `,
