@@ -51,7 +51,7 @@ export async function handler(req: Request): Promise<Response> {
 
   const t = {
     en: {
-      subject: `In search of — member #${memberNum}`,
+      subject: `in search of member #${memberNum}`,
       greeting: "Hello,",
       approved: `Your application has been approved. You are now <strong style="color: #800000;">member #${memberNum}</strong> of lost time.`,
       login: `You can log in at <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> to browse members' portraits and begin corresponding.`,
@@ -62,7 +62,7 @@ export async function handler(req: Request): Promise<Response> {
       manifestoBenching: "No boomerang: if you end a correspondence, you have to wait 34 days before you can restart it.",
       manifestoPenPals: "No pen pals (here): you get 10 messages each before the correspondence ends automatically. Move the conversation elsewhere if you click.",
       changeLabel: "Need to change your location or your answers? Want to add another language?",
-      changeText: "Write to admin@lost-time.org and we will update your portrait for you.",
+      changeText: "Write to <a href="mailto:admin@lost-time.org" style="color: #800000; text-decoration: underline;">admin@lost-time.org</a> and we will update your portrait for you.",
       deleteLabel: "Want to delete your account?",
       deleteText: `Delete your account</a> — this will permanently remove your portrait, answers, messages and all associated data.`,
       outro: "Godspeed.",
@@ -70,7 +70,7 @@ export async function handler(req: Request): Promise<Response> {
       brand: "— lost time",
     },
     fr: {
-      subject: `À la recherche de — membre #${memberNum}`,
+      subject: `à la recherche du membre #${memberNum}`,
       greeting: "Bonjour,",
       approved: `Ta candidature a été approuvée. Tu es désormais <strong style="color: #800000;">membre #${memberNum}</strong> de lost time.`,
       login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> pour parcourir les portraits des membres et entamer une correspondance.`,
@@ -81,7 +81,7 @@ export async function handler(req: Request): Promise<Response> {
       manifestoBenching: "Pas de boomerang : si tu mets fin à une correspondance, tu dois attendre 34 jours avant de la reprendre.",
       manifestoPenPals: "Pas d'éternels correspondants (ici) : vous avez droit à 10 messages chacun avant que la correspondance ne se termine automatiquement. Poursuivez la conversation ailleurs si vous vous entendez bien.",
       changeLabel: "Besoin de modifier ta localisation ou tes réponses ? Envie d'ajouter une autre langue ?",
-      changeText: "Écris à admin@lost-time.org et nous mettrons ton portrait à jour.",
+      changeText: "Écris à <a href="mailto:admin@lost-time.org" style="color: #800000; text-decoration: underline;">admin@lost-time.org</a> et nous mettrons ton portrait à jour.",
       deleteLabel: "Tu souhaites supprimer ton compte ?",
       deleteText: `Supprimer ton compte</a> — cela supprimera définitivement ton portrait, tes réponses, tes messages et toutes les données associées.`,
       outro: "Bonne recherche.",
@@ -89,7 +89,7 @@ export async function handler(req: Request): Promise<Response> {
       brand: "— lost time",
     },
     it: {
-      subject: `Alla ricerca di — socio #${memberNum}`,
+      subject: `alla ricerca di — socio #${memberNum}`,
       greeting: "Ciao,",
       approved: `La tua candidatura è stata approvata. Sei ora <strong style="color: #800000;">membro #${memberNum}</strong> di lost time.`,
       login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> per sfogliare i ritratti dei membri e iniziare corrispondenze.`,
@@ -100,7 +100,7 @@ export async function handler(req: Request): Promise<Response> {
       manifestoBenching: "Niente boomerang: se termini una corrispondenza, devi aspettare 34 giorni prima di poterla riprendere.",
       manifestoPenPals: "Niente pen friends (qui): avete 10 messaggi ciascuno prima che la corrispondenza finisca automaticamente. Sposta la conversazione altrove se c'è feeling.",
       changeLabel: "Hai bisogno di modificare la tua località o le tue risposte? Vuoi aggiungere un'altra lingua?",
-      changeText: "Scrivi ad admin@lost-time.org aggiorneremo il tuo ritratto.",
+      changeText: "Scrivi ad <a href="mailto:admin@lost-time.org" style="color: #800000; text-decoration: underline;">admin@lost-time.org</a> e aggiorneremo il tuo ritratto.",
       deleteLabel: "Vuoi eliminare il tuo account?",
       deleteText: `Elimina il tuo account</a> — questo rimuoverà permanentemente il tuo ritratto, le tue risposte, i messaggi e tutti i dati associati.`,
       outro: "Buona ricerca.",
