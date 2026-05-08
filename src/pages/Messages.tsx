@@ -99,10 +99,26 @@ const Messages = () => {
           <h2 className="font-sans-ui text-xl text-black font-normal mb-4">{t("messages.past")}</h2>
           <div className="border border-border p-6">
             {archived.length === 0 ? (
-<p className="text-muted-foreground italic text-center font-sans-ui opacity-50">{t("messages.noArchive")}</p>
+              <p className="text-muted-foreground italic text-center font-sans-ui opacity-50">{t("messages.noArchive")}</p>
             ) : (
               <div className="flex flex-wrap gap-4">
-                {archived.map(({ conv, other }) => {
+                {archived
+                  .sort((a, b) => {
+                    const canRestartA = (() => {
+                      if (!a.conv.ended_by) return false;
+                      if (a.conv.ended_by !== user?.id) return false;
+                      if (a.conv.archived_at && new Date(a.conv.archived_at) > new Date(Date.now() - 34 * 24 * 60 * 60 * 1000)) return false;
+                      return true;
+                    })();
+                    const canRestartB = (() => {
+                      if (!b.conv.ended_by) return false;
+                      if (b.conv.ended_by !== user?.id) return false;
+                      if (b.conv.archived_at && new Date(b.conv.archived_at) > new Date(Date.now() - 34 * 24 * 60 * 60 * 1000)) return false;
+                      return true;
+                    })();
+                    return (canRestartB ? 1 : 0) - (canRestartA ? 1 : 0);
+                  })
+                  .map(({ conv, other }) => {
                   const canRestart = (() => {
                     if (conv.status === "active") return false;
                     if (!conv.ended_by) return false;

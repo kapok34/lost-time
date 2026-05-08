@@ -190,9 +190,21 @@ const Members = () => {
           <p className="text-center text-muted-foreground italic">{t("members.noMatch")}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {filtered.map((m) => {
-              const state = memberStates[m.id] ?? "none";
-              const cardClasses = (() => {
+            {[...filtered]
+              .sort((a, b) => {
+                const priority = (state: MemberConvState) => {
+                  switch (state) {
+                    case "active": return 0;
+                    case "none": return 1;
+                    case "canRestart": return 2;
+                    case "blocked": return 3;
+                  }
+                };
+                return priority(memberStates[a.id] ?? "none") - priority(memberStates[b.id] ?? "none");
+              })
+              .map((m) => {
+                const state = memberStates[m.id] ?? "none";
+                const cardClasses = (() => {
                 const base = "flex flex-col items-center justify-center aspect-square border bg-card transition-colors";
                 if (state === "active") return `${base} border-[hsl(350,55%,35%)]`;
                 if (state === "canRestart") return `${base} border-border opacity-20 hover:border-[hsl(350,55%,35%)]`;
