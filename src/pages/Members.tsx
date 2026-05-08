@@ -195,7 +195,7 @@ const Members = () => {
               const cardClasses = (() => {
                 const base = "flex flex-col items-center justify-center aspect-square border bg-card transition-colors";
                 if (state === "active") return `${base} border-[hsl(350,55%,35%)]`;
-                if (state === "canRestart") return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)]`;
+                if (state === "canRestart") return `${base} border-border hover:border-[hsl(350,55%,35%)]`;
                 if (state === "blocked") return `${base} border-border opacity-40`;
                 return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)]`;
               })();
