@@ -70,7 +70,7 @@ export async function handler(req: Request): Promise<Response> {
       brand: "— lost time",
     },
     fr: {
-      subject: `à la recherche du membre #${memberNum}`,
+      subject: `à la recherche du membre n°${memberNum}`,
       greeting: "Bonjour,",
       approved: `Ta candidature a été approuvée. Tu es désormais le <strong style="color: #800000;">membre n°${memberNum}</strong> de lost time.`,
       login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> pour parcourir les portraits des membres et entamer une correspondance.`,
@@ -89,7 +89,7 @@ export async function handler(req: Request): Promise<Response> {
       brand: "— lost time",
     },
     it: {
-      subject: `alla ricerca di — socio #${memberNum}`,
+      subject: `alla ricerca di — socio n°${memberNum}`,
       greeting: "Ciao,",
       approved: `La tua candidatura è stata approvata. Sei ora il <strong style="color: #800000;">membro n°${memberNum}</strong> di lost time.`,
       login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> per sfogliare i ritratti dei membri e iniziare corrispondenze.`,
