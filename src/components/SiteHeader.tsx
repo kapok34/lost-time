@@ -31,7 +31,7 @@ export const SiteHeader = () => {
           <Title />
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 gap-y-2">
           {!user && (
             <>
               <button
