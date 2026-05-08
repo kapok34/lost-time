@@ -28,7 +28,7 @@ describe("notify-member edge function", () => {
     (globalThis as any).Deno.env._store = {
       RESEND_API_KEY: "re_test_key",
       SUPABASE_URL: "https://test.supabase.co",
-      SB_SERVICE_ROLE_KEY: "test_service_role",
+      SUPABASE_SECRET_KEYS: JSON.stringify({ default: "test_service_role" }),
     };
   });
 
@@ -37,34 +37,65 @@ describe("notify-member edge function", () => {
     delete (globalThis as any).Deno.env._store;
   });
 
-  function mockConversation(active = true) {
-    return {
-      data: {
-        id: "conv-1",
-        member_a: "sender-id",
-        member_b: "recipient-id",
-        status: active ? "active" : "ended",
-      },
-      error: null,
+  function mockFromImpl(
+    senderLang: string,
+    recipientLang: string,
+    opts?: { convActive?: boolean; convError?: boolean; selfMessage?: boolean }
+  ) {
+    return (table: string) => {
+      if (table === "conversations") {
+        return {
+          select: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              maybeSingle: () => {
+                if (opts?.convError) {
+                  return Promise.resolve({ data: null, error: new Error("not found") });
+                }
+                if (opts?.selfMessage) {
+                  return Promise.resolve({
+                    data: { id: "conv-1", member_a: "same-id", member_b: "same-id", status: "active" },
+                    error: null,
+                  });
+                }
+                return Promise.resolve({
+                  data: {
+                    id: "conv-1",
+                    member_a: "sender-id",
+                    member_b: "recipient-id",
+                    status: opts?.convActive === false ? "ended" : "active",
+                  },
+                  error: null,
+                });
+              },
+            })),
+          })),
+        };
+      }
+      if (table === "profiles") {
+        return {
+          select: vi.fn((cols: string) => ({
+            eq: vi.fn((field: string, value: string) => ({
+              maybeSingle: () => {
+                if (value === "sender-id") {
+                  return Promise.resolve({
+                    data: { id: "sender-id", member_number: 42, language: senderLang },
+                    error: null,
+                  });
+                }
+                if (value === "recipient-id") {
+                  return Promise.resolve({
+                    data: { id: "recipient-id", language: recipientLang },
+                    error: null,
+                  });
+                }
+                return Promise.resolve({ data: null, error: null });
+              },
+            })),
+          })),
+        };
+      }
+      return {};
     };
-  }
-
-  function mockProfiles(senderLang: string, recipientLang: string) {
-    return (table: string) => ({
-      select: vi.fn((cols: string) => ({
-        eq: vi.fn((field: string, value: string) => ({
-          maybeSingle: () => {
-            if (value === "sender-id") {
-              return Promise.resolve({ data: { id: "sender-id", member_number: 42, language: senderLang }, error: null });
-            }
-            if (value === "recipient-id") {
-              return Promise.resolve({ data: { id: "recipient-id", language: recipientLang }, error: null });
-            }
-            return Promise.resolve({ data: null, error: null });
-          },
-        })),
-      })),
-    });
   }
 
   it("returns 500 when RESEND_API_KEY is missing", async () => {
@@ -80,13 +111,7 @@ describe("notify-member edge function", () => {
   });
 
   it("returns 404 when conversation is not found", async () => {
-    mockFrom.mockReturnValue({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: () => Promise.resolve({ data: null, error: new Error("not found") }),
-        })),
-      })),
-    });
+    mockFrom.mockImplementation(mockFromImpl("en", "en", { convError: true }));
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
@@ -94,16 +119,11 @@ describe("notify-member edge function", () => {
     });
     const res = await handler(req);
     expect(res.status).toBe(404);
+    expect(await res.text()).toBe("Conversation not found");
   });
 
   it("returns 200 and skips when conversation is not active", async () => {
-    mockFrom.mockReturnValue({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: () => Promise.resolve(mockConversation(false)),
-        })),
-      })),
-    });
+    mockFrom.mockImplementation(mockFromImpl("en", "en", { convActive: false }));
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
@@ -115,16 +135,7 @@ describe("notify-member edge function", () => {
   });
 
   it("returns 200 and skips self-messages", async () => {
-    mockFrom.mockReturnValue({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: () => Promise.resolve({
-            data: { id: "conv-1", member_a: "same-id", member_b: "same-id", status: "active" },
-            error: null,
-          }),
-        })),
-      })),
-    });
+    mockFrom.mockImplementation(mockFromImpl("en", "en", { selfMessage: true }));
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
@@ -138,7 +149,7 @@ describe("notify-member edge function", () => {
   });
 
   it("returns 404 when recipient email is not found", async () => {
-    mockFrom.mockReturnValue(mockProfiles("en", "en"));
+    mockFrom.mockImplementation(mockFromImpl("en", "en"));
     mockGetUserById.mockResolvedValue({ data: { user: null }, error: new Error("not found") });
 
     const req = new Request("https://test.supabase.co", {
@@ -151,7 +162,7 @@ describe("notify-member edge function", () => {
   });
 
   it("sends an English notification email when recipient language is en", async () => {
-    mockFrom.mockReturnValue(mockProfiles("fr", "en"));
+    mockFrom.mockImplementation(mockFromImpl("fr", "en"));
     mockGetUserById.mockResolvedValue({
       data: { user: { id: "recipient-id", email: "alice@example.com" } },
       error: null,
@@ -183,7 +194,7 @@ describe("notify-member edge function", () => {
   });
 
   it("sends a French notification email when recipient language is fr", async () => {
-    mockFrom.mockReturnValue(mockProfiles("en", "fr"));
+    mockFrom.mockImplementation(mockFromImpl("en", "fr"));
     mockGetUserById.mockResolvedValue({
       data: { user: { id: "recipient-id", email: "beatrice@example.com" } },
       error: null,
@@ -215,7 +226,7 @@ describe("notify-member edge function", () => {
   });
 
   it("sends an Italian notification email when recipient language is it", async () => {
-    mockFrom.mockReturnValue(mockProfiles("en", "it"));
+    mockFrom.mockImplementation(mockFromImpl("en", "it"));
     mockGetUserById.mockResolvedValue({
       data: { user: { id: "recipient-id", email: "carlo@example.com" } },
       error: null,
@@ -247,7 +258,7 @@ describe("notify-member edge function", () => {
   });
 
   it("defaults to English when recipient language is unsupported", async () => {
-    mockFrom.mockReturnValue(mockProfiles("en", "es"));
+    mockFrom.mockImplementation(mockFromImpl("en", "es"));
     mockGetUserById.mockResolvedValue({
       data: { user: { id: "recipient-id", email: "juan@example.com" } },
       error: null,
@@ -272,7 +283,7 @@ describe("notify-member edge function", () => {
   });
 
   it("returns 500 when Resend API fails", async () => {
-    mockFrom.mockReturnValue(mockProfiles("en", "en"));
+    mockFrom.mockImplementation(mockFromImpl("en", "en"));
     mockGetUserById.mockResolvedValue({
       data: { user: { id: "recipient-id", email: "fail@example.com" } },
       error: null,

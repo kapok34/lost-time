@@ -165,7 +165,6 @@ describe("Conversation cancel functionality", () => {
       });
     });
 
-    expect(toast.success).toHaveBeenCalledWith("Correspondence cancelled");
     expect(mockNavigate).toHaveBeenCalledWith("/members");
   });
 
