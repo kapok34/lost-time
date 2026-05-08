@@ -185,7 +185,7 @@ const Members = () => {
         </div>
 
         {loading ? (
-          <p className="text-center text-muted-foreground">Loading…</p>
+          <p className="text-center text-muted-foreground">loading</p>
         ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground italic">{t("members.noMatch")}</p>
         ) : (
@@ -195,8 +195,8 @@ const Members = () => {
               const cardClasses = (() => {
                 const base = "flex flex-col items-center justify-center aspect-square border bg-card transition-colors";
                 if (state === "active") return `${base} border-[hsl(350,55%,35%)]`;
-                if (state === "canRestart") return `${base} border-border hover:border-[hsl(350,55%,35%)]`;
-                if (state === "blocked") return `${base} border-border opacity-40`;
+                if (state === "canRestart") return `${base} border-border opacity-20 hover:border-[hsl(350,55%,35%)]`;
+                if (state === "blocked") return `${base} border-border opacity-50`;
                 return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)]`;
               })();
               return (
@@ -205,7 +205,7 @@ const Members = () => {
                   key={m.id}
                   className={cardClasses}
                 >
-                  <span className={`text-4xl font-bold font-sans-ui ${state === "canRestart" || state === "blocked" ? "text-muted-foreground" : ""}`}>{m.member_number ?? "—"}</span>
+                  <span className={`text-4xl font-bold font-sans-ui`>{m.member_number ?? "—"}</span>
                   <span className="text-base text-muted-foreground mt-1">{m.location}</span>
                   {m.questionnaire_languages && m.questionnaire_languages.length > 0 && (
                     <span className="text-xs text-muted-foreground mt-1 tracking-wider">
