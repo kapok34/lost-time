@@ -42,6 +42,21 @@ const EnglishPreface = () => {
         </p>
       </div>
 
+      <div>
+        <p
+          className="text-right"
+          style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(0.9rem, 1.4vw, 1.2rem)", lineHeight: 1.4, fontWeight: 400 }}
+        >
+          Your answers
+        </p>
+        <p
+          className="text-right italic"
+          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(1.5rem, 2.8vw, 2.25rem)", lineHeight: 1.2, fontWeight: 300 }}
+        >
+          will form your portrait.
+        </p>
+      </div>
+
       <div className="md:pl-20">
         <p className="text-xs font-sans-ui tracking-[0.18em] uppercase text-muted-foreground">
           No name
