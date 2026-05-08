@@ -348,7 +348,7 @@ const ItalianPreface = () => {
 const Preface = () => {
   const { lang } = useI18n();
   return (
-    <main className="h-screen bg-background text-foreground flex flex-col overflow-hidden">
+    <main className="min-h-screen bg-background text-foreground flex flex-col">
       <SiteHeader />
       {lang === "fr" ? <FrenchPreface /> : lang === "it" ? <ItalianPreface /> : <EnglishPreface />}
       <Footer />

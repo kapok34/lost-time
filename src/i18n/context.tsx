@@ -268,7 +268,7 @@ export const translations: Record<UILang, Record<string, string>> = {
     "admin.broadcastRecipients": "{{count}} membres approuvés",
     "admin.broadcastEmpty": "Saisis un objet et un message.",
     "footer.copyright": "© 2026 lost time",
-    "footer.privacy": "nous respectons ta vie privée",
+    "footer.privacy": "nous respectons\nta vie privée",
     "deleteAccount.title": "Supprimer ton compte",
 "deleteAccount.description": "Cela effacera définitivement ton portrait, tes réponses au questionnaire, tes messages, tes conversations et toutes les données associées. Cette action est irréversible.",
 "deleteAccount.itemProfile": "Ton portrait et ton avatar",

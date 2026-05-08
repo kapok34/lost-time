@@ -13,7 +13,7 @@ export const Footer = () => {
         >
           contact
         </button>
-        <span className="flex-1 text-right">{t("footer.privacy")}</span>
+        <span className="flex-1 text-right whitespace-pre-line">{t("footer.privacy")}</span>
       </div>
     </footer>
   );
