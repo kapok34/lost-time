@@ -197,7 +197,7 @@ const Members = () => {
                 if (state === "active") return `${base} border-[hsl(350,55%,35%)]`;
                 if (state === "canRestart") return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)]`;
                 if (state === "blocked") return `${base} border-border opacity-40`;
-                return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)] opacity-50`;
+                return `${base} border-muted-foreground hover:border-[hsl(350,55%,35%)]`;
               })();
               return (
                 <Link
