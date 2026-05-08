@@ -26,8 +26,8 @@ const Index = () => {
 
         <Link
           to="/preface"
-          className="text-xl tracking-widest text-foreground hover:text-[hsl(350,55%,35%)] transition-colors underline underline-offset-4"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontVariant: "small-caps" }}
+          className="text-base tracking-widest font-sans-ui text-muted-foreground hover:text-[hsl(350,55%,35%)] transition-colors underline underline-offset-4"
+          style={{ fontVariant: "small-caps" }}
         >
           {t("prefaceLink")}
         </Link>
