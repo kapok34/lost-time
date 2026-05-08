@@ -53,7 +53,7 @@ export async function handler(req: Request): Promise<Response> {
     en: {
       subject: `in search of member #${memberNum}`,
       greeting: "Hello,",
-      approved: `Your application has been approved. You are now <strong style="color: #800000;">member #${memberNum}</strong> of lost time.`,
+      approved: `Your application has been approved. You are now lost time's <strong style="color: #800000;">member no.${memberNum}</strong>.`,
       login: `You can log in at <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> to browse members' portraits and begin corresponding.`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "No juggling: each member can hold only one active correspondence at a time.",
@@ -72,7 +72,7 @@ export async function handler(req: Request): Promise<Response> {
     fr: {
       subject: `à la recherche du membre #${memberNum}`,
       greeting: "Bonjour,",
-      approved: `Ta candidature a été approuvée. Tu es désormais <strong style="color: #800000;">membre #${memberNum}</strong> de lost time.`,
+      approved: `Ta candidature a été approuvée. Tu es désormais le <strong style="color: #800000;">membre n°${memberNum}</strong> de lost time.`,
       login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> pour parcourir les portraits des membres et entamer une correspondance.`,
       manifestoTitle: "Manifeste",
       manifestoJuggling: "Pas de jonglage : chaque membre ne peut entretenir qu'une seule correspondance à la fois.",
@@ -91,7 +91,7 @@ export async function handler(req: Request): Promise<Response> {
     it: {
       subject: `alla ricerca di — socio #${memberNum}`,
       greeting: "Ciao,",
-      approved: `La tua candidatura è stata approvata. Sei ora <strong style="color: #800000;">membro #${memberNum}</strong> di lost time.`,
+      approved: `La tua candidatura è stata approvata. Sei ora il <strong style="color: #800000;">membro n°${memberNum}</strong> di lost time.`,
       login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> per sfogliare i ritratti dei membri e iniziare corrispondenze.`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "Niente giocoleria: ogni socio può mantenere una sola corrispondenza attiva alla volta.",
