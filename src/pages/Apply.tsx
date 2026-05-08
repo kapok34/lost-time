@@ -435,7 +435,7 @@ const Apply = () => {
                   setCountry("");
                   setAnswers({});
                   setCompletedLangs(new Set());
-                  
+                  toast.info(t("apply.cleared") ?? "Draft cleared");
                 }
               }}
               className="text-base font-sans-ui bg-muted text-muted-foreground px-6 py-2 rounded hover:bg-muted/80 transition-colors"
