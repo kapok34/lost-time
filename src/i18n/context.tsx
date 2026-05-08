@@ -322,7 +322,7 @@ export const translations: Record<UILang, Record<string, string>> = {
     "conversation": "corrispondenza",
     "profile.edit": "Modifica le tue risposte",
     "profile.connect": "scrivi",
-    "profile.beginCorrespondence": "Inizia una corrispondenza",
+    "profile.beginCorrespondence": "inizia corrispondenza",
     "profile.endCurrent": "Termina la corrispondenza in corso per scrivere a qualcun altro.",
     "profile.oneConversationHint": "i soci possono avere solo una conversazione attiva alla volta",
     "profile.restartCorrespondence": "Riprendi la corrispondenza",
