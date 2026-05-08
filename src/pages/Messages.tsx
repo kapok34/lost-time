@@ -99,7 +99,7 @@ const Messages = () => {
           <h2 className="font-sans-ui text-xl text-black font-normal mb-4">{t("messages.past")}</h2>
           <div className="border border-border p-6">
             {archived.length === 0 ? (
-              <p className="text-muted-foreground italic text-center font-sans-ui">{t("messages.noArchive")}</p>
+<p className="text-muted-foreground italic text-center font-sans-ui opacity-50">{t("messages.noArchive")}</p>
             ) : (
               <div className="flex flex-wrap gap-4">
                 {archived.map(({ conv, other }) => {
