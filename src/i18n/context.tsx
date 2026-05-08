@@ -154,7 +154,7 @@ export const translations: Record<UILang, Record<string, string>> = {
     "admin.broadcastRecipients": "{{count}} approved members",
     "admin.broadcastEmpty": "Please enter a subject and message.",
     "footer.copyright": "© 2026 lost time",
-    "footer.privacy": "we respect your privacy",
+    "footer.privacy": "we respect\nyour privacy",
     "deleteAccount.title": "Delete your account",
 "deleteAccount.description": "This will permanently erase your portrait, questionnaire answers, messages, correspondences and all associated data. This action cannot be undone.",
 "deleteAccount.itemProfile": "Your portrait and avatar",
