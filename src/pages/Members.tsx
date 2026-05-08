@@ -205,7 +205,7 @@ const Members = () => {
                   key={m.id}
                   className={cardClasses}
                 >
-                  <span className={`text-4xl font-bold font-sans-ui`>{m.member_number ?? "—"}</span>
+                  <span className={`text-4xl font-bold font-sans-ui`}>{m.member_number ?? "\u2014"}</span>
                   <span className="text-base text-muted-foreground mt-1">{m.location}</span>
                   {m.questionnaire_languages && m.questionnaire_languages.length > 0 && (
                     <span className="text-xs text-muted-foreground mt-1 tracking-wider">
