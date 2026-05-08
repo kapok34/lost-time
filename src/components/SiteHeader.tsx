@@ -80,23 +80,23 @@ export const SiteHeader = () => {
           )}
           {user && (
             <>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 sm:contents">
                 <button
                   onClick={() => navigate("/members")}
-                  className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
+                  className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors sm:order-1"
                 >
                   {t("profiles")}
                 </button>
                 <button
                   onClick={() => navigate("/messages")}
-                  className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
+                  className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors sm:order-2"
                 >
                   {t("conversation")}
                 </button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+                      className="p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors sm:order-6"
                       aria-label="Language"
                     >
                       <Globe size={18} />
@@ -124,24 +124,24 @@ export const SiteHeader = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 sm:contents">
                 {isAdmin && (
                   <button
                     onClick={() => navigate("/admin")}
-                    className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
+                    className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors sm:order-3"
                   >
                     admin
                   </button>
                 )}
                 <button
                   onClick={async () => { await signOut(); navigate("/"); }}
-                  className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors"
+                  className="text-base font-sans-ui border border-foreground text-foreground px-4 py-1 rounded hover:bg-[#800000] hover:text-white transition-colors sm:order-4"
                 >
                   {t("signOut")}
                 </button>
                 <button
                   onClick={() => navigate(`/members/${profile?.member_number}`)}
-                  className="p-0 rounded-full hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="p-0 rounded-full hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary sm:order-5"
                   aria-label={t("profile")}
                 >
                   <Avatar className="h-10 w-10 border border-border rounded-full">

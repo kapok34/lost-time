@@ -108,7 +108,7 @@ const Members = () => {
     <div className="min-h-screen flex flex-col font-sans-ui">
       <SiteHeader />
       <main className="flex-1 container max-w-6xl py-12">
-        <div className="flex justify-end gap-3 mb-8">
+        <div className="flex flex-wrap justify-end gap-3 mb-8">
           <Select value={countryFilter} onValueChange={(v) => { setCountryFilter(v); setCityFilter("all"); }}>
             <SelectTrigger className="w-40 bg-white border-input font-sans-ui">
               <SelectValue placeholder={t("members.filterCountry")} />
@@ -164,7 +164,7 @@ const Members = () => {
         ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground italic">{t("members.noMatch")}</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {filtered.map((m) => {
               const contacted = contactedIds.has(m.id);
               return (
