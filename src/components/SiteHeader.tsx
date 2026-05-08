@@ -31,7 +31,7 @@ export const SiteHeader = () => {
           <Title />
         </Link>
 
-        <div className="flex flex-wrap items-center gap-3 gap-y-2">
+        <div className="flex items-center gap-3">
           {!user && (
             <>
               <button
@@ -76,6 +76,11 @@ export const SiteHeader = () => {
               >
                 {t("signOut")}
               </button>
+            </>
+          )}
+
+          <div className="flex flex-col-reverse items-center gap-1 sm:flex-row sm:gap-3">
+            {user && (
               <button
                 onClick={() => navigate(`/members/${profile?.member_number}`)}
                 className="p-0 rounded-full hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
@@ -87,40 +92,40 @@ export const SiteHeader = () => {
                   </AvatarFallback>
                 </Avatar>
               </button>
-            </>
-          )}
+            )}
 
-          {/* Language dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="ml-2 p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Language"
-              >
-                <Globe size={18} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[80px]">
-              <DropdownMenuItem
-                onClick={() => setLang("en")}
-                className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "en" ? "text-foreground font-medium" : ""}`}
-              >
-                EN
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setLang("fr")}
-                className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "fr" ? "text-foreground font-medium" : ""}`}
-              >
-                FR
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setLang("it")}
-                className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "it" ? "text-foreground font-medium" : ""}`}
-              >
-                IT
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            {/* Language dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Language"
+                >
+                  <Globe size={18} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[80px]">
+                <DropdownMenuItem
+                  onClick={() => setLang("en")}
+                  className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "en" ? "text-foreground font-medium" : ""}`}
+                >
+                  EN
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLang("fr")}
+                  className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "fr" ? "text-foreground font-medium" : ""}`}
+                >
+                  FR
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLang("it")}
+                  className={`font-sans-ui text-sm cursor-pointer hover:bg-[#800000] hover:text-white transition-colors ${lang === "it" ? "text-foreground font-medium" : ""}`}
+                >
+                  IT
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </header>
