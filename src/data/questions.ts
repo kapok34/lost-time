@@ -217,7 +217,7 @@ const esQuestions: QuestionDef[] = [
   { id: 30, text: "El don natural que me gustaría tener." },
   { id: 31, text: "Cómo me gustaría morir." },
   { id: 32, text: "Mi estado de ánimo actual." },
-  { id: 33, text: "Las faltas por las que soy más indulgente." },
+  { id: 33, text: "Los defectos que más tolero." },
   { id: 34, text: "Mi lema favorito." },
 ];
 
