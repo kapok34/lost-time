@@ -59,7 +59,7 @@ describe("Application submission flow", () => {
   it("should render the apply form with account and questionnaire sections", () => {
     render(<Apply />, { wrapper });
     expect(screen.getByText(/account information/i)).toBeInTheDocument();
-    expect(screen.getByText(/questionnaire/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /questionnaire/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
     // Country appears as both a Label and a Select placeholder, so use getAllByText
