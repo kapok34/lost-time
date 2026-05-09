@@ -328,7 +328,7 @@ const ptQuestions: QuestionDef[] = [
   { id: 30, text: "O dom natural que gostaria de ter." },
   { id: 31, text: "Como gostaria de morrer." },
   { id: 32, text: "O meu estado de espírito actual." },
-  { id: 33, text: "As faltas por que sou mais indulgente." },
+  { id: 33, text: "Os defeitos que mais tolero." },
   { id: 34, text: "O meu lema favorito." },
 ];
 
