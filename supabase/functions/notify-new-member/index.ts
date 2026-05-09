@@ -67,8 +67,8 @@ export async function handler(req: Request): Promise<Response> {
   const translations: Record<string, { subject: string; body: string; linkText: string; unsubscribe: string; outro: string; signoff: string; brand: string }> = {
     en: {
       subject: `new member at lost time — no.${senderNum}`,
-      body: `A new member has joined lost time: <strong style="color: #800000;">member no.${senderNum}</strong> and has filled out the questionnaire in the same language as you.`,
-      linkText: "browse portraits",
+      body: `A new member has joined lost time - <strong style="color: #800000;">member no.${senderNum}</strong> - and has filled out the questionnaire in the same language as you.`,
+      linkText: "peruse portraits",
       unsubscribe: "You can turn off these notifications from your portrait.",
       outro: "Happy searching.",
       signoff: "Yours truly,",
@@ -76,7 +76,7 @@ export async function handler(req: Request): Promise<Response> {
     },
     fr: {
       subject: `nouveau membre de lost time — n°${senderNum}`,
-      body: `Un nouveau membre a rejoint lost time : <strong style="color: #800000;">membre n°${senderNum}</strong> et a rempli le questionnaire dans la même langue que toi.`,
+      body: `Un nouveau membre a rejoint lost time - le <strong style="color: #800000;">membre n°${senderNum}</strong> - et a rempli le questionnaire dans la même langue que toi.`,
       linkText: "parcourir les portraits",
       unsubscribe: "Tu peux désactiver ces notifications depuis ton portrait.",
       outro: "Bonne recherche.",
