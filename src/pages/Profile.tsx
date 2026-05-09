@@ -8,6 +8,7 @@ import { getQuestions, type QuestionnaireLang } from "@/data/questions";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ProfileFull {
@@ -17,6 +18,7 @@ interface ProfileFull {
   location: string;
   questionnaire_language: QuestionnaireLang | null;
   questionnaire_languages: QuestionnaireLang[] | null;
+  notify_new_members: boolean | null;
 }
 
 interface ConvWithProfile {
@@ -45,17 +47,19 @@ const Profile = () => {
   const [viewLang, setViewLang] = useState<QuestionnaireLang>("en");
   const [messageState, setMessageState] = useState<MessageState | null>(null);
   const [starting, setStarting] = useState(false);
+  const [notifyNewMembers, setNotifyNewMembers] = useState<boolean>(true);
 
   useEffect(() => {
     if (!memberNumber) return;
     (async () => {
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, avatar_url, member_number, location, questionnaire_language, questionnaire_languages")
+        .select("id, avatar_url, member_number, location, questionnaire_language, questionnaire_languages, notify_new_members")
         .eq("member_number", Number(memberNumber))
         .maybeSingle();
       const p = (prof as ProfileFull) ?? null;
       setProfile(p);
+      setNotifyNewMembers(p?.notify_new_members ?? true);
       if (!p) return;
       const [{ data: ans }, { data: convs }] = await Promise.all([
         supabase.from("questionnaire_answers").select("question_id, answer, lang").eq("user_id", p.id),
@@ -130,6 +134,19 @@ const Profile = () => {
     [profile?.questionnaire_languages]
   );
 
+  const onToggleNotify = async (checked: boolean) => {
+    if (!profile?.id) return;
+    setNotifyNewMembers(checked);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ notify_new_members: checked })
+      .eq("id", profile.id);
+    if (error) {
+      toast.error("Failed to update preference");
+      setNotifyNewMembers(!checked);
+    }
+  };
+
   const onMessage = async () => {
     if (!profile?.id) return;
     if (messageState?.type === "active") {
@@ -184,6 +201,20 @@ const Profile = () => {
             </div>
           )}
         </div>
+
+        {isMe && (
+          <div className="flex items-center justify-center gap-3 mb-10">
+            <Switch
+              id="notify-new-members"
+              checked={notifyNewMembers}
+              onCheckedChange={onToggleNotify}
+              className="data-[state=checked]:bg-[hsl(350,55%,35%)]"
+            />
+            <label htmlFor="notify-new-members" className="text-sm text-muted-foreground cursor-pointer select-none">
+              {t("profile.notifyNewMembers")}
+            </label>
+          </div>
+        )}
 
         <div className="space-y-10">
           {questions.map((q) => (
