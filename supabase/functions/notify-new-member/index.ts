@@ -85,7 +85,7 @@ export async function handler(req: Request): Promise<Response> {
     },
     it: {
       subject: `nuovo socio di lost time n°${senderNum}`,
-      body: `Un nuovo socio si è unito a lost time : <strong style="color: #800000;">socio n°${senderNum}</strong> e ha compilato il questionario nella stessa lingue di te.`,
+      body: `Un nuovo socio ha raggiunto lost time - <strong style="color: #800000;">socio n°${senderNum}</strong> - e ha compilato il questionario nella stessa lingue di te.`,
       linkText: "sfoglia i ritratti",
       unsubscribe: "Puoi disattivare queste notifiche dal tuo ritratto.",
       outro: "Buona ricerca.",
