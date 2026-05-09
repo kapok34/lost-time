@@ -119,7 +119,7 @@ const itQuestions: QuestionDef[] = [
   { id: 6, text: "La mia occupazione preferita." },
   { id: 7, text: "Qual è, per me, la felicità." },
   { id: 8, text: "Qual è, per me, la più grande disgrazia." },
-  { id: 9, text: "Se non io stesso, chi vorrei essere." },
+  { id: 9, text: "Se non io, chi vorrei essere." },
   { id: 10, text: "Dove vorrei vivere." },
   { id: 11, text: "Il colore che preferisco." },
   { id: 12, text: "La mia stagione preferita." },
