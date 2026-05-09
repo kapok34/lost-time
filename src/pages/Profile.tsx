@@ -202,20 +202,6 @@ const Profile = () => {
           )}
         </div>
 
-        {isMe && (
-          <div className="flex items-center justify-center gap-3 mb-10">
-            <Switch
-              id="notify-new-members"
-              checked={notifyNewMembers}
-              onCheckedChange={onToggleNotify}
-              className="data-[state=checked]:bg-[hsl(350,55%,35%)]"
-            />
-            <label htmlFor="notify-new-members" className="text-sm text-muted-foreground cursor-pointer select-none">
-              {t("profile.notifyNewMembers")}
-            </label>
-          </div>
-        )}
-
         <div className="space-y-10">
           {questions.map((q) => (
             <div key={q.id}>
@@ -262,6 +248,20 @@ const Profile = () => {
               )}
             </div>
           )
+        )}
+
+        {isMe && (
+          <div className="flex items-center justify-center gap-3 mt-16 pt-8 border-t border-border">
+            <Switch
+              id="notify-new-members"
+              checked={notifyNewMembers}
+              onCheckedChange={onToggleNotify}
+              className="data-[state=checked]:bg-[hsl(350,55%,35%)]"
+            />
+            <label htmlFor="notify-new-members" className="text-base font-sans-ui text-muted-foreground cursor-pointer select-none">
+              {t("profile.notifyNewMembers")}
+            </label>
+          </div>
         )}
       </main>
       <Footer />
