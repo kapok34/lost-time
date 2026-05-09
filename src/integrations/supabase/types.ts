@@ -88,6 +88,7 @@ export type Database = {
           language: string
           location: string
           member_number: number | null
+          notify_new_members: boolean | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["profile_status"]
           updated_at: string
@@ -100,6 +101,7 @@ export type Database = {
           language: string
           location: string
           member_number?: number | null
+          notify_new_members?: boolean | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string
@@ -112,6 +114,7 @@ export type Database = {
           language?: string
           location?: string
           member_number?: number | null
+          notify_new_members?: boolean | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string

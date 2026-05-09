@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.notify-member]
 verify_jwt = false
+
+[functions.notify-new-member]
+verify_jwt = false
