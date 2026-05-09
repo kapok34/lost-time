@@ -95,7 +95,7 @@ const frQuestions: QuestionDef[] = [
   { id: 19, text: "Mes compositeurs et compositrices préférés." },
   { id: 20, text: "L'artiste que je chéris." },
   { id: 21, text: "Mes héros et héroïnes dans la vie réelle." },
-  { id: 22, text: "Mes héros et héroînes dans l'histoire." },
+  { id: 22, text: "Mes héros et héroïnes dans l'histoire." },
   { id: 23, text: "Mon péché mignon." },
   { id: 24, text: "Ma gourmandise favorite." },
   { id: 25, text: "Mes noms favoris." },
