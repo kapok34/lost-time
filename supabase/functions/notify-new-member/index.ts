@@ -13,11 +13,13 @@ export async function handler(req: Request): Promise<Response> {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
   const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS")!);
 
-  const { id, member_number, questionnaire_languages } = await req.json();
+  const { id, member_number, questionnaire_languages, new_languages } = await req.json();
 
-  if (!id || !questionnaire_languages) {
-    return new Response("Missing member id or questionnaire_languages", { status: 400 });
+  if (!id || (!questionnaire_languages && !new_languages)) {
+    return new Response("Missing member id and either questionnaire_languages or new_languages", { status: 400 });
   }
+
+  const targetLanguages = new_languages ?? questionnaire_languages;
 
   if (!RESEND_API_KEY) {
     console.error("RESEND_API_KEY not set");
@@ -34,7 +36,7 @@ export async function handler(req: Request): Promise<Response> {
     .select("id, language")
     .eq("status", "approved")
     .eq("notify_new_members", true)
-    .overlaps("questionnaire_languages", questionnaire_languages)
+    .overlaps("questionnaire_languages", targetLanguages)
     .neq("id", id);
 
   if (matchError) {
@@ -64,10 +66,16 @@ export async function handler(req: Request): Promise<Response> {
     if (u.email) emailMap.set(u.id, u.email);
   });
 
+  const isNewLanguageNotification = !!new_languages;
+
   const translations: Record<string, { subject: string; body: string; linkText: string; unsubscribe: string; outro: string; signoff: string; brand: string }> = {
     en: {
-      subject: `new member at lost time — no.${senderNum}`,
-      body: `A new member has joined lost time: <strong style="color: #800000;">member no.${senderNum}</strong> and has filled out the questionnaire in the same language as you.`,
+      subject: isNewLanguageNotification
+        ? `new language added by member no.${senderNum}`
+        : `new member at lost time — no.${senderNum}`,
+      body: isNewLanguageNotification
+        ? `Member no.${senderNum} has filled out the questionnaire in a new language that matches yours.`
+        : `A new member has joined lost time - <strong style="color: #800000;">member no.${senderNum}</strong> - and has filled out the questionnaire in the same language as you.`,
       linkText: "browse portraits",
       unsubscribe: "You can turn off these notifications from your portrait.",
       outro: "Happy searching.",
@@ -75,8 +83,12 @@ export async function handler(req: Request): Promise<Response> {
       brand: "— lost time",
     },
     fr: {
-      subject: `nouveau membre de lost time — n°${senderNum}`,
-      body: `Un nouveau membre a rejoint lost time : <strong style="color: #800000;">membre n°${senderNum}</strong> et a rempli le questionnaire dans la même langue que toi.`,
+      subject: isNewLanguageNotification
+        ? `nouvelle langue ajoutée par membre n°${senderNum}`
+        : `nouveau membre de lost time — n°${senderNum}`,
+      body: isNewLanguageNotification
+        ? `Le membre n°${senderNum} a rempli le questionnaire dans une nouvelle langue qui correspond à la tienne.`
+        : `Un nouveau membre a rejoint lost time - <strong style="color: #800000;">membre n°${senderNum}</strong> - et a rempli le questionnaire dans la même langue que toi.`,
       linkText: "parcourir les portraits",
       unsubscribe: "Tu peux désactiver ces notifications depuis ton portrait.",
       outro: "Bonne recherche.",
@@ -84,8 +96,12 @@ export async function handler(req: Request): Promise<Response> {
       brand: "— lost time",
     },
     it: {
-      subject: `nuovo socio di lost time n°${senderNum}`,
-      body: `Un nuovo socio si è unito a lost time : <strong style="color: #800000;">socio n°${senderNum}</strong> e ha compilato il questionario nella stessa lingue di te.`,
+      subject: isNewLanguageNotification
+        ? `nuova lingua aggiunta dal socio n°${senderNum}`
+        : `nuovo socio di lost time n°${senderNum}`,
+      body: isNewLanguageNotification
+        ? `Il socio n°${senderNum} ha compilato il questionario in una nuova lingua che corrisponde alla tua.`
+        : `Un nuovo socio ha raggiunto lost time - <strong style="color: #800000;">socio n°${senderNum}</strong> - e ha compilato il questionario nella stessa lingue di te.`,
       linkText: "sfoglia i ritratti",
       unsubscribe: "Puoi disattivare queste notifiche dal tuo ritratto.",
       outro: "Buona ricerca.",
