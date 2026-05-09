@@ -64,11 +64,12 @@ export async function handler(req: Request): Promise<Response> {
     if (u.email) emailMap.set(u.id, u.email);
   });
 
-  const translations: Record<string, { subject: string; body: string; linkText: string; outro: string; signoff: string; brand: string }> = {
+  const translations: Record<string, { subject: string; body: string; linkText: string; unsubscribe: string; outro: string; signoff: string; brand: string }> = {
     en: {
       subject: `new member at lost time — no.${senderNum}`,
       body: `A new member has joined lost time: <strong style="color: #800000;">member no.${senderNum}</strong> and has filled out the questionnaire in the same language as you.`,
       linkText: "browse portraits",
+      unsubscribe: "You can turn off these notifications from your portrait.",
       outro: "Happy searching.",
       signoff: "Yours truly,",
       brand: "— lost time",
@@ -77,6 +78,7 @@ export async function handler(req: Request): Promise<Response> {
       subject: `nouveau membre de lost time — n°${senderNum}`,
       body: `Un nouveau membre a rejoint lost time : <strong style="color: #800000;">membre n°${senderNum}</strong> et a rempli le questionnaire dans la même langue que toi.`,
       linkText: "parcourir les portraits",
+      unsubscribe: "Tu peux désactiver ces notifications depuis ton portrait.",
       outro: "Bonne recherche.",
       signoff: "Amitiés,",
       brand: "— lost time",
@@ -85,6 +87,7 @@ export async function handler(req: Request): Promise<Response> {
       subject: `nuovo socio di lost time n°${senderNum}`,
       body: `Un nuovo socio si è unito a lost time : <strong style="color: #800000;">socio n°${senderNum}</strong> e ha compilato il questionario nella stessa lingue di te.`,
       linkText: "sfoglia i ritratti",
+      unsubscribe: "Puoi disattivare queste notifiche dal tuo ritratto.",
       outro: "Buona ricerca.",
       signoff: "Saluti,",
       brand: "— lost time",
@@ -116,6 +119,7 @@ export async function handler(req: Request): Promise<Response> {
             <div style="max-width: 480px; margin: 0 auto; font-family: 'Cormorant Garamond', Georgia, serif; line-height: 1.65; color: #1a1a1a;">
               <p>${t.body}</p>
               <p><a href="https://lost-time.org/members" style="color: #800000; text-decoration: underline;">${t.linkText}</a></p>
+              <p style="margin-top: 1.5em; font-size: 0.95em; color: #555;">${t.unsubscribe}</p>
               <p style="margin-top: 1.5em;">${t.outro}</p>
               <p>${t.signoff}</p>
               <p style="color: #888; font-size: 0.9em; margin-top: 2em;">${t.brand}</p>
