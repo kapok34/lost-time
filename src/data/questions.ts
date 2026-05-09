@@ -143,7 +143,7 @@ const itQuestions: QuestionDef[] = [
   { id: 30, text: "Il dono di natura che vorrei avere." },
   { id: 31, text: "Come vorrei morire." },
   { id: 32, text: "Stato attuale del mio animo." },
-  { id: 33, text: "Le colpe che mi ispirano maggiore indulgenza." },
+  { id: 33, text: "Le mancanze che mi ispirano maggiore indulgenza." },
   { id: 34, text: "Il mio motto preferito." },
 ];
 
@@ -217,7 +217,7 @@ const esQuestions: QuestionDef[] = [
   { id: 30, text: "El don natural que me gustaría tener." },
   { id: 31, text: "Cómo me gustaría morir." },
   { id: 32, text: "Mi estado de ánimo actual." },
-  { id: 33, text: "Los defectos que más tolero." },
+  { id: 33, text: "Las faltas que más perdono." },
   { id: 34, text: "Mi lema favorito." },
 ];
 
@@ -328,7 +328,7 @@ const ptQuestions: QuestionDef[] = [
   { id: 30, text: "O dom natural que gostaria de ter." },
   { id: 31, text: "Como gostaria de morrer." },
   { id: 32, text: "O meu estado de espírito actual." },
-  { id: 33, text: "Os defeitos que mais tolero." },
+  { id: 33, text: "As faltas que mais perdoo." },
   { id: 34, text: "O meu lema favorito." },
 ];
 
