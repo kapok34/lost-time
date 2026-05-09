@@ -39,10 +39,6 @@ BEGIN
   IF _questionnaire_languages IS NULL OR array_length(_questionnaire_languages, 1) IS NULL THEN
     RAISE EXCEPTION 'At least one questionnaire language is required';
   END IF;
-  IF array_length(_questionnaire_languages, 1) > 2 THEN
-    RAISE EXCEPTION 'Maximum 2 questionnaire languages allowed';
-  END IF;
-
   -- Validate each language set has all answers
   FOREACH _lang IN ARRAY _questionnaire_languages
   LOOP
