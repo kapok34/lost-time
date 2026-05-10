@@ -22,25 +22,6 @@ const Pending = () => {
             </p>
           </>
         )}
-        {profile.status === "rejected" && (
-          <>
-            <h1 className="font-display text-4xl mb-6">{t("rejected.title")}</h1>
-            <p className="text-muted-foreground italic text-lg leading-relaxed mb-2">
-              {t("rejected.subtitle")}
-            </p>
-            <p className="text-muted-foreground italic text-base">
-              {t("rejected.note")}
-            </p>
-            <div className="mt-8">
-              <a
-                href="/apply"
-                className="inline-block text-base font-sans-ui bg-[hsl(350,55%,35%)] text-white px-6 py-2 rounded hover:bg-[hsl(350,55%,30%)] transition-colors"
-              >
-                {t("rejected.reapply")}
-              </a>
-            </div>
-          </>
-        )}
         {profile.status === "suspended" && (
           <>
             <h1 className="font-display text-4xl mb-6">{t("pending.title")}</h1>
