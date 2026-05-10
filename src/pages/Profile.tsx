@@ -4,10 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { getQuestions, type QuestionnaireLang } from "@/data/questions";
+import { getQuestions, type QuestionnaireLang, QUESTIONNAIRE_LANG_LABELS } from "@/data/questions";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
-import { toast } from "sonner";
+import { localizeLocation } from "@/data/countries";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -41,7 +41,7 @@ const Profile = () => {
   const { memberNumber } = useParams<{ memberNumber: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [profile, setProfile] = useState<ProfileFull | null>(null);
   const [answers, setAnswers] = useState<Record<string, Record<number, string>>>({});
   const [viewLang, setViewLang] = useState<QuestionnaireLang>("en");
@@ -182,7 +182,7 @@ const Profile = () => {
       <main className="flex-1 container max-w-3xl py-16">
         <div className="flex flex-col items-center text-center mb-12">
           <h1 className="font-sans-ui text-7xl font-bold mb-2">{profile.member_number ?? "—"}</h1>
-          <p className="text-xl text-muted-foreground italic mb-4">{profile.location}</p>
+          <p className="text-xl text-muted-foreground italic mb-4">{localizeLocation(profile.location, lang)}</p>
           {availableLangs.length > 1 && (
             <div className="flex gap-2 mb-6">
               {availableLangs.map((l) => (
