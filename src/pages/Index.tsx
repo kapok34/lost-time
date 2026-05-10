@@ -32,6 +32,14 @@ const Index = () => {
           {t("prefaceLink")}
         </Link>
 
+        <Link
+          to="/manifesto"
+          className="text-base tracking-widest font-sans-ui text-muted-foreground hover:text-[hsl(350,55%,35%)] transition-colors underline underline-offset-4"
+          style={{ fontVariant: "small-caps" }}
+        >
+          {t("manifestoLink")}
+        </Link>
+
         <div className="flex-[1]" />
       </div>
 
