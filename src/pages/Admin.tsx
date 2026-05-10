@@ -441,7 +441,12 @@ const Admin = () => {
                 <h2 className="font-display text-3xl">
                   {[...pending, ...members].find((p) => p.id === openId)?.member_number ?? "—"}
                 </h2>
-                <Button variant="ghost" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setOpenId(null)}>close</Button>
+                <div className="flex gap-2">
+                  {!editMode && [...pending, ...members].find((p) => p.id === openId)?.status === 'pending' && (
+                    <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setEditMode(true)}>edit answers</Button>
+                  )}
+                  <Button variant="ghost" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setOpenId(null)}>close</Button>
+                </div>
               </div>
 
               <div className="space-y-8 mb-12">
@@ -552,34 +557,42 @@ const Admin = () => {
                 })()}
               </div>
 
-              {editMode ? (
-                <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
-                  <Button className="bg-[#800000] text-white hover:bg-[hsl(350,55%,30%)]" onClick={saveMemberAnswers} disabled={savingAnswers}>
-                    {savingAnswers ? "saving…" : "save"}
-                  </Button>
-                  <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setAnswers((a) => ({ ...a, [reviewLang]: {} }))} disabled={([...pending, ...members].find((p) => p.id === openId)?.questionnaire_languages ?? ["en"]).length <= 1}>clear</Button>
-                </div>
-              ) : (
-                <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
-                  <Button className="flex-1 bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="outline" className="flex-1 hover:!bg-destructive hover:!text-white">{t("admin.reject")}</Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>reject application?</AlertDialogTitle>
-                        <AlertDialogDescription>optionally include a short note.</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" className="bg-white border-input" />
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => reject(openId)} className="hover:!bg-destructive hover:!text-white">{t("admin.reject")}</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              )}
+              {(() => {
+                const isPendingProfile = [...pending, ...members].find((p) => p.id === openId)?.status === 'pending';
+                return (
+                  <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
+                    {editMode && (
+                      <>
+                        <Button className="bg-[#800000] text-white hover:bg-[hsl(350,55%,30%)]" onClick={saveMemberAnswers} disabled={savingAnswers}>
+                          {savingAnswers ? "saving…" : "save"}
+                        </Button>
+                        <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setAnswers((a) => ({ ...a, [reviewLang]: {} }))} disabled={([...pending, ...members].find((p) => p.id === openId)?.questionnaire_languages ?? ["en"]).length <= 1}>clear</Button>
+                      </>
+                    )}
+                    {isPendingProfile && (
+                      <>
+                        <Button className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" className="hover:!bg-destructive hover:!text-white">{t("admin.reject")}</Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>reject application?</AlertDialogTitle>
+                              <AlertDialogDescription>optionally include a short note.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" className="bg-white border-input" />
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => reject(openId)} className="hover:!bg-destructive hover:!text-white">{t("admin.reject")}</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
