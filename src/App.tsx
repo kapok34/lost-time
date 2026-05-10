@@ -10,6 +10,7 @@ import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import Apply from "./pages/Apply.tsx";
 import Preface from "./pages/Preface.tsx";
+import Manifesto from "./pages/Manifesto.tsx";
 import Pending from "./pages/Pending.tsx";
 import Members from "./pages/Members.tsx";
 import Profile from "./pages/Profile.tsx";
@@ -32,6 +33,7 @@ const App = () => (
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/preface" element={<Preface />} />
+            <Route path="/manifesto" element={<Manifesto />} />
             <Route path="/login" element={<Login />} />
             <Route path="/apply" element={<Apply />} />
             <Route path="/pending" element={<RequireAuth><Pending /></RequireAuth>} />
