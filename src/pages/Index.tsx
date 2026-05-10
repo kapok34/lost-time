@@ -34,7 +34,7 @@ const Index = () => {
 
         <Link
           to="/manifesto"
-          className="text-base tracking-widest font-sans-ui text-muted-foreground hover:text-[hsl(350,55%,35%)] transition-colors underline underline-offset-4"
+          className="text-base tracking-widest font-sans-ui text-muted-foreground hover:text-[hsl(350,55%,35%)] transition-colors underline underline-offset-4 mt-3"
           style={{ fontVariant: "small-caps" }}
         >
           {t("manifestoLink")}
