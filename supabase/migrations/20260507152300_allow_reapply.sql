@@ -62,33 +62,18 @@ BEGIN
   SELECT status INTO _existing_status FROM public.profiles WHERE id = _uid;
 
   IF _existing_status IS NOT NULL THEN
-    IF _existing_status = 'rejected' THEN
-      -- Reset rejected profile to pending, overwrite data
-      UPDATE public.profiles
-      SET
-        status = 'pending',
-        rejection_reason = NULL,
-        display_name = trim(_display_name),
-        language = _language,
-        location = trim(_location),
-        questionnaire_language = _questionnaire_languages[1],
-        questionnaire_languages = _questionnaire_languages,
-        updated_at = now()
-      WHERE id = _uid;
-    ELSE
-      RAISE EXCEPTION 'Profile already exists for this user';
-    END IF;
-  ELSE
-    -- Insert new profile
-    INSERT INTO public.profiles (
-      id, display_name, language, location, status,
-      questionnaire_language, questionnaire_languages
-    )
-    VALUES (
-      _uid, trim(_display_name), _language, trim(_location), 'pending',
-      _questionnaire_languages[1], _questionnaire_languages
-    );
+    RAISE EXCEPTION 'Profile already exists for this user';
   END IF;
+
+  -- Insert new profile
+  INSERT INTO public.profiles (
+    id, display_name, language, location, status,
+    questionnaire_language, questionnaire_languages
+  )
+  VALUES (
+    _uid, trim(_display_name), _language, trim(_location), 'pending',
+    _questionnaire_languages[1], _questionnaire_languages
+  );
 
   -- Clear old answers and insert new ones for each language
   DELETE FROM public.questionnaire_answers WHERE user_id = _uid;

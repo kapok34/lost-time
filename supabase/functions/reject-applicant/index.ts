@@ -63,6 +63,13 @@ serve(async (req) => {
     return new Response("User email not found", { status: 404 });
   }
 
+  // Delete auth user so they can re-apply with the same email (cascades to profiles, answers, etc.)
+  const { error: deleteError } = await supabase.auth.admin.deleteUser(member_id);
+  if (deleteError) {
+    console.error("Delete user error:", deleteError);
+    return new Response(`Failed to delete rejected user: ${deleteError.message}`, { status: 500 });
+  }
+
   const lang = (profile.language === "fr" || profile.language === "it") ? profile.language : "en";
   const note = reason?.trim() || profile.rejection_reason?.trim() || "";
 
