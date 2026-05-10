@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS } from "@/data/questions";
+import { COUNTRIES, toEnglishCountry } from "@/data/countries";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
 import { toast } from "sonner";
@@ -22,89 +23,6 @@ import { Globe } from "lucide-react";
 
 const STORAGE_KEY = "salon.apply.draft.v2";
 
-const COUNTRIES: Record<string, string[]> = {
-  en: [
-    "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan",
-    "Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia",
-    "Bosnia and Herzegovina","Botswana","Brazil","Bulgaria","Burkina Faso","Burundi",
-    "Cambodia","Cameroon","Canada","Chad","Chile","China","Colombia","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic",
-    "Denmark","Djibouti","Dominican Republic",
-    "Ecuador","Egypt","El Salvador","Estonia","Ethiopia",
-    "Fiji","Finland","France",
-    "Gabon","Gambia","Georgia","Germany","Ghana","Greece","Guatemala","Guinea",
-    "Haiti","Honduras","Hungary",
-    "Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Ivory Coast",
-    "Jamaica","Japan","Jordan",
-    "Kazakhstan","Kenya","Kuwait","Kyrgyzstan",
-    "Laos","Latvia","Lebanon","Liberia","Libya","Lithuania","Luxembourg",
-    "Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar",
-    "Namibia","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway",
-    "Oman",
-    "Pakistan","Panama","Paraguay","Peru","Philippines","Poland","Portugal",
-    "Qatar",
-    "Romania","Russia","Rwanda",
-    "Saudi Arabia","Senegal","Serbia","Sierra Leone","Singapore","Slovakia","Slovenia","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria",
-    "Tajikistan","Tanzania","Thailand","Togo","Tunisia","Turkey","Turkmenistan",
-    "Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan",
-    "Venezuela","Vietnam",
-    "Yemen",
-    "Zambia","Zimbabwe",
-  ],
-  fr: [
-    "Afghanistan","Albanie","Algérie","Andorre","Angola","Argentine","Arménie","Australie","Autriche","Azerbaïdjan",
-    "Bahamas","Bahreïn","Bangladesh","Barbade","Biélorussie","Belgique","Belize","Bénin","Bhoutan","Bolivie",
-    "Bosnie-Herzégovine","Botswana","Brésil","Bulgarie","Burkina Faso","Burundi",
-    "Cambodge","Cameroun","Canada","Tchad","Chili","Chine","Colombie","Costa Rica","Croatie","Cuba","Chypre","République tchèque",
-    "Danemark","Djibouti","République dominicaine",
-    "Équateur","Égypte","Salvador","Estonie","Éthiopie",
-    "Fidji","Finlande","France",
-    "Gabon","Gambie","Géorgie","Allemagne","Ghana","Grèce","Guatemala","Guinée",
-    "Haïti","Honduras","Hongrie",
-    "Islande","Inde","Indonésie","Iran","Irak","Irlande","Israël","Italie","Côte d'Ivoire",
-    "Jamaïque","Japon","Jordanie",
-    "Kazakhstan","Kenya","Koweït","Kirghizistan",
-    "Laos","Lettonie","Liban","Libéria","Libye","Lituanie","Luxembourg",
-    "Madagascar","Malawi","Malaisie","Maldives","Mali","Malte","Mauritanie","Maurice","Mexique","Moldavie","Monaco","Mongolie","Monténégro","Maroc","Mozambique","Myanmar",
-    "Namibie","Népal","Pays-Bas","Nouvelle-Zélande","Nicaragua","Niger","Nigeria","Corée du Nord","Macédoine du Nord","Norvège",
-    "Oman",
-    "Pakistan","Panama","Paraguay","Pérou","Philippines","Pologne","Portugal",
-    "Qatar",
-    "Roumanie","Russie","Rwanda",
-    "Arabie saoudite","Sénégal","Serbie","Sierra Leone","Singapour","Slovaquie","Slovénie","Somalie","Afrique du Sud","Corée du Sud","Soudan du Sud","Espagne","Sri Lanka","Soudan","Suriname","Suède","Suisse","Syrie",
-    "Tadjikistan","Tanzanie","Thaïlande","Togo","Tunisie","Turquie","Turkménistan",
-    "Ouganda","Ukraine","Émirats arabes unis","Royaume-Uni","États-Unis","Uruguay","Ouzbékistan",
-    "Venezuela","Viêt Nam",
-    "Yémen",
-    "Zambie","Zimbabwe",
-  ],
-  it: [
-    "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaigian",
-    "Bahamas","Bahrein","Bangladesh","Barbados","Bielorussia","Belgio","Belize","Benin","Bhutan","Bolivia",
-    "Bosnia ed Erzegovina","Botswana","Brasile","Bulgaria","Burkina Faso","Burundi",
-    "Cambogia","Camerun","Canada","Ciad","Cile","Cina","Colombia","Costa Rica","Croazia","Cuba","Cipro","Repubblica Ceca",
-    "Danimarca","Gibuti","Repubblica Dominicana",
-    "Ecuador","Egitto","El Salvador","Estonia","Etiopia",
-    "Figi","Finlandia","Francia",
-    "Gabon","Gambia","Georgia","Germania","Ghana","Grecia","Guatemala","Guinea",
-    "Haiti","Honduras","Ungheria",
-    "Islanda","India","Indonesia","Iran","Iraq","Irlanda","Israele","Italia","Costa d'Avorio",
-    "Giamaica","Giappone","Giordania",
-    "Kazakistan","Kenya","Kuwait","Kirghizistan",
-    "Laos","Lettonia","Libano","Liberia","Libia","Lituania","Lussemburgo",
-    "Madagascar","Malawi","Malesia","Maldive","Mali","Malta","Mauritania","Mauritius","Messico","Moldavia","Monaco","Mongolia","Montenegro","Marocco","Mozambico","Myanmar",
-    "Namibia","Nepal","Paesi Bassi","Nuova Zelanda","Nicaragua","Niger","Nigeria","Corea del Nord","Macedonia del Nord","Norvegia",
-    "Oman",
-    "Pakistan","Panama","Paraguay","Perù","Filippine","Polonia","Portogallo",
-    "Qatar",
-    "Romania","Russia","Ruanda",
-    "Arabia Saudita","Senegal","Serbia","Sierra Leone","Singapore","Slovacchia","Slovenia","Somalia","Sudafrica","Corea del Sud","Sud Sudan","Spagna","Sri Lanka","Sudan","Suriname","Svezia","Svizzera","Siria",
-    "Tagikistan","Tanzania","Thailandia","Togo","Tunisia","Turchia","Turkmenistan",
-    "Uganda","Ucraina","Emirati Arabi Uniti","Regno Unito","Stati Uniti","Uruguay","Uzbekistan",
-    "Venezuela","Vietnam",
-    "Yemen",
-    "Zambia","Zimbabwe",
-  ],
-};
 
 const accountSchema = z.object({
   email: z.string().trim().email().max(255),
@@ -140,7 +58,7 @@ const Apply = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const location = city && country ? `${city}, ${country}` : city || country || "";
+  const location = city && country ? `${city}, ${toEnglishCountry(country)}` : city || toEnglishCountry(country) || "";
 
   // Hydrate from localStorage
   useEffect(() => {

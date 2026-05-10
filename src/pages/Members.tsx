@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import { parseLocation, getCountryDisplay, localizeLocation } from "@/data/countries";
 
 interface Member {
   id: string;
@@ -24,7 +25,7 @@ interface Member {
 
 const Members = () => {
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [members, setMembers] = useState<Member[]>([]);
   type MemberConvState = "active" | "canRestart" | "blocked" | "none";
   const [memberStates, setMemberStates] = useState<Record<string, MemberConvState>>({});
@@ -92,17 +93,15 @@ const Members = () => {
   const { countries, citiesByCountry, languages } = useMemo(() => {
     const otherMembers = members.filter((m) => !(user && m.id === user.id));
     const parsed = otherMembers.map((m) => {
-      const parts = m.location.split(",").map((s) => s.trim());
-      const country = parts.length > 1 ? parts[parts.length - 1] : parts[0];
-      const city = parts.length > 1 ? parts.slice(0, parts.length - 1).join(", ") : "";
-      return { ...m, city, country };
+      const { city, countryEn } = parseLocation(m.location);
+      return { ...m, city, countryEn };
     });
-    const countries = Array.from(new Set(parsed.map((m) => m.country).filter(Boolean))).sort();
+    const countries = Array.from(new Set(parsed.map((m) => m.countryEn).filter(Boolean))).sort();
     const citiesByCountry: Record<string, string[]> = {};
     parsed.forEach((m) => {
-      if (!citiesByCountry[m.country]) citiesByCountry[m.country] = [];
-      if (m.city && !citiesByCountry[m.country].includes(m.city)) {
-        citiesByCountry[m.country].push(m.city);
+      if (!citiesByCountry[m.countryEn]) citiesByCountry[m.countryEn] = [];
+      if (m.city && !citiesByCountry[m.countryEn].includes(m.city)) {
+        citiesByCountry[m.countryEn].push(m.city);
       }
     });
     Object.keys(citiesByCountry).forEach((c) => citiesByCountry[c].sort());
@@ -119,10 +118,8 @@ const Members = () => {
   const filtered = useMemo(() => {
     return members.filter((m) => {
       if (user && m.id === user.id) return false;
-      const parts = m.location.split(",").map((s) => s.trim());
-      const country = parts.length > 1 ? parts[parts.length - 1] : parts[0];
-      const city = parts.length > 1 ? parts.slice(0, parts.length - 1).join(", ") : "";
-      if (countryFilter !== "all" && country !== countryFilter) return false;
+      const { city, countryEn } = parseLocation(m.location);
+      if (countryFilter !== "all" && countryEn !== countryFilter) return false;
       if (cityFilter !== "all" && city !== cityFilter) return false;
       if (languageFilter !== "all" && (!m.questionnaire_languages || !m.questionnaire_languages.includes(languageFilter))) return false;
       return true;
@@ -141,7 +138,7 @@ const Members = () => {
             <SelectContent>
               <SelectItem value="all" className="font-sans-ui">{t("members.allCountries")}</SelectItem>
               {countries.map((c) => (
-                <SelectItem key={c} value={c} className="font-sans-ui">{c}</SelectItem>
+                <SelectItem key={c} value={c} className="font-sans-ui">{getCountryDisplay(c, lang)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -218,7 +215,7 @@ const Members = () => {
                   className={cardClasses}
                 >
                   <span className={`text-4xl font-bold font-sans-ui`}>{m.member_number ?? "\u2014"}</span>
-                  <span className="text-base text-muted-foreground mt-1">{m.location}</span>
+                  <span className="text-base text-muted-foreground mt-1">{localizeLocation(m.location, lang)}</span>
                   {m.questionnaire_languages && m.questionnaire_languages.length > 0 && (
                     <span className="text-xs text-muted-foreground mt-1 tracking-wider">
                       {m.questionnaire_languages.map((l) => l.toUpperCase()).join(" / ")}

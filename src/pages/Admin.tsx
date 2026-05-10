@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { getQuestions, type QuestionnaireLang, QUESTIONNAIRE_LANGS, QUESTIONNAIRE_LANG_LABELS } from "@/data/questions";
+import { localizeLocation } from "@/data/countries";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Globe } from "lucide-react";
 import { useI18n } from "@/i18n/context";
@@ -29,7 +30,7 @@ interface Profile {
 }
 
 const Admin = () => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [pending, setPending] = useState<Profile[]>([]);
   const [members, setMembers] = useState<Profile[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -302,7 +303,7 @@ const Admin = () => {
                   <li key={p.id} className="border border-border p-4 flex items-center justify-between hover:border-[#800000] transition-colors cursor-pointer" onClick={() => openApplicant(p.id)}>
                     <div>
                       <p className="text-base text-muted-foreground italic">
-                        {p.location} · {p.language} · applied {new Date(p.created_at).toLocaleDateString()}
+                        {localizeLocation(p.location, lang)} · {p.language} · applied {new Date(p.created_at).toLocaleDateString()}
                       </p>
                     </div>
                     <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={(e) => { e.stopPropagation(); openApplicant(p.id); }}>review</Button>
@@ -319,7 +320,7 @@ const Admin = () => {
                   <div>
                     <h3 className="font-display text-xl">Member #{p.member_number}</h3>
                     <p className="text-base text-muted-foreground italic">
-                      {p.location} · {p.language} · {p.status}
+                      {localizeLocation(p.location, lang)} · {p.language} · {p.status}
                     </p>
                   </div>
                   <div className="flex gap-2">
