@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           archived_at: string | null
           created_at: string
+          ended_by: string | null
           id: string
           member_a: string
           member_b: string
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           archived_at?: string | null
           created_at?: string
+          ended_by?: string | null
           id?: string
           member_a: string
           member_b: string
@@ -34,6 +36,7 @@ export type Database = {
         Update: {
           archived_at?: string | null
           created_at?: string
+          ended_by?: string | null
           id?: string
           member_a?: string
           member_b?: string
@@ -84,6 +87,8 @@ export type Database = {
           id: string
           language: string
           location: string
+          member_number: number | null
+          notify_new_members: boolean | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["profile_status"]
           updated_at: string
@@ -95,6 +100,8 @@ export type Database = {
           id: string
           language: string
           location: string
+          member_number?: number | null
+          notify_new_members?: boolean | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string
@@ -106,6 +113,8 @@ export type Database = {
           id?: string
           language?: string
           location?: string
+          member_number?: number | null
+          notify_new_members?: boolean | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string
@@ -116,6 +125,7 @@ export type Database = {
         Row: {
           answer: string
           id: string
+          lang: string
           question_id: number
           updated_at: string
           user_id: string
@@ -123,6 +133,7 @@ export type Database = {
         Insert: {
           answer?: string
           id?: string
+          lang?: string
           question_id: number
           updated_at?: string
           user_id: string
@@ -130,6 +141,7 @@ export type Database = {
         Update: {
           answer?: string
           id?: string
+          lang?: string
           question_id?: number
           updated_at?: string
           user_id?: string
@@ -195,7 +207,7 @@ export type Database = {
     }
     Functions: {
       archive_conversation: { Args: { _conv_id: string }; Returns: undefined }
-      get_member_stats: { Args: never; Returns: Json }
+      approve_member: { Args: { _member_id: string }; Returns: undefined }
       has_active_conversation: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -209,6 +221,7 @@ export type Database = {
         Args: { _conv_id: string; _user_id: string }
         Returns: boolean
       }
+      cancel_conversation: { Args: { _conv_id: string }; Returns: undefined }
       start_conversation: { Args: { _other_user: string }; Returns: string }
     }
     Enums: {
