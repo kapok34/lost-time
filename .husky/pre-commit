@@ -1,0 +1,9 @@
+# Validate explicit GRANT statements on public schema tables in Supabase migrations
+# Blocks commit if any table is missing grants.
+# This requires python3; if missing, the check is skipped.
+if command -v python3 >/dev/null 2>&1; then
+    python3 supabase/scripts/validate_grants.py
+else
+    echo "warning: python3 not found — skipping GRANT validation"
+    exit 0
+fi
