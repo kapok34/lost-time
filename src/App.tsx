@@ -18,6 +18,7 @@ import Messages from "./pages/Messages.tsx";
 import Conversation from "./pages/Conversation.tsx";
 import Admin from "./pages/Admin.tsx";
 import DeleteAccount from "./pages/DeleteAccount.tsx";
+import ResetPassword from "./pages/ResetPassword.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/messages/:id" element={<RequireAuth requireApproved><Conversation /></RequireAuth>} />
             <Route path="/admin" element={<RequireAuth requireAdmin><Admin /></RequireAuth>} />
             <Route path="/delete-account" element={<DeleteAccount />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
