@@ -6,11 +6,12 @@ import { Footer } from "@/components/Footer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useI18n } from "@/i18n/context";
+import { PageSEO } from "@/components/PageSEO";
 import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,7 +44,17 @@ const Login = () => {
     navigate("/");
   };
 
+  const seoTitle = lang === "fr" ? "connexion" : lang === "it" ? "accedi" : "sign in";
+  const seoDescription =
+    lang === "fr"
+      ? "Connecte-toi à lost time."
+      : lang === "it"
+      ? "Accedi a lost time."
+      : "Sign in to lost time.";
+
   return (
+    <>
+      <PageSEO title={seoTitle} description={seoDescription} path="/login" ogTitle={seoTitle} ogDescription={seoDescription} />
     <div className="min-h-screen bg-background flex flex-col font-sans-ui">
       <SiteHeader />
       <main className="flex-1 container max-w-md flex flex-col justify-center py-16">
@@ -88,6 +99,7 @@ const Login = () => {
       </main>
       <Footer />
     </div>
+    </>
   );
 };
 

@@ -1,11 +1,18 @@
 User-agent: *
-Disallow: /
+Allow: /$
+Allow: /preface
+Allow: /manifesto
+Allow: /apply
+Allow: /login
+Allow: /favicon.ico
+Allow: /og-image.png
+Allow: /sitemap.xml
+Disallow: /members
+Disallow: /messages
+Disallow: /messages-demo
+Disallow: /admin
+Disallow: /pending
+Disallow: /delete-account
+Disallow: /reset-password
 
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: WhatsApp
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
+Sitemap: https://lost-time.org/sitemap.xml

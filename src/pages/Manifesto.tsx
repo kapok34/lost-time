@@ -1,6 +1,7 @@
 import { useI18n } from "@/i18n/context";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
+import { PageSEO } from "@/components/PageSEO";
 
 const EnglishManifesto = () => {
   return (
@@ -118,12 +119,24 @@ const ItalianManifesto = () => {
 
 const Manifesto = () => {
   const { lang } = useI18n();
+
+  const title = lang === "fr" ? "manifeste" : lang === "it" ? "manifesto" : "manifesto";
+  const description =
+    lang === "fr"
+      ? "Les règles de lost time : pas de jonglage, pas de salut toi, pas de fantômisation, pas de boomerang, pas d'éternels correspondants."
+      : lang === "it"
+      ? "Le regole di lost time: niente giocoleria, niente ciao come va, niente ghosting, niente boomerang, niente pen friends."
+      : "The rules of lost time: no juggling, no hey you, no ghosting, no boomerang, no pen pals (here).";
+
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col">
-      <SiteHeader />
-      {lang === "fr" ? <FrenchManifesto /> : lang === "it" ? <ItalianManifesto /> : <EnglishManifesto />}
-      <Footer />
-    </main>
+    <>
+      <PageSEO title={title} description={description} path="/manifesto" ogTitle={title} ogDescription={description} />
+      <main className="min-h-screen bg-background text-foreground flex flex-col">
+        <SiteHeader />
+        {lang === "fr" ? <FrenchManifesto /> : lang === "it" ? <ItalianManifesto /> : <EnglishManifesto />}
+        <Footer />
+      </main>
+    </>
   );
 };
 

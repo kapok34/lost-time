@@ -1,6 +1,7 @@
 import { useI18n } from "@/i18n/context";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
+import { PageSEO } from "@/components/PageSEO";
 
 const EnglishPreface = () => {
   return (
@@ -346,13 +347,25 @@ const ItalianPreface = () => {
 };
 
 const Preface = () => {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
+
+  const title = lang === "fr" ? "préface" : lang === "it" ? "prefazione" : "preface";
+  const description =
+    lang === "fr"
+      ? "Qu'est-ce que lost time ? Un réseau asocial à la recherche du temps perdu. Postule en remplissant le questionnaire de Proust."
+      : lang === "it"
+      ? "Cos'è lost time? Una rete asociale alla ricerca del tempo perduto. Candidati compilando il questionario di Proust."
+      : "What is lost time? An asocial network in remembrance of things past. Apply by filling out the Proust questionnaire.";
+
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col">
-      <SiteHeader />
-      {lang === "fr" ? <FrenchPreface /> : lang === "it" ? <ItalianPreface /> : <EnglishPreface />}
-      <Footer />
-    </main>
+    <>
+      <PageSEO title={title} description={description} path="/preface" ogTitle={title} ogDescription={description} />
+      <main className="min-h-screen bg-background text-foreground flex flex-col">
+        <SiteHeader />
+        {lang === "fr" ? <FrenchPreface /> : lang === "it" ? <ItalianPreface /> : <EnglishPreface />}
+        <Footer />
+      </main>
+    </>
   );
 };
 
