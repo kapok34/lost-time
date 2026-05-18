@@ -36,7 +36,15 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Add 404.html for SPA routing
+      - name: Generate static HTML for indexable routes
+        run: |
+          mkdir -p ./dist/preface ./dist/manifesto ./dist/apply ./dist/login
+          cp ./dist/index.html ./dist/preface/index.html
+          cp ./dist/index.html ./dist/manifesto/index.html
+          cp ./dist/index.html ./dist/apply/index.html
+          cp ./dist/index.html ./dist/login/index.html
+
+      - name: Add 404.html for SPA routing fallback
         run: cp ./dist/index.html ./dist/404.html
 
       - name: Add CNAME for custom domain
