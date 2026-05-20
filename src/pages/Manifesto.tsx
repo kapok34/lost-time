@@ -93,7 +93,7 @@ const ItalianManifesto = () => {
           Ogni socio può mantenere una sola corrispondenza attiva alla volta.
         </li>
         <li>
-          <span className="font-bold text-foreground">Niente <i className="font-bold text-foreground">ciao, come va?</i></span>.{" "}
+          <span className="font-bold text-foreground">Niente <i className="font-bold text-foreground">ciao, come va?</i></span>{" "}
           <br />
           Il tuo primo messaggio ad un altro socio deve contenere almeno 34 caratteri.
         </li>
