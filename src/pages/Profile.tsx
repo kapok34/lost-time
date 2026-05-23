@@ -440,7 +440,7 @@ const Profile = () => {
               className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white"
               onClick={() => setShowEditDialog(false)}
             >
-              cancel
+              {t("conversation.cancel")}
             </Button>
           </div>
         </DialogContent>
