@@ -106,23 +106,20 @@ export async function handler(req: Request): Promise<Response> {
       if (email) {
         const t: Record<string, Record<string, string>> = {
           en: {
-            subject: "Your questionnaire changes have been approved",
-            body: `Your questionnaire changes in ${lang.toUpperCase()} have been approved and applied to your portrait.`,
-            outro: "Happy searching.",
+            subject: "well done",
+            body: `Your edits have been approved.`,
             signoff: "Yours truly,",
             brand: "— lost time",
           },
           fr: {
-            subject: "Tes modifications du questionnaire ont été approuvées",
-            body: `Tes modifications du questionnaire en ${lang.toUpperCase()} ont été approuvées et appliquées à ton portrait.`,
-            outro: "Bonne recherche.",
+            subject: "bien joué",
+            body: `Tes modifications ont été approuvées.`,
             signoff: "Amitiés,",
             brand: "— lost time",
           },
           it: {
-            subject: "Le tue modifiche al questionario sono state approvate",
-            body: `Le tue modifiche al questionario in ${lang.toUpperCase()} sono state approvate e applicate al tuo ritratto.`,
-            outro: "Buona ricerca.",
+            subject: "complimenti",
+            body: `Le tue modifiche sono state approvate.`,
             signoff: "Saluti,",
             brand: "— lost time",
           },
@@ -142,8 +139,7 @@ export async function handler(req: Request): Promise<Response> {
               html: `
                 <div style="max-width: 480px; margin: 0 auto; font-family: 'Cormorant Garamond', Georgia, serif; line-height: 1.65; color: #1a1a1a;">
                   <p>${m.body}</p>
-                  <p style="margin-top: 1.5em;">${m.outro}</p>
-                  <p>${m.signoff}</p>
+                  <p style="margin-top: 1.5em;">${m.signoff}</p>
                   <p style="color: #800000; font-size: 0.9em; margin-top: 2em;">${m.brand}</p>
                 </div>
               `,
@@ -177,26 +173,23 @@ export async function handler(req: Request): Promise<Response> {
       if (email) {
         const t: Record<string, Record<string, string>> = {
           en: {
-            subject: "Your questionnaire changes were not approved",
-            body: `Your questionnaire changes in ${lang.toUpperCase()} were not approved.` +
+            subject: "try again",
+            body: `Your edits were rejected.` +
               (rejectionReason ? ` Reason: ${rejectionReason}` : ""),
-            outro: "You may submit revised changes at any time.",
             signoff: "Yours truly,",
             brand: "— lost time",
           },
           fr: {
-            subject: "Tes modifications du questionnaire n'ont pas été approuvées",
-            body: `Tes modifications du questionnaire en ${lang.toUpperCase()} n'ont pas été approuvées.` +
+            subject: "essaie encore",
+            body: `Tes modifications n'ont pas été approuvées.` +
               (rejectionReason ? ` Motif : ${rejectionReason}` : ""),
-            outro: "Tu peux soumettre de nouvelles modifications à tout moment.",
             signoff: "Amitiés,",
             brand: "— lost time",
           },
           it: {
-            subject: "Le tue modifiche al questionario non sono state approvate",
-            body: `Le tue modifiche al questionario in ${lang.toUpperCase()} non sono state approvate.` +
+            subject: "ripensaci",
+            body: `Le tue modifiche non sono state approvate.` +
               (rejectionReason ? ` Motivo: ${rejectionReason}` : ""),
-            outro: "Puoi inviare nuove modifiche in qualsiasi momento.",
             signoff: "Saluti,",
             brand: "— lost time",
           },
@@ -216,8 +209,7 @@ export async function handler(req: Request): Promise<Response> {
               html: `
                 <div style="max-width: 480px; margin: 0 auto; font-family: 'Cormorant Garamond', Georgia, serif; line-height: 1.65; color: #1a1a1a;">
                   <p>${m.body}</p>
-                  <p style="margin-top: 1.5em;">${m.outro}</p>
-                  <p>${m.signoff}</p>
+                  <p style="margin-top: 1.5em;">${m.signoff}</p>
                   <p style="color: #800000; font-size: 0.9em; margin-top: 2em;">${m.brand}</p>
                 </div>
               `,
