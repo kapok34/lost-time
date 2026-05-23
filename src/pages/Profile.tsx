@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Globe, PenLine } from "lucide-react";
+import { Globe } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
@@ -340,6 +340,13 @@ const Profile = () => {
 
         {isMe && (
           <div className="flex flex-col items-center gap-4 mt-16 pt-8 border-t border-border">
+            <Button
+              variant="outline"
+              className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white"
+              onClick={openEditDialog}
+            >
+              {t("profile.edit") || "edit your answers"}
+            </Button>
             <div className="flex items-center justify-center gap-3">
               <Switch
                 id="notify-new-members"
@@ -351,14 +358,6 @@ const Profile = () => {
                 {t("profile.notifyNewMembers")}
               </label>
             </div>
-            <Button
-              variant="outline"
-              className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white"
-              onClick={openEditDialog}
-            >
-              <PenLine size={16} className="mr-2" />
-              {t("profile.edit") || "edit your answers"}
-            </Button>
           </div>
         )}
       </main>
@@ -372,7 +371,7 @@ const Profile = () => {
               {t("profile.edit") || "edit your answers"}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground italic">
-              {t("apply.questionnairePrompt.zero") || "Please answer all questions in at least one language."}
+              {t("profile.editHint")}
             </DialogDescription>
           </DialogHeader>
 
@@ -434,7 +433,7 @@ const Profile = () => {
               onClick={sendEditRequest}
               disabled={sendingEdit}
             >
-              {sendingEdit ? "sending…" : "send for approval"}
+              {sendingEdit ? t("profile.sendingEdit") || "sending…" : t("profile.sendForApproval")}
             </Button>
             <Button
               variant="outline"
