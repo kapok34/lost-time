@@ -41,5 +41,3 @@ CREATE POLICY "Admins can view all edits" ON pending_questionnaire_edits
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON pending_questionnaire_edits TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON pending_questionnaire_edits TO authenticated;
-GRANT USAGE, SELECT ON SEQUENCE pending_questionnaire_edits_id_seq TO anon;
-GRANT USAGE, SELECT ON SEQUENCE pending_questionnaire_edits_id_seq TO authenticated;
