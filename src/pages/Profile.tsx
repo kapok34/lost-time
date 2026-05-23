@@ -10,6 +10,21 @@ import { useI18n } from "@/i18n/context";
 import { localizeLocation } from "@/data/countries";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Globe, PenLine } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
+import { QUESTIONNAIRE_LANGS } from "@/data/questions";
 
 interface ProfileFull {
   id: string;
@@ -48,6 +63,17 @@ const Profile = () => {
   const [messageState, setMessageState] = useState<MessageState | null>(null);
   const [starting, setStarting] = useState(false);
   const [notifyNewMembers, setNotifyNewMembers] = useState<boolean>(true);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editLang, setEditLang] = useState<QuestionnaireLang>("en");
+  const [editAnswers, setEditAnswers] = useState<Record<string, Record<number, string>>>({});
+  const [sendingEdit, setSendingEdit] = useState(false);
+
+  const editQuestions = useMemo(() => getQuestions(editLang), [editLang]);
+
+  const hasPendingEdit = useMemo(() => {
+    const availableLangs = (profile?.questionnaire_languages ?? []) as QuestionnaireLang[];
+    return !availableLangs.includes(editLang);
+  }, [profile?.questionnaire_languages, editLang]);
 
   useEffect(() => {
     if (!memberNumber) return;
@@ -123,6 +149,68 @@ const Profile = () => {
   }, [memberNumber, user?.id]);
 
   const isMe = user?.id === profile?.id;
+
+  const openEditDialog = () => {
+    const availableLangs = (profile?.questionnaire_languages ?? []) as QuestionnaireLang[];
+    const firstAvailable = availableLangs.length > 0 ? availableLangs[0] : "en";
+    // Start with existing answers if editing an existing language, empty for new language
+    setEditLang(firstAvailable);
+    const initialAnswers: Record<string, Record<number, string>> = {};
+    availableLangs.forEach((l) => {
+      initialAnswers[l] = { ...(answers[l] ?? {}) };
+    });
+    setEditAnswers(initialAnswers);
+    setShowEditDialog(true);
+  };
+
+  const sendEditRequest = async () => {
+    const currentAnswers = editAnswers[editLang] ?? {};
+    const isComplete = editQuestions.every((q) => {
+      const val = (currentAnswers[q.id] ?? "").trim();
+      return val.length >= 3 && val.length <= 200;
+    });
+    if (!isComplete) {
+      toast.error("Please answer all questions (3–200 characters each)");
+      return;
+    }
+
+    setSendingEdit(true);
+    try {
+      const answersJson: Record<string, string> = {};
+      editQuestions.forEach((q) => {
+        answersJson[q.id] = (currentAnswers[q.id] ?? "").trim();
+      });
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        toast.error("Not authenticated");
+        setSendingEdit(false);
+        return;
+      }
+
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-questionnaire-edit`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ lang: editLang, answers: answersJson }),
+      });
+
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(result.error || "Failed to submit edit");
+      } else {
+        toast.success("Edit request sent for admin approval");
+        setShowEditDialog(false);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit edit");
+    } finally {
+      setSendingEdit(false);
+    }
+  };
 
   const questions = useMemo(
     () => getQuestions(viewLang),
@@ -251,20 +339,113 @@ const Profile = () => {
         )}
 
         {isMe && (
-          <div className="flex items-center justify-center gap-3 mt-16 pt-8 border-t border-border">
-            <Switch
-              id="notify-new-members"
-              checked={notifyNewMembers}
-              onCheckedChange={onToggleNotify}
-              className="data-[state=checked]:bg-[hsl(350,55%,35%)]"
-            />
-            <label htmlFor="notify-new-members" className="text-base font-sans-ui text-muted-foreground cursor-pointer select-none">
-              {t("profile.notifyNewMembers")}
-            </label>
+          <div className="flex flex-col items-center gap-4 mt-16 pt-8 border-t border-border">
+            <div className="flex items-center justify-center gap-3">
+              <Switch
+                id="notify-new-members"
+                checked={notifyNewMembers}
+                onCheckedChange={onToggleNotify}
+                className="data-[state=checked]:bg-[hsl(350,55%,35%)]"
+              />
+              <label htmlFor="notify-new-members" className="text-base font-sans-ui text-muted-foreground cursor-pointer select-none">
+                {t("profile.notifyNewMembers")}
+              </label>
+            </div>
+            <Button
+              variant="outline"
+              className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white"
+              onClick={openEditDialog}
+            >
+              <PenLine size={16} className="mr-2" />
+              {t("profile.edit") || "edit your answers"}
+            </Button>
           </div>
         )}
       </main>
       <Footer />
+
+      {/* Edit Questionnaire Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-sans-ui text-2xl tracking-tight">
+              {t("profile.edit") || "edit your answers"}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground italic">
+              {t("apply.questionnairePrompt.zero") || "Please answer all questions in at least one language."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex items-center justify-between mb-4">
+            <Select value={editLang} onValueChange={(val) => setEditLang(val as QuestionnaireLang)}>
+              <SelectTrigger className="w-auto min-w-[120px] bg-transparent border-none font-sans-ui gap-1 px-1.5">
+                <Globe size={20} className="text-muted-foreground" />
+                <span className="text-muted-foreground">{editLang.toUpperCase()}</span>
+              </SelectTrigger>
+              <SelectContent>
+                {QUESTIONNAIRE_LANGS.map((l) => (
+                  <SelectItem key={l} value={l} className="font-sans-ui text-sm cursor-pointer">
+                    {l.toUpperCase()}
+                    {(profile?.questionnaire_languages ?? []).includes(l as QuestionnaireLang) ? " ✓" : " +"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {!(profile?.questionnaire_languages ?? []).includes(editLang) && (
+              <span className="text-xs text-[hsl(350,55%,35%)] font-sans-ui">new language</span>
+            )}
+          </div>
+
+          <div className="space-y-8 font-sans-ui">
+            <div className="border-b border-border pb-2">
+              <h2 className="font-sans-ui text-2xl tracking-tight text-black font-medium">{t("apply.questionnaire") || "questionnaire"}</h2>
+            </div>
+            {editQuestions.map((q) => {
+              const currentAnswers = editAnswers[editLang] ?? {};
+              return (
+                <div key={q.id} className="space-y-2">
+                  <Label className="font-cormorant text-xl leading-snug">
+                    <span className="text-foreground mr-2">{q.id}.</span>{q.text}
+                  </Label>
+                  <div className="relative">
+                    <Textarea
+                      rows={3}
+                      minLength={3}
+                      maxLength={200}
+                      value={currentAnswers[q.id] ?? ""}
+                      onChange={(e) => setEditAnswers((a) => ({
+                        ...a,
+                        [editLang]: { ...(a[editLang] ?? {}), [q.id]: e.target.value },
+                      }))}
+                      className="bg-white border-input pr-12"
+                    />
+                    <div className="absolute bottom-1.5 right-2 text-[10px] text-muted-foreground pointer-events-none">
+                      {(currentAnswers[q.id] ?? "").length}/200
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex gap-3 mt-6">
+            <Button
+              className="bg-[#800000] text-white hover:bg-[hsl(350,55%,30%)]"
+              onClick={sendEditRequest}
+              disabled={sendingEdit}
+            >
+              {sendingEdit ? "sending…" : "send for approval"}
+            </Button>
+            <Button
+              variant="outline"
+              className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white"
+              onClick={() => setShowEditDialog(false)}
+            >
+              cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
