@@ -63,8 +63,12 @@ export async function handler(req: Request): Promise<Response> {
       manifestoPenPals: "No pen pals (here): you get 10 messages each before the correspondence ends automatically. Move the conversation elsewhere if you click.",
       changeLabel: "Need to edit your answers or add another language?",
       changeText: `Go to your <a href="https://lost-time.org/profile/${memberNum}" style="color: #800000; text-decoration: underline;">portrait</a> and click <strong>edit</strong>. To change your location, write to <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a>.`,
+      inviteLabel: "Know someone who might like this?",
+      shareText: `Check out lost time — an asocial network: https://lost-time.org`,
+      emailSubject: `Check out lost time`,
       deleteLabel: "Want to delete your account?",
-      deleteText: `Delete your account</a> — this will permanently remove your portrait, answers, messages and all associated data.`,
+      deleteLinkText: `Delete your account`,
+      deleteDescription: `— this will permanently remove your portrait, answers, messages and all associated data.`,
       outro: "Godspeed.",
       signoff: "Yours truly,",
       brand: "— lost time",
@@ -82,8 +86,12 @@ export async function handler(req: Request): Promise<Response> {
       manifestoPenPals: "Pas d'éternels correspondants (ici) : vous avez droit à 10 messages chacun avant que la correspondance ne se termine automatiquement. Poursuivez la conversation ailleurs si vous vous entendez bien.",
       changeLabel: "Tu veux modifier tes réponses ou ajouter une autre langue ?",
       changeText: `Va sur ton <a href="https://lost-time.org/profile/${memberNum}" style="color: #800000; text-decoration: underline;">portrait</a> et clique <strong>modifier</strong>. Pour changer ta localisation, écris à <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a>.`,
+      inviteLabel: "Tu connais quelqu'un à qui ça pourrait plaire ?",
+      shareText: `Découvre lost time — un réseau asocial : https://lost-time.org`,
+      emailSubject: `Découvre lost time`,
       deleteLabel: "Tu souhaites supprimer ton compte ?",
-      deleteText: `Supprimer ton compte</a> — cela supprimera définitivement ton portrait, tes réponses, tes messages et toutes les données associées.`,
+      deleteLinkText: `Supprimer ton compte`,
+      deleteDescription: `— cela supprimera définitivement ton portrait, tes réponses, tes messages et toutes les données associées.`,
       outro: "Bonne recherche.",
       signoff: "Amitiés,",
       brand: "— lost time",
@@ -101,13 +109,21 @@ export async function handler(req: Request): Promise<Response> {
       manifestoPenPals: "Niente pen friends (qui): avete 10 messaggi ciascuno prima che la corrispondenza finisca automaticamente. Sposta la conversazione altrove se c'è feeling.",
       changeLabel: "Vuoi modificare le tue risposte o aggiungere un'altra lingua?",
       changeText: `Vai sul tuo <a href="https://lost-time.org/profile/${memberNum}" style="color: #800000; text-decoration: underline;">ritratto</a> e clicca <strong>modifica</strong>. Per cambiare la località, scrivi ad <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a>.`,
+      inviteLabel: "Conosci qualcuno a cui potrebbe piacere?",
+      shareText: `Scopri lost time — una rete asociale: https://lost-time.org`,
+      emailSubject: `Scopri lost time`,
       deleteLabel: "Vuoi eliminare il tuo account?",
-      deleteText: `Elimina il tuo account</a> — questo rimuoverà permanentemente il tuo ritratto, le tue risposte, i messaggi e tutti i dati associati.`,
+      deleteLinkText: `Elimina il tuo account`,
+      deleteDescription: `— questo rimuoverà permanentemente il tuo ritratto, le tue risposte, i messaggi e tutti i dati associati.`,
       outro: "Buona ricerca.",
       signoff: "Saluti,",
       brand: "— lost time",
     },
   }[lang];
+
+  const shareBody = encodeURIComponent(t.shareText);
+  const shareUrl = encodeURIComponent("https://lost-time.org");
+  const emailSubject = encodeURIComponent(t.emailSubject);
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -138,9 +154,17 @@ export async function handler(req: Request): Promise<Response> {
               <strong>${t.changeLabel}</strong><br>
               ${t.changeText}
             </p>
-            <p style="color: #444; font-size: 0.95em;">
+            <p style="margin-top: 1em;">
+              <strong>${t.inviteLabel}</strong><br>
+              <a href="sms:?body=${shareBody}" style="color: #800000; text-decoration: underline;">SMS</a> ·
+              <a href="https://wa.me/?text=${shareBody}" style="color: #800000; text-decoration: underline;">WhatsApp</a> ·
+              <a href="https://t.me/share/url?url=${shareUrl}&text=${shareBody}" style="color: #800000; text-decoration: underline;">Telegram</a> ·
+              <a href="https://signal.me/" style="color: #800000; text-decoration: underline;">Signal</a> ·
+              <a href="mailto:?subject=${emailSubject}&body=${shareBody}" style="color: #800000; text-decoration: underline;">Email</a>
+            </p>
+            <p style="color: #444; font-size: 0.95em; margin-top: 1em;">
               <strong>${t.deleteLabel}</strong><br>
-              <a href="${deleteUrl}" style="color: #800000; text-decoration: underline;">${t.deleteText}
+              <a href="${deleteUrl}" style="color: #800000; text-decoration: underline;">${t.deleteLinkText}</a> ${t.deleteDescription}
             </p>
             <p style="margin-top: 1.5em;">${t.outro}</p>
             <p>${t.signoff}</p>
