@@ -23,9 +23,13 @@ export async function handler(req: Request): Promise<Response> {
       }
     );
 
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "");
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !userData.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const userId = userData.user.id;
