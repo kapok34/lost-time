@@ -260,7 +260,28 @@ describe("Language selection flow", () => {
     });
   });
 
-  it("should restore active language from localStorage on mount", async () => {
+  it("should restore active language from localStorage on mount when answers exist", async () => {
+    localStorage.setItem(
+      "salon.apply.draft.v2",
+      JSON.stringify({
+        email: "",
+        city: "",
+        country: "",
+        answers: { en: { 1: "An answer" } },
+        activeLang: "en",
+        completedLangs: [],
+      })
+    );
+
+    render(<Apply />, { wrapper });
+
+    // Should show questions directly (no prompt) when answers exist
+    await waitFor(() => {
+      expect(screen.getByText(/Your favourite virtue/i)).toBeInTheDocument();
+    });
+  });
+
+  it("should revert to default language when no answers exist on refresh", async () => {
     localStorage.setItem(
       "salon.apply.draft.v2",
       JSON.stringify({
@@ -275,10 +296,11 @@ describe("Language selection flow", () => {
 
     render(<Apply />, { wrapper });
 
-    // Should show questions directly (no prompt)
+    // Should show the prompt instead of questions when no answers exist
     await waitFor(() => {
-      expect(screen.getByText(/Your favourite virtue/i)).toBeInTheDocument();
+      expect(screen.getByText(/Choose the language in which you would like to answer/i)).toBeInTheDocument();
     });
+    expect(screen.queryByText(/Your favourite virtue/i)).not.toBeInTheDocument();
   });
 
   it("should allow switching to another language via the same dropdown", async () => {
