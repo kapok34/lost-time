@@ -29,6 +29,19 @@ interface Profile {
   questionnaire_languages?: QuestionnaireLang[] | null;
 }
 
+interface PendingEdit {
+  id: string;
+  user_id: string;
+  lang: QuestionnaireLang;
+  answers: Record<string, string>;
+  original_answers: Record<string, string> | null;
+  status: string;
+  rejection_reason: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+  member_number?: number | null;
+}
+
 const Admin = () => {
   const { t, lang } = useI18n();
   const [pending, setPending] = useState<Profile[]>([]);
@@ -46,6 +59,10 @@ const Admin = () => {
   const [editCity, setEditCity] = useState("");
   const [editCountry, setEditCountry] = useState("");
   const [savingLocation, setSavingLocation] = useState(false);
+  const [pendingEdits, setPendingEdits] = useState<PendingEdit[]>([]);
+  const [reviewingEditId, setReviewingEditId] = useState<string | null>(null);
+  const [editRejectionReason, setEditRejectionReason] = useState("");
+  const [processingEdit, setProcessingEdit] = useState(false);
 
   const load = async () => {
     const { data } = await supabase
@@ -55,6 +72,26 @@ const Admin = () => {
     const all = (data as Profile[]) ?? [];
     setPending(all.filter((p) => p.status === "pending"));
     setMembers(all.filter((p) => p.status === "approved" || p.status === "suspended"));
+
+    const { data: editsData } = await supabase
+      .from("pending_questionnaire_edits")
+      .select("*, profiles(member_number)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+
+    const edits: PendingEdit[] = (editsData ?? []).map((e: any) => ({
+      id: e.id,
+      user_id: e.user_id,
+      lang: e.lang,
+      answers: e.answers ?? {},
+      original_answers: e.original_answers ?? null,
+      status: e.status,
+      rejection_reason: e.rejection_reason,
+      created_at: e.created_at,
+      reviewed_at: e.reviewed_at,
+      member_number: e.profiles?.member_number,
+    }));
+    setPendingEdits(edits);
   };
 
   useEffect(() => { load(); }, []);
@@ -243,6 +280,89 @@ const Admin = () => {
 
   const approvedCount = members.filter((p) => p.status === "approved").length;
 
+  const openEditReview = (edit: PendingEdit) => {
+    setReviewingEditId(edit.id);
+    setEditRejectionReason("");
+    setReviewLang(edit.lang);
+    const ansMap: Record<string, Record<number, string>> = {};
+    ansMap[edit.lang] = {};
+    Object.entries(edit.answers).forEach(([qid, answer]) => {
+      ansMap[edit.lang][Number(qid)] = answer;
+    });
+    setAnswers((prev) => ({ ...prev, ...ansMap }));
+    setOpenId(edit.user_id);
+    setEditMode(false);
+  };
+
+  const closeEditReview = () => {
+    setReviewingEditId(null);
+    setOpenId(null);
+  };
+
+  const approveEdit = async (editId: string) => {
+    setProcessingEdit(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        toast.error("Not authenticated");
+        return;
+      }
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-review-questionnaire-edit`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ editId, action: "approve" }),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(result.error || "Failed to approve edit");
+      } else {
+        toast.success("Edit approved");
+        closeEditReview();
+        load();
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to approve edit");
+    } finally {
+      setProcessingEdit(false);
+    }
+  };
+
+  const rejectEdit = async (editId: string) => {
+    setProcessingEdit(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        toast.error("Not authenticated");
+        return;
+      }
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-review-questionnaire-edit`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ editId, action: "reject", rejectionReason: editRejectionReason || null }),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(result.error || "Failed to reject edit");
+      } else {
+        toast.success("Edit rejected");
+        closeEditReview();
+        load();
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to reject edit");
+    } finally {
+      setProcessingEdit(false);
+    }
+  };
+
   const sendBroadcast = async () => {
     if (!broadcastSubject.trim() || !broadcastBody.trim()) {
       toast.error(t("admin.broadcastEmpty") || "Please enter a subject and message.");
@@ -288,8 +408,9 @@ const Admin = () => {
       <SiteHeader />
       <main className="flex-1 container max-w-5xl py-12">
         <Tabs defaultValue="pending">
-          <TabsList className="w-full grid grid-cols-3">
+          <TabsList className="w-full grid grid-cols-4">
             <TabsTrigger value="pending" className="font-sans-ui">{t("admin.pendingApplications")} ({pending.length})</TabsTrigger>
+            <TabsTrigger value="edits" className="font-sans-ui">pending edits ({pendingEdits.length})</TabsTrigger>
             <TabsTrigger value="members" className="font-sans-ui">{t("admin.members") || "Members"} ({members.length})</TabsTrigger>
             <TabsTrigger value="broadcast" className="font-sans-ui">{t("admin.broadcast") || "Broadcast"}</TabsTrigger>
           </TabsList>
@@ -307,6 +428,31 @@ const Admin = () => {
                       </p>
                     </div>
                     <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={(e) => { e.stopPropagation(); openApplicant(p.id); }}>review</Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </TabsContent>
+
+          <TabsContent value="edits" className="mt-8">
+            {pendingEdits.length === 0 ? (
+              <p className="text-muted-foreground italic">no pending questionnaire edits</p>
+            ) : (
+              <ul className="space-y-3">
+                {pendingEdits.map((e) => (
+                  <li key={e.id} className="border border-border p-4 flex items-center justify-between hover:border-[#800000] transition-colors cursor-pointer" onClick={() => openEditReview(e)}>
+                    <div>
+                      <p className="text-base font-sans-ui">
+                        Member #{e.member_number ?? "—"} · {e.lang.toUpperCase()}
+                      </p>
+                      <p className="text-sm text-muted-foreground italic">
+                        submitted {new Date(e.created_at).toLocaleDateString()}
+                        {e.original_answers ? " (editing existing)" : " (new language)"}
+                      </p>
+                    </div>
+                    <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={(ev) => { ev.stopPropagation(); openEditReview(e); }}>
+                      review
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -560,6 +706,7 @@ const Admin = () => {
 
               {(() => {
                 const isPendingProfile = [...pending, ...members].find((p) => p.id === openId)?.status === 'pending';
+                const reviewingEdit = reviewingEditId ? pendingEdits.find((e) => e.id === reviewingEditId) : null;
                 return (
                   <div className="flex gap-3 sticky bottom-4 bg-background border border-border p-4">
                     {editMode && (
@@ -570,7 +717,7 @@ const Admin = () => {
                         <Button variant="outline" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={() => setAnswers((a) => ({ ...a, [reviewLang]: {} }))} disabled={([...pending, ...members].find((p) => p.id === openId)?.questionnaire_languages ?? ["en"]).length <= 1}>clear</Button>
                       </>
                     )}
-                    {isPendingProfile && (
+                    {isPendingProfile && !reviewingEdit && (
                       <>
                         <Button className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]" onClick={() => approve(openId)}>{t("admin.approve")}</Button>
                         <AlertDialog>
@@ -589,6 +736,30 @@ const Admin = () => {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                      </>
+                    )}
+                    {reviewingEdit && (
+                      <>
+                        <Button className="bg-[hsl(350,55%,35%)] text-white hover:bg-[hsl(350,55%,30%)]" onClick={() => approveEdit(reviewingEdit.id)} disabled={processingEdit}>
+                          {processingEdit ? "processing…" : "approve edit"}
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" className="hover:!bg-destructive hover:!text-white" disabled={processingEdit}>reject edit</Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>reject edit?</AlertDialogTitle>
+                              <AlertDialogDescription>optionally include a short note.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <Textarea value={editRejectionReason} onChange={(e) => setEditRejectionReason(e.target.value)} placeholder="Reason (optional)" className="bg-white border-input" />
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white">cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => rejectEdit(reviewingEdit.id)} className="hover:!bg-destructive hover:!text-white" disabled={processingEdit}>reject edit</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                        <Button variant="ghost" className="hover:!bg-[hsl(350,55%,35%)] hover:!text-white" onClick={closeEditReview}>close</Button>
                       </>
                     )}
                   </div>

@@ -18,6 +18,7 @@ import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS } from "@/data/quest
 import { COUNTRIES, toEnglishCountry } from "@/data/countries";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
+import { PageSEO } from "@/components/PageSEO";
 import { toast } from "sonner";
 import { Globe } from "lucide-react";
 
@@ -244,7 +245,17 @@ const Apply = () => {
     );
   }
 
+  const seoTitle = lang === "fr" ? "postuler" : lang === "it" ? "candidati" : "apply";
+  const seoDescription =
+    lang === "fr"
+      ? "Postule à lost time en remplissant le questionnaire de Proust."
+      : lang === "it"
+      ? "Candidati a lost time compilando il questionario di Proust."
+      : "Apply to lost time by filling out the Proust questionnaire.";
+
   return (
+    <>
+      <PageSEO title={seoTitle} description={seoDescription} path="/apply" ogTitle={seoTitle} ogDescription={seoDescription} />
     <div className="min-h-screen bg-background flex flex-col font-sans-ui">
       <SiteHeader />
       <main className="flex-1 container max-w-2xl py-16">
@@ -371,6 +382,7 @@ const Apply = () => {
       </main>
       <Footer />
     </div>
+    </>
   );
 };
 

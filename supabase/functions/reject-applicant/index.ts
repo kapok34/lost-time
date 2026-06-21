@@ -88,7 +88,7 @@ serve(async (req) => {
       greeting: "Bonjour,",
       body: "Merci pour ta candidature. Après mûre réflexion, nous pensons que ton moment n'est pas encore venu.",
       reasonLabel: "  ",
-      outro: "N'hésite pas à nous écrire à admin@lost-time.org si tu as des questions. Bon vent!",
+      outro: "N'hésite pas à nous écrire à admin@lost-time.org si tu as des questions. Bon vent !",
       signoff: "Amitiés,",
       brand: "— lost time",
     },

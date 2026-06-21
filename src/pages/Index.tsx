@@ -2,12 +2,26 @@ import { useI18n } from "@/i18n/context";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
 import { SeedButton } from "@/components/SeedButton";
+import { PageSEO } from "@/components/PageSEO";
 import { Link } from "react-router-dom";
 
 const Index = () => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+
+  const description =
+    lang === "fr"
+      ? "un réseau asocial où les grands esprits se rencontrent"
+      : lang === "it"
+      ? "una rete asociale dove le grandi menti si incontrano"
+      : "an asocial network for great minds who do not think alike";
 
   return (
+    <>
+      <PageSEO
+        description={description}
+        ogTitle="lost time"
+        ogDescription={description}
+      />
     <main className="min-h-screen bg-background text-foreground flex flex-col">
       <SiteHeader />
 
@@ -45,6 +59,7 @@ const Index = () => {
 
       <Footer />
     </main>
+    </>
   );
 };
 
