@@ -303,7 +303,7 @@ const Apply = () => {
               <Select value={activeLang} onValueChange={(val) => setActiveLang(val as QuestionnaireLang)}>
                 <SelectTrigger className="w-auto min-w-[80px] bg-transparent border-none font-sans-ui gap-1 px-1.5" aria-label="Questionnaire language">
                   <Globe size={20} className="text-muted-foreground" />
-                  <SelectValue placeholder={t("apply.selectQuestionnaireLangs")} />
+                  <SelectValue placeholder="" />
                 </SelectTrigger>
                 <SelectContent align="end" side="bottom" sideOffset={4} position="popper" className="min-w-[140px]">
                   {QUESTIONNAIRE_LANGS.map((l) => (
