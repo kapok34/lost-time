@@ -21,7 +21,27 @@ export async function handler(req: Request): Promise<Response> {
 
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-  const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS")!);
+
+  let serviceRoleKey: string | null = null;
+  try {
+    const raw = Deno.env.get("SUPABASE_SECRET_KEYS");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      serviceRoleKey = parsed?.default ?? null;
+    }
+  } catch {
+    // ignore invalid JSON
+  }
+  if (!serviceRoleKey) {
+    serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? null;
+  }
+  if (!serviceRoleKey) {
+    console.error("Missing Supabase service role key");
+    return new Response(
+      JSON.stringify({ error: "Server configuration error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
 
   const { lang, answers } = await req.json();
 
@@ -29,18 +49,14 @@ export async function handler(req: Request): Promise<Response> {
     return new Response("Missing lang or answers", { status: 400 });
   }
 
-  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SECRET_KEYS['default'], {
+  const supabaseAdmin = createClient(SUPABASE_URL, serviceRoleKey, {
     auth: { persistSession: false },
   });
 
-  // Validate all questions answered with 3-200 chars
-  const { data: questions } = await supabaseAdmin.rpc("get_questions", { _lang: lang });
-  if (!questions || !Array.isArray(questions)) {
-    return new Response("Could not validate questions", { status: 500 });
-  }
-
-  const missing = questions.filter((q: any) => {
-    const val = (answers[q.id] ?? "").trim();
+  // Validate all 34 questions answered with 3-200 chars
+  const questionIds = Array.from({ length: 34 }, (_, i) => String(i + 1));
+  const missing = questionIds.filter((qid) => {
+    const val = (answers[qid] ?? "").trim();
     return val.length < 3 || val.length > 200;
   });
 
