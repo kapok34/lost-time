@@ -109,7 +109,8 @@ describe("welcome-member edge function", () => {
     expect(payload.html).toContain("https://lost-time.org/delete-account");
     expect(payload.html).toContain("sms:");
     expect(payload.html).toContain("signal.me");
-    expect(payload.html).toContain("Need to change your location or your answers? Want to add another language?");
+    expect(payload.html).toContain("Need to edit your answers or add another language?");
+    expect(payload.html).toContain("https://lost-time.org/profile/7");
     expect(payload.html).toContain("mailto:admin@lost-time.org");
   });
 
@@ -166,7 +167,7 @@ describe("welcome-member edge function", () => {
     const payload = JSON.parse(callInit.body);
 
     expect(payload.to).toEqual(["carlo@example.com"]);
-    expect(payload.subject).toBe("alla ricerca di — socio n°9");
+    expect(payload.subject).toBe("alla ricerca del socio n°9");
     expect(payload.html).toContain("Ciao,");
     expect(payload.html).toContain("membro n°9");
     expect(payload.html).toContain("admin@lost-time.org");

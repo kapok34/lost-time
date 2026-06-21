@@ -55,18 +55,19 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Hello,",
       approved: `Your application has been approved. You are now lost time's <strong style="color: #800000;">member no.${memberNum}</strong>.`,
       login: `You can log in at <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> to browse members' portraits and begin corresponding.`,
-      inviteLabel: "Know someone who might like this?",
-      shareText: `Check out lost time — an asocial network: https://lost-time.org`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "No juggling: each member can hold only one active correspondence at a time.",
       manifestoHeyYou: `No "hey you": your first message to another member must contain at least 34 characters.`,
       manifestoGhosting: "No ghosting: you can end a correspondence only after you have responded, or if your correspondent has not responded for over 34 hours.",
       manifestoBenching: "No boomerang: if you end a correspondence, you have to wait 34 days before you can restart it.",
       manifestoPenPals: "No pen pals (here): you get 10 messages each before the correspondence ends automatically. Move the conversation elsewhere if you click.",
-      changeLabel: "Need to change your location or your answers? Want to add another language?",
-      changeText: `Write to <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a> and we will update your portrait for you.`,
+      changeLabel: "Need to edit your answers or add another language?",
+      changeText: `Go to your <a href="https://lost-time.org/profile/${memberNum}" style="color: #800000; text-decoration: underline;">portrait</a> and click <strong>edit</strong>. To change your location, write to <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a>.`,
+      inviteLabel: "Know someone who might like this?",
+      shareText: `Check out lost time — an asocial network: https://lost-time.org`,
       deleteLabel: "Want to delete your account?",
-      deleteText: `Delete your account</a> — this will permanently remove your portrait, answers, messages and all associated data.`,
+      deleteLinkText: `Delete your account`,
+      deleteDescription: `— this will permanently remove your portrait, answers, messages and all associated data.`,
       outro: "Godspeed.",
       signoff: "Yours truly,",
       brand: "— lost time",
@@ -76,39 +77,41 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Bonjour,",
       approved: `Ta candidature a été approuvée. Tu es désormais le <strong style="color: #800000;">membre n°${memberNum}</strong> de lost time.`,
       login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> pour parcourir les portraits des membres et entamer une correspondance.`,
-      inviteLabel: "Tu connais quelqu'un à qui ça pourrait plaire ?",
-shareText: `Découvre lost time — un réseau asocial : https://lost-time.org`,
       manifestoTitle: "Manifeste",
       manifestoJuggling: "Pas de jonglage : chaque membre ne peut entretenir qu'une seule correspondance à la fois.",
       manifestoHeyYou: `Pas de « salut toi » : ton premier message à un autre membre doit contenir au moins 34 caractères.`,
       manifestoGhosting: "Pas de fantômisation : tu ne peux mettre fin à une correspondance qu'après avoir répondu, ou si ton correspondant n'a pas répondu depuis plus de 34 heures.",
       manifestoBenching: "Pas de boomerang : si tu mets fin à une correspondance, tu dois attendre 34 jours avant de la reprendre.",
       manifestoPenPals: "Pas d'éternels correspondants (ici) : vous avez droit à 10 messages chacun avant que la correspondance ne se termine automatiquement. Poursuivez la conversation ailleurs si vous vous entendez bien.",
-      changeLabel: "Besoin de modifier ta localisation ou tes réponses ? Envie d'ajouter une autre langue ?",
-      changeText: `Écris à <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a> et nous mettrons ton portrait à jour.`,
+      changeLabel: "Tu veux modifier tes réponses ou ajouter une autre langue ?",
+      changeText: `Va sur ton <a href="https://lost-time.org/profile/${memberNum}" style="color: #800000; text-decoration: underline;">portrait</a> et clique <strong>modifier</strong>. Pour changer ta localisation, écris à <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a>.`,
+      inviteLabel: "Tu connais quelqu'un à qui ça pourrait plaire ?",
+      shareText: `Découvre lost time — un réseau asocial : https://lost-time.org`,
       deleteLabel: "Tu souhaites supprimer ton compte ?",
-      deleteText: `Supprimer ton compte</a> — cela supprimera définitivement ton portrait, tes réponses, tes messages et toutes les données associées.`,
+      deleteLinkText: `Supprimer ton compte`,
+      deleteDescription: `— cela supprimera définitivement ton portrait, tes réponses, tes messages et toutes les données associées.`,
       outro: "Bonne recherche.",
       signoff: "Amitiés,",
       brand: "— lost time",
     },
     it: {
-      subject: `alla ricerca di — socio n°${memberNum}`,
+      subject: `alla ricerca del socio n°${memberNum}`,
       greeting: "Ciao,",
       approved: `La tua candidatura è stata approvata. Sei ora il <strong style="color: #800000;">membro n°${memberNum}</strong> di lost time.`,
       login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> per sfogliare i ritratti dei membri e iniziare corrispondenze.`,
-      inviteLabel: "Conosci qualcuno a cui potrebbe piacere?",
-      shareText: `Scopri lost time — una rete asociale: https://lost-time.org`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "Niente giocoleria: ogni socio può mantenere una sola corrispondenza attiva alla volta.",
-      manifestoHeyYou: `Niente « ciao »: il tuo primo messaggio ad un altro socio deve contenere almeno 34 caratteri.`,
+      manifestoHeyYou: `Niente <i>ciao, come va?</i>: il tuo primo messaggio ad un altro socio deve contenere almeno 34 caratteri.`,
       manifestoGhosting: "Niente ghosting: puoi terminare una corrispondenza solo dopo aver risposto, o se il tuo corrispondente non ha risposto per più di 34 ore.",
       manifestoBenching: "Niente boomerang: se termini una corrispondenza, devi aspettare 34 giorni prima di poterla riprendere.",
       manifestoPenPals: "Niente pen friends (qui): avete 10 messaggi ciascuno prima che la corrispondenza finisca automaticamente. Sposta la conversazione altrove se c'è feeling.",
-      changeLabel: "Hai bisogno di modificare la tua località o le tue risposte? Vuoi aggiungere un'altra lingua?",
-      changeText: `Scrivi ad <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a> e aggiorneremo il tuo ritratto.`,
+      changeLabel: "Vuoi modificare le tue risposte o aggiungere un'altra lingua?",
+      changeText: `Vai sul tuo <a href="https://lost-time.org/profile/${memberNum}" style="color: #800000; text-decoration: underline;">ritratto</a> e clicca <strong>modifica</strong>. Per cambiare la località, scrivi ad <a href='mailto:admin@lost-time.org' style="color: #800000; text-decoration: underline;">admin@lost-time.org</a>.`,
+      inviteLabel: "Conosci qualcuno a cui potrebbe piacere?",
+      shareText: `Scopri lost time — una rete asociale: https://lost-time.org`,
       deleteLabel: "Vuoi eliminare il tuo account?",
-      deleteText: `Elimina il tuo account</a> — questo rimuoverà permanentemente il tuo ritratto, le tue risposte, i messaggi e tutti i dati associati.`,
+      deleteLinkText: `Elimina il tuo account`,
+      deleteDescription: `— questo rimuoverà permanentemente il tuo ritratto, le tue risposte, i messaggi e tutti i dati associati.`,
       outro: "Buona ricerca.",
       signoff: "Saluti,",
       brand: "— lost time",
@@ -134,13 +137,6 @@ shareText: `Découvre lost time — un réseau asocial : https://lost-time.org`,
             <p>${t.greeting}</p>
             <p>${t.approved}</p>
             <p>${t.login}</p>
-            <p style="margin-top: 1em;">
-              <strong>${t.inviteLabel}</strong><br>
-              <a href="sms:?body=${shareBody}" style="color: #800000; text-decoration: underline;">SMS</a> ·
-              <a href="https://wa.me/?text=${shareBody}" style="color: #800000; text-decoration: underline;">WhatsApp</a> ·
-              <a href="https://t.me/share/url?url=${shareUrl}&text=${shareBody}" style="color: #800000; text-decoration: underline;">Telegram</a> ·
-              <a href="https://signal.me/" style="color: #800000; text-decoration: underline;">Signal</a>
-            </p>
             <p style="margin-top: 1.5em; font-weight: bold;">${t.manifestoTitle}</p>
             <ul style="padding-left: 1.2em; margin: 0.5em 0; color: #333;">
               <li style="margin-bottom: 0.5em;">${t.manifestoJuggling}</li>
@@ -154,9 +150,16 @@ shareText: `Découvre lost time — un réseau asocial : https://lost-time.org`,
               <strong>${t.changeLabel}</strong><br>
               ${t.changeText}
             </p>
-            <p style="color: #444; font-size: 0.95em;">
+            <p style="margin-top: 1em;">
+              <strong>${t.inviteLabel}</strong><br>
+              <a href="sms:?body=${shareBody}" style="color: #800000; text-decoration: underline;">SMS</a> ·
+              <a href="https://wa.me/?text=${shareBody}" style="color: #800000; text-decoration: underline;">WhatsApp</a> ·
+              <a href="https://t.me/share/url?url=${shareUrl}&text=${shareBody}" style="color: #800000; text-decoration: underline;">Telegram</a> ·
+              <a href="https://signal.me/" style="color: #800000; text-decoration: underline;">Signal</a>
+            </p>
+            <p style="color: #444; font-size: 0.95em; margin-top: 1em;">
               <strong>${t.deleteLabel}</strong><br>
-              <a href="${deleteUrl}" style="color: #800000; text-decoration: underline;">${t.deleteText}
+              <a href="${deleteUrl}" style="color: #800000; text-decoration: underline;">${t.deleteLinkText}</a> ${t.deleteDescription}
             </p>
             <p style="margin-top: 1.5em;">${t.outro}</p>
             <p>${t.signoff}</p>
