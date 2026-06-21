@@ -76,7 +76,11 @@ const Apply = () => {
         } else {
           setAnswers(loadedAnswers);
           if (d.completedLangs) setCompletedLangs(new Set(d.completedLangs));
-          if (d.activeLang) setActiveLang(d.activeLang);
+          // Only restore activeLang if user has actually started answering
+          const hasStartedAnswering = Object.values(loadedAnswers).some(
+            (langAnswers: any) => Object.values(langAnswers).some((a: any) => typeof a === "string" && a.trim().length > 0)
+          );
+          if (hasStartedAnswering && d.activeLang) setActiveLang(d.activeLang);
         }
       } catch {}
     }
