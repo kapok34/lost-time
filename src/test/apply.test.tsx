@@ -5,7 +5,7 @@ import { HelmetProvider } from "react-helmet-async";
 import Apply from "../pages/Apply";
 import { AuthProvider } from "../hooks/useAuth";
 import { I18nProvider } from "../i18n/context";
-import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS, QUESTIONNAIRE_LANG_LABELS } from "../data/questions";
+import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS } from "../data/questions";
 
 // Mock supabase client
 vi.mock("@/integrations/supabase/client", () => ({
@@ -128,7 +128,7 @@ describe("Application submission flow", () => {
     // Select a questionnaire language from the dropdown
     const langSelect = screen.getByRole("combobox", { name: /questionnaire language/i });
     fireEvent.click(langSelect);
-    const englishOption = await screen.findByRole("option", { name: /English/i });
+    const englishOption = await screen.findByRole("option", { name: "EN" });
     fireEvent.click(englishOption);
 
     await waitFor(() => {
@@ -154,7 +154,7 @@ describe("Application submission flow", () => {
     // Select a questionnaire language from the dropdown
     const langSelect = screen.getByRole("combobox", { name: /questionnaire language/i });
     fireEvent.click(langSelect);
-    const englishOption = await screen.findByRole("option", { name: /English/i });
+    const englishOption = await screen.findByRole("option", { name: "EN" });
     fireEvent.click(englishOption);
 
     await waitFor(() => {
@@ -229,7 +229,7 @@ describe("Language selection flow", () => {
     fireEvent.click(langSelect);
 
     // Select English
-    const englishOption = await screen.findByRole("option", { name: /English/i });
+    const englishOption = await screen.findByRole("option", { name: "EN" });
     fireEvent.click(englishOption);
 
     // Now the first question should be visible
@@ -249,7 +249,7 @@ describe("Language selection flow", () => {
     // Open the language selector and pick French
     const langSelect = screen.getByRole("combobox", { name: /questionnaire language/i });
     fireEvent.click(langSelect);
-    const frenchOption = await screen.findByRole("option", { name: /Français/i });
+    const frenchOption = await screen.findByRole("option", { name: "FR" });
     fireEvent.click(frenchOption);
 
     await waitFor(() => {
@@ -287,7 +287,7 @@ describe("Language selection flow", () => {
     // Open the language selector and pick English
     const langSelect = screen.getByRole("combobox", { name: /questionnaire language/i });
     fireEvent.click(langSelect);
-    const englishOption = await screen.findByRole("option", { name: /English/i });
+    const englishOption = await screen.findByRole("option", { name: "EN" });
     fireEvent.click(englishOption);
 
     await waitFor(() => {
@@ -296,7 +296,7 @@ describe("Language selection flow", () => {
 
     // Open again and switch to French
     fireEvent.click(langSelect);
-    const frenchOption = await screen.findByRole("option", { name: /Français/i });
+    const frenchOption = await screen.findByRole("option", { name: "FR" });
     fireEvent.click(frenchOption);
 
     // English questions should disappear, French prompt should appear
@@ -315,7 +315,7 @@ describe("Language selection flow", () => {
     await waitFor(() => {
       QUESTIONNAIRE_LANGS.forEach((l) => {
         expect(
-          screen.getByRole("option", { name: new RegExp(QUESTIONNAIRE_LANG_LABELS[l], "i") })
+          screen.getByRole("option", { name: l.toUpperCase() })
         ).toBeInTheDocument();
       });
     });

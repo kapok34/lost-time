@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS, QUESTIONNAIRE_LANG_LABELS } from "@/data/questions";
+import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS } from "@/data/questions";
 import { COUNTRIES, toEnglishCountry } from "@/data/countries";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
@@ -308,7 +308,7 @@ const Apply = () => {
                 <SelectContent align="end" side="bottom" sideOffset={4} position="popper" className="min-w-[140px]">
                   {QUESTIONNAIRE_LANGS.map((l) => (
                     <SelectItem key={l} value={l} className="font-sans-ui text-sm cursor-pointer">
-                      {QUESTIONNAIRE_LANG_LABELS[l]} <span className="opacity-70">({l.toUpperCase()})</span>{completedLangs.has(l) ? ' ✓' : ''}
+                      {l.toUpperCase()}{completedLangs.has(l) ? ' ✓' : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>
