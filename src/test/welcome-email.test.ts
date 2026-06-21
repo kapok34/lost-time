@@ -31,6 +31,8 @@ describe("welcome-member edge function", () => {
       RESEND_API_KEY: "re_test_key",
       SUPABASE_URL: "https://test.supabase.co",
       SB_SERVICE_ROLE_KEY: "test_service_role",
+      INTERNAL_API_KEY: "test_internal_key",
+      SUPABASE_SECRET_KEYS: JSON.stringify({ default: "test_service_role" }),
     };
   });
 
@@ -42,6 +44,7 @@ describe("welcome-member edge function", () => {
   it("returns 400 when member_id is missing", async () => {
     const req = new Request("https://test.supabase.co", {
       method: "POST",
+      headers: { apikey: "test_internal_key" },
       body: JSON.stringify({}),
     });
     const res = await handler(req);
@@ -56,6 +59,7 @@ describe("welcome-member edge function", () => {
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
+      headers: { apikey: "test_internal_key" },
       body: JSON.stringify({ member_id: "non-existent" }),
     });
     const res = await handler(req);
@@ -70,6 +74,7 @@ describe("welcome-member edge function", () => {
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
+      headers: { apikey: "test_internal_key" },
       body: JSON.stringify({ member_id: "user-1" }),
     });
     const res = await handler(req);
@@ -85,6 +90,7 @@ describe("welcome-member edge function", () => {
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
+      headers: { apikey: "test_internal_key" },
       body: JSON.stringify({ member_id: "user-1" }),
     });
     const res = await handler(req);
@@ -97,12 +103,16 @@ describe("welcome-member edge function", () => {
     const payload = JSON.parse(callInit.body);
 
     expect(payload.to).toEqual(["alice@example.com"]);
-    expect(payload.subject).toBe("In search of — member #7");
+    expect(payload.subject).toBe("in search of member no.7");
     expect(payload.html).toContain("Hello,");
-    expect(payload.html).toContain("member #7");
+    expect(payload.html).toContain("member no.7");
     expect(payload.html).toContain("https://lost-time.org/delete-account");
-    expect(payload.html).toContain("Need to change your location or your answers? Want to add another language?");
-    expect(payload.html).toContain("Write to admin@lost-time.org");
+    expect(payload.html).toContain("sms:");
+    expect(payload.html).toContain("signal.me");
+    expect(payload.html).toContain("mailto:?subject=");
+    expect(payload.html).toContain("Need to edit your answers or add another language?");
+    expect(payload.html).toContain("https://lost-time.org/profile/7");
+    expect(payload.html).toContain("mailto:admin@lost-time.org");
   });
 
   it("sends a French welcome email when language is fr", async () => {
@@ -114,6 +124,7 @@ describe("welcome-member edge function", () => {
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
+      headers: { apikey: "test_internal_key" },
       body: JSON.stringify({ member_id: "user-2" }),
     });
     const res = await handler(req);
@@ -126,11 +137,12 @@ describe("welcome-member edge function", () => {
     const payload = JSON.parse(callInit.body);
 
     expect(payload.to).toEqual(["beatrice@example.com"]);
-    expect(payload.subject).toBe("À la recherche de — membre #8");
+    expect(payload.subject).toBe("à la recherche du membre n°8");
     expect(payload.html).toContain("Bonjour,");
-    expect(payload.html).toContain("membre #8");
+    expect(payload.html).toContain("membre n°8");
     expect(payload.html).toContain("lost-time.org");
     expect(payload.html).toContain("admin@lost-time.org");
+    expect(payload.html).toContain("wa.me");
     expect(payload.html).toContain("Bonne recherche.");
   });
 
@@ -143,6 +155,7 @@ describe("welcome-member edge function", () => {
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
+      headers: { apikey: "test_internal_key" },
       body: JSON.stringify({ member_id: "user-3" }),
     });
     const res = await handler(req);
@@ -155,10 +168,11 @@ describe("welcome-member edge function", () => {
     const payload = JSON.parse(callInit.body);
 
     expect(payload.to).toEqual(["carlo@example.com"]);
-    expect(payload.subject).toBe("Alla ricerca di — socio #9");
+    expect(payload.subject).toBe("alla ricerca del socio n°9");
     expect(payload.html).toContain("Ciao,");
-    expect(payload.html).toContain("membro #9");
+    expect(payload.html).toContain("membro n°9");
     expect(payload.html).toContain("admin@lost-time.org");
+    expect(payload.html).toContain("t.me");
     expect(payload.html).toContain("Buona ricerca.");
   });
 
@@ -171,6 +185,7 @@ describe("welcome-member edge function", () => {
 
     const req = new Request("https://test.supabase.co", {
       method: "POST",
+      headers: { apikey: "test_internal_key" },
       body: JSON.stringify({ member_id: "user-1" }),
     });
     const res = await handler(req);
