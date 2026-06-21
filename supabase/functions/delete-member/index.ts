@@ -3,7 +3,26 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 serve(async (req) => {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-  const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS")!);
+
+  let serviceRoleKey: string | null = null;
+  try {
+    const raw = Deno.env.get("SUPABASE_SECRET_KEYS");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      serviceRoleKey = parsed?.default ?? null;
+    }
+  } catch { /* ignore */ }
+  if (!serviceRoleKey) {
+    serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? null;
+  }
+  if (!serviceRoleKey) {
+    console.error("Missing Supabase service role key");
+    return new Response(
+      JSON.stringify({ error: "Server configuration error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
@@ -15,7 +34,7 @@ serve(async (req) => {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEYS['default'], {
+  const supabase = createClient(SUPABASE_URL, serviceRoleKey, {
     auth: { persistSession: false },
   });
 
