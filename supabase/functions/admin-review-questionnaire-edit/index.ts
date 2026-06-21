@@ -1,7 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 export async function handler(req: Request): Promise<Response> {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
   // Validate caller is admin via auth token
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -171,7 +181,7 @@ export async function handler(req: Request): Promise<Response> {
 
     return new Response(
       JSON.stringify({ success: true, action: "approved" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } else {
     // Reject
@@ -241,7 +251,7 @@ export async function handler(req: Request): Promise<Response> {
 
     return new Response(
       JSON.stringify({ success: true, action: "rejected" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 }
