@@ -63,6 +63,7 @@ const Admin = () => {
   const [reviewingEditId, setReviewingEditId] = useState<string | null>(null);
   const [editRejectionReason, setEditRejectionReason] = useState("");
   const [processingEdit, setProcessingEdit] = useState(false);
+  const [reviewOriginalAnswers, setReviewOriginalAnswers] = useState<Record<string, Record<number, string>>>({});
 
   const load = async () => {
     const { data } = await supabase
@@ -290,6 +291,14 @@ const Admin = () => {
       ansMap[edit.lang][Number(qid)] = answer;
     });
     setAnswers((prev) => ({ ...prev, ...ansMap }));
+    const origMap: Record<string, Record<number, string>> = {};
+    if (edit.original_answers) {
+      origMap[edit.lang] = {};
+      Object.entries(edit.original_answers).forEach(([qid, answer]) => {
+        origMap[edit.lang][Number(qid)] = answer;
+      });
+    }
+    setReviewOriginalAnswers(origMap);
     setOpenId(edit.user_id);
     setEditMode(false);
   };
@@ -297,6 +306,7 @@ const Admin = () => {
   const closeEditReview = () => {
     setReviewingEditId(null);
     setOpenId(null);
+    setReviewOriginalAnswers({});
   };
 
   const approveEdit = async (editId: string) => {
@@ -688,16 +698,44 @@ const Admin = () => {
                           ))}
                         </div>
                       ) : (
-                        qs.map((q) => (
-                          <div key={q.id}>
-                            <h3 className="font-display text-lg mb-1">
-                              <span className="text-primary mr-2">{q.id}.</span>{q.text}
-                            </h3>
-                            <p className="leading-relaxed whitespace-pre-wrap">
-                              {answers[currentLang]?.[q.id] || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
-                            </p>
-                          </div>
-                        ))
+                        qs.map((q) => {
+                          const orig = reviewOriginalAnswers[currentLang]?.[q.id];
+                          const newAns = answers[currentLang]?.[q.id];
+                          const isChanged = orig !== undefined && newAns !== undefined && orig !== newAns;
+                          const isNew = orig === undefined && newAns !== undefined && newAns.length > 0;
+                          const isDeleted = orig !== undefined && (newAns === undefined || newAns === "");
+                          return (
+                            <div key={q.id}>
+                              <h3 className="font-display text-lg mb-1">
+                                <span className="text-primary mr-2">{q.id}.</span>{q.text}
+                              </h3>
+                              {isChanged ? (
+                                <div className="space-y-1">
+                                  <p className="leading-relaxed whitespace-pre-wrap text-muted-foreground line-through">
+                                    {orig}
+                                  </p>
+                                  <p className="leading-relaxed whitespace-pre-wrap font-medium">
+                                    {newAns}
+                                  </p>
+                                </div>
+                              ) : isNew ? (
+                                <p className="leading-relaxed whitespace-pre-wrap">
+                                  <span className="text-xs font-sans-ui bg-[hsl(350,55%,35%)] text-white px-1.5 py-0.5 rounded mr-2">NEW</span>
+                                  {newAns}
+                                </p>
+                              ) : isDeleted ? (
+                                <p className="leading-relaxed whitespace-pre-wrap text-muted-foreground line-through">
+                                  {orig}
+                                  <span className="text-xs font-sans-ui ml-2">deleted</span>
+                                </p>
+                              ) : (
+                                <p className="leading-relaxed whitespace-pre-wrap">
+                                  {newAns || <span className="text-muted-foreground italic">{t("profile.noAnswer")}</span>}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })
                       )}
                     </>
                   );
