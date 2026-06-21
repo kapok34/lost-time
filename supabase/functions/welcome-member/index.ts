@@ -55,6 +55,8 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Hello,",
       approved: `Your application has been approved. You are now lost time's <strong style="color: #800000;">member no.${memberNum}</strong>.`,
       login: `You can log in at <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> to browse members' portraits and begin corresponding.`,
+      inviteLabel: "Know someone who might like this?",
+      shareText: `Check out lost time — an asocial network: https://lost-time.org`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "No juggling: each member can hold only one active correspondence at a time.",
       manifestoHeyYou: `No "hey you": your first message to another member must contain at least 34 characters.`,
@@ -74,6 +76,8 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Bonjour,",
       approved: `Ta candidature a été approuvée. Tu es désormais le <strong style="color: #800000;">membre n°${memberNum}</strong> de lost time.`,
       login: `Tu peux te connecter sur <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> pour parcourir les portraits des membres et entamer une correspondance.`,
+      inviteLabel: "Tu as des amis à qui ça pourrait plaire ?",
+      shareText: `Découvre lost time — un féseau asociale : https://lost-time.org`,
       manifestoTitle: "Manifeste",
       manifestoJuggling: "Pas de jonglage : chaque membre ne peut entretenir qu'une seule correspondance à la fois.",
       manifestoHeyYou: `Pas de « salut toi » : ton premier message à un autre membre doit contenir au moins 34 caractères.`,
@@ -93,6 +97,8 @@ export async function handler(req: Request): Promise<Response> {
       greeting: "Ciao,",
       approved: `La tua candidatura è stata approvata. Sei ora il <strong style="color: #800000;">membro n°${memberNum}</strong> di lost time.`,
       login: `Puoi accedere su <a href="https://lost-time.org/login" style="color: #800000; text-decoration: underline;">lost-time.org</a> per sfogliare i ritratti dei membri e iniziare corrispondenze.`,
+      inviteLabel: "Conosci amici a cui potrebbe piacere?",
+      shareText: `Scopri lost time — una rete asociale: https://lost-time.org`,
       manifestoTitle: "Manifesto",
       manifestoJuggling: "Niente giocoleria: ogni socio può mantenere una sola corrispondenza attiva alla volta.",
       manifestoHeyYou: `Niente « ciao »: il tuo primo messaggio ad un altro socio deve contenere almeno 34 caratteri.`,
@@ -108,6 +114,9 @@ export async function handler(req: Request): Promise<Response> {
       brand: "— lost time",
     },
   }[lang];
+
+  const shareBody = encodeURIComponent(t.shareText);
+  const shareUrl = encodeURIComponent("https://lost-time.org");
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -125,6 +134,13 @@ export async function handler(req: Request): Promise<Response> {
             <p>${t.greeting}</p>
             <p>${t.approved}</p>
             <p>${t.login}</p>
+            <p style="margin-top: 1em;">
+              <strong>${t.inviteLabel}</strong><br>
+              <a href="sms:?body=${shareBody}" style="display:inline-block;margin:4px 4px 4px 0;padding:6px 12px;background:#800000;color:#fff;text-decoration:none;border-radius:3px;font-size:0.9em;font-family:Georgia,serif;">SMS</a>
+              <a href="https://wa.me/?text=${shareBody}" style="display:inline-block;margin:4px 4px 4px 0;padding:6px 12px;background:#800000;color:#fff;text-decoration:none;border-radius:3px;font-size:0.9em;font-family:Georgia,serif;">WhatsApp</a>
+              <a href="https://t.me/share/url?url=${shareUrl}&text=${shareBody}" style="display:inline-block;margin:4px 4px 4px 0;padding:6px 12px;background:#800000;color:#fff;text-decoration:none;border-radius:3px;font-size:0.9em;font-family:Georgia,serif;">Telegram</a>
+              <a href="https://signal.me/" style="display:inline-block;margin:4px 4px 4px 0;padding:6px 12px;background:#800000;color:#fff;text-decoration:none;border-radius:3px;font-size:0.9em;font-family:Georgia,serif;">Signal</a>
+            </p>
             <p style="margin-top: 1.5em; font-weight: bold;">${t.manifestoTitle}</p>
             <ul style="padding-left: 1.2em; margin: 0.5em 0; color: #333;">
               <li style="margin-bottom: 0.5em;">${t.manifestoJuggling}</li>
