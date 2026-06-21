@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS } from "@/data/questions";
+import { getQuestions, TOTAL_QUESTIONS, QUESTIONNAIRE_LANGS, QUESTIONNAIRE_LANG_LABELS } from "@/data/questions";
 import { COUNTRIES, toEnglishCountry } from "@/data/countries";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/i18n/context";
@@ -52,9 +52,7 @@ const Apply = () => {
     it: "it",
   };
 
-  const [activeLang, setActiveLang] = useState<QuestionnaireLang>(
-    UI_DEFAULT_LANG[lang as "en" | "fr" | "it"] ?? "en"
-  );
+  const [activeLang, setActiveLang] = useState<QuestionnaireLang | "">("");
   const [completedLangs, setCompletedLangs] = useState<Set<QuestionnaireLang>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -74,9 +72,11 @@ const Apply = () => {
         // Migrate from old single-language format if needed
         if (loadedAnswers["1"] !== undefined || loadedAnswers[1] !== undefined) {
           setAnswers({ [d.activeLang ?? "en"]: loadedAnswers });
+          setActiveLang(d.activeLang ?? "");
         } else {
           setAnswers(loadedAnswers);
           if (d.completedLangs) setCompletedLangs(new Set(d.completedLangs));
+          if (d.activeLang) setActiveLang(d.activeLang);
         }
       } catch {}
     }
@@ -85,7 +85,7 @@ const Apply = () => {
   // Persist draft (without password)
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      email, city, country, answers, activeLang, completedLangs: Array.from(completedLangs)
+      email, city, country, answers, activeLang: activeLang || null, completedLangs: Array.from(completedLangs)
     }));
   }, [email, city, country, answers, activeLang, completedLangs]);
 
@@ -93,7 +93,7 @@ const Apply = () => {
   useEffect(() => {
     const flush = () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        email, city, country, answers, activeLang, completedLangs: Array.from(completedLangs)
+        email, city, country, answers, activeLang: activeLang || null, completedLangs: Array.from(completedLangs)
       }));
     };
     window.addEventListener("pagehide", flush);
@@ -127,7 +127,7 @@ const Apply = () => {
     }
   }, [loading, user, profile, submitted, navigate]);
 
-  const questions = useMemo(() => getQuestions(activeLang), [activeLang]);
+  const questions = useMemo(() => activeLang ? getQuestions(activeLang) : [], [activeLang]);
 
   const validCount = useMemo(
     () => questions.filter((q) => {
@@ -153,10 +153,14 @@ const Apply = () => {
     setCompletedLangs(next);
   }, [answers]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const setAnswer = (id: number, val: string) => setAnswers((a) => ({
-    ...a,
-    [activeLang]: { ...(a[activeLang] ?? {}), [id]: val },
-  }));
+
+  const setAnswer = (id: number, val: string) => {
+    if (!activeLang) return;
+    setAnswers((a) => ({
+      ...a,
+      [activeLang]: { ...(a[activeLang] ?? {}), [id]: val },
+    }));
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,56 +303,65 @@ const Apply = () => {
               <Select value={activeLang} onValueChange={(val) => setActiveLang(val as QuestionnaireLang)}>
                 <SelectTrigger className="w-auto min-w-[80px] bg-transparent border-none font-sans-ui gap-1 px-1.5" aria-label="Questionnaire language">
                   <Globe size={20} className="text-muted-foreground" />
-                  <span className="text-muted-foreground">{activeLang.toUpperCase()}</span>
+                  <SelectValue placeholder={t("apply.selectQuestionnaireLangs")} />
                 </SelectTrigger>
-                <SelectContent align="end" side="bottom" sideOffset={4} position="popper" className="min-w-[80px]">
+                <SelectContent align="end" side="bottom" sideOffset={4} position="popper" className="min-w-[140px]">
                   {QUESTIONNAIRE_LANGS.map((l) => (
                     <SelectItem key={l} value={l} className="font-sans-ui text-sm cursor-pointer">
-                      {l.toUpperCase()}{completedLangs.has(l) ? ' ✓' : ''}
+                      {QUESTIONNAIRE_LANG_LABELS[l]} <span className="opacity-70">({l.toUpperCase()})</span>{completedLangs.has(l) ? ' ✓' : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <p className="text-sm text-muted-foreground italic">
-              {completedLangs.size === 0
-                ? t("apply.questionnairePrompt.zero")
-                : completedLangs.size === 1
-                ? (() => {
-                    const completed = Array.from(completedLangs)[0];
-                    const others = QUESTIONNAIRE_LANGS
-                      .filter((l) => l !== completed)
-                      .map((l) => l.toUpperCase())
-                      .join(" / ");
-                    return t("apply.questionnairePrompt.one")
-                      .replace("{lang}", completed.toUpperCase())
-                      .replace("{other}", others);
-                  })()
-                : `Completed in ${Array.from(completedLangs).map((l) => l.toUpperCase()).join(", ")}.`}
-            </p>
-            {questions.map((q) => {
-              const langAnswers = answers[activeLang] ?? {};
-              return (
-                <div key={q.id} className="space-y-2">
-                  <Label className="font-cormorant text-xl leading-snug">
-                    <span className="text-foreground mr-2">{q.id}.</span>{q.text}
-                  </Label>
-                  <div className="relative">
-                    <Textarea
-                      rows={3}
-                      minLength={3}
-                      maxLength={200}
-                      value={langAnswers[q.id] ?? ""}
-                      onChange={(e) => setAnswer(q.id, e.target.value)}
-                      className="bg-white border-input pr-12"
-                    />
-                    <div className="absolute bottom-1.5 right-2 text-[10px] text-muted-foreground pointer-events-none">
-                      {(langAnswers[q.id] ?? "").length}/200
+
+            {!activeLang ? (
+              <p className="text-sm text-muted-foreground italic">
+                {t("apply.selectQuestionnaireLangPrompt")}
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground italic">
+                  {completedLangs.size === 0
+                    ? t("apply.questionnairePrompt.zero")
+                    : completedLangs.size === 1
+                    ? (() => {
+                        const completed = Array.from(completedLangs)[0];
+                        const others = QUESTIONNAIRE_LANGS
+                          .filter((l) => l !== completed)
+                          .map((l) => l.toUpperCase())
+                          .join(" / ");
+                        return t("apply.questionnairePrompt.one")
+                          .replace("{lang}", completed.toUpperCase())
+                          .replace("{other}", others);
+                      })()
+                    : `Completed in ${Array.from(completedLangs).map((l) => l.toUpperCase()).join(", ")}.`}
+                </p>
+                {questions.map((q) => {
+                  const langAnswers = answers[activeLang] ?? {};
+                  return (
+                    <div key={q.id} className="space-y-2">
+                      <Label className="font-cormorant text-xl leading-snug">
+                        <span className="text-foreground mr-2">{q.id}.</span>{q.text}
+                      </Label>
+                      <div className="relative">
+                        <Textarea
+                          rows={3}
+                          minLength={3}
+                          maxLength={200}
+                          value={langAnswers[q.id] ?? ""}
+                          onChange={(e) => setAnswer(q.id, e.target.value)}
+                          className="bg-white border-input pr-12"
+                        />
+                        <div className="absolute bottom-1.5 right-2 text-[10px] text-muted-foreground pointer-events-none">
+                          {(langAnswers[q.id] ?? "").length}/200
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </>
+            )}
           </section>
 
           <div className="flex justify-center gap-3">
@@ -362,6 +375,7 @@ const Apply = () => {
                   setCity("");
                   setCountry("");
                   setAnswers({});
+                  setActiveLang("");
                   setCompletedLangs(new Set());
                   
                 }
