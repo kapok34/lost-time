@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 lighthouse-report.report.html
 lighthouse-report.report.json
+
+# Supabase CLI local artifacts (contain DB credentials)
+supabase/.temp/
+
+# Local env
+.env
